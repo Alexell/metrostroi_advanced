@@ -27,6 +27,9 @@ train_list["gmod_subway_81-722"] 			= "81-722 (Юбилейный)"
 for k, v in pairs (train_list) do
 	ULib.ucl.registerAccess(k, ULib.ACCESS_ALL, "Спавн состава "..v, CATEGORY_NAME)
 end
+ULib.ucl.registerAccess("add_1wagons", ULib.ACCESS_ADMIN, "Спавн на 1 вагон больше", CATEGORY_NAME)
+ULib.ucl.registerAccess("add_2wagons", ULib.ACCESS_ADMIN, "Спавн на 2 вагона больше", CATEGORY_NAME)
+ULib.ucl.registerAccess("add_3wagons", ULib.ACCESS_ADMIN, "Спавн на 3 вагона больше", CATEGORY_NAME)
 
 -- Получение местоположения состава
 local function GetTrainLoc(ent)

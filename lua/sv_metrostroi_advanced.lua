@@ -10,10 +10,11 @@
 if CLIENT then return end
 local CATEGORY_NAME = "Metrostroi Advanced"
 
---CVars
-local spawn_int = CreateConVar("metrostroi_spawn_interval", "0", {FCVAR_NEVER_AS_STRING})
-local train_rest = CreateConVar("metrostroi_trains_restrict", "0", {FCVAR_NEVER_AS_STRING})
-local spawn_mes = CreateConVar("metrostroi_spawn_message", "1", {FCVAR_NEVER_AS_STRING})
+-- CVars
+local spawn_int = CreateConVar("metrostroi_advanced_spawninterval", "0", {FCVAR_NEVER_AS_STRING})
+local train_rest = CreateConVar("metrostroi_advanced_trainsrestrict", "0", {FCVAR_NEVER_AS_STRING})
+local spawn_mes = CreateConVar("metrostroi_advanced_spawnmessage", "1", {FCVAR_NEVER_AS_STRING})
+local max_wags = CreateConVar("metrostroi_advanced_maxwagons", "4", {FCVAR_NEVER_AS_STRING})
 
 local train_list = {}
 train_list["gmod_subway_81-502"] 			= "81-502 (Ема-502)"
@@ -113,8 +114,8 @@ end
 
 hook.Add("MetrostroiSpawnerRestrict","TrainSpawnerLimits",function(ply,settings)
 	if IsValid(ply) then
-		--задержка спавна
-		local spawnint = GetConVarNumber("metrostroi_spawn_interval")
+		-- задержка спавна
+		local spawnint = GetConVarNumber("metrostroi_advanced_spawninterval")
 		if (spawnint > 0) then
 			local lastspawn = GetGlobalInt("TrainLastSpawned",0)
 			local curtime = os.time()
@@ -126,8 +127,8 @@ hook.Add("MetrostroiSpawnerRestrict","TrainSpawnerLimits",function(ply,settings)
 			end
 		end
 		
-		--ограничение составов по правам ULX
-		local train_restrict = GetConVarNumber("metrostroi_trains_restrict")
+		-- ограничение составов по правам ULX
+		local train_restrict = GetConVarNumber("metrostroi_advanced_trainsrestrict")
 		local train = settings.Train
 		
 		if (train_restrict == 1) then
@@ -143,8 +144,29 @@ hook.Add("MetrostroiSpawnerRestrict","TrainSpawnerLimits",function(ply,settings)
 			end
 		end
 		
+		-- лимиты вагонов
+		local max_wagons = GetConVarNumber("metrostroi_advanced_maxwagons")
+		local wag_awail = max_wagons
+		if (ULib.ucl.query(ply,"add_3wagons")) then
+			wag_awail = wag_awail + 3
+		else
+			if (ULib.ucl.query(ply,"add_2wagons")) then
+				wag_awail = wag_awail + 2
+			else
+				if (ULib.ucl.query(ply,"add_1wagons")) then
+					wag_awail = wag_awail + 1
+				end
+			end
+		end
+		
+		if (settings.WagNum > wag_awail) then
+			ply:ChatPrint("Вы не можете спавнить столько вагонов!")
+			ply:ChatPrint("Вам доступно: "..wag_awail.." вагона(ов).")
+			return true
+		end
+		
 		-- спавн разрешен
-		local spawnmes = GetConVarNumber("metrostroi_spawn_message")
+		local spawnmes = GetConVarNumber("metrostroi_advanced_spawnmessage")
 		if (spawnmes == 1) then
 			local wag_str = "вагон"
 			local wag_num = settings.WagNum
