@@ -110,6 +110,90 @@ local sts = ulx.command( CATEGORY_NAME, "ulx stations", ulx.sts, "!stations" )
 sts:defaultAccess( ULib.ACCESS_ALL )
 sts:help( "Список станций на карте." )
 
+-- Замена !station
+function ulx.tps( calling_ply,station )
+        station = string.PatternSafe(station:lower())
+
+        --Обработка сообщений вида станция:номер для станций, которые имеют несколько позиций
+        local add = 0
+        if station:find("[^:]+:%d+$") then
+            local st,en = station:find(":%d+$")
+            add = tonumber(station:sub(st+1,en))
+            station = station:sub(1,st-1)
+        end
+
+        --Проверка на наличие таблицы
+        if not Metrostroi.StationConfigurations then ULib.tsayError( calling_ply, "Карта не сконфигурирована!", true ) return end
+
+        --Создание массива найденых станций по индкесу станции или куска имени
+        local st = {}
+        for k,v in pairs(Metrostroi.StationConfigurations) do
+            if not v.positions then continue end
+            if v.names then
+                for _,stat in pairs(v.names) do
+                    if stat:lower():find(station) then
+                        table.insert(st,k)
+                        break
+                    end
+                end
+            end
+            if tostring(k):find(station) then
+                table.insert(st,k)
+            end
+        end
+
+        if #st == 0 then
+            ULib.tsayError( calling_ply, Format("Станция не найдена: %s",station), true )
+            return
+        elseif #st > 1 then
+            ULib.tsayError( calling_ply,  Format("Найдено больше одной станции по запросу %s:",station), true )
+            for k,v in pairs(st) do
+                local tbl = Metrostroi.StationConfigurations[v]
+                if tbl.names and tbl.names[1] then
+                    ULib.tsayError( calling_ply, Format("\t%s=%s",v,tbl.names[1]), true )
+                else
+                    ULib.tsayError( calling_ply, Format("\t%s",k), true )
+                end
+            end
+            ULib.tsayError( calling_ply, "Введите более точное название или ID станции!", true )
+            return
+        end
+        local key = st[1]
+        st = Metrostroi.StationConfigurations[key]
+        local ptbl
+        if add > 0 then
+            local pos = st.positions
+            ptbl = pos[math.min(#pos,add+1)]
+        else
+            ptbl = st.positions and st.positions[1]
+        end
+        if IsValid(calling_ply) then
+            if ptbl and ptbl[1] then
+                if calling_ply:InVehicle() then calling_ply:ExitVehicle() end
+                calling_ply.ulx_prevpos = calling_ply:GetPos()--ulx return
+                calling_ply.ulx_prevang = calling_ply:EyeAngles()
+                calling_ply:SetPos(ptbl[1])
+                calling_ply:SetAngles(ptbl[2])
+                calling_ply:SetEyeAngles(ptbl[2])
+                ulx.fancyLogAdmin( calling_ply, "#A телепортировался на станцию #s", st.names and st.names[1] or key)
+            else
+                ULib.tsayError( calling_ply, "Ошибка конфигурации для станции "..key, true )
+                ulx.fancyLogAdmin( calling_ply, "Ошибка конфигурации для станции #s", key)
+            end
+
+        else
+            if ptbl and ptbl[1] then
+                print(Format("DEBUG1:Teleported to %s(%s) pos:%s ang:%s",st.names and st.names[1] or key,key,ptbl[1],ptbl[2]))
+            else
+                ulx.fancyLogAdmin( calling_ply, "Ошибка конфигурации для станции #s", station:gsub("^%l", string.upper))
+            end
+        end
+end
+local tps = ulx.command( "Metrostroi", "ulx station", ulx.tps, "!station" )
+tps:addParam{ type=ULib.cmds.StringArg, hint="Станция или ее номер", ULib.cmds.takeRestOfLine }
+tps:defaultAccess( ULib.ACCESS_ALL )
+tps:help( "Телепорт по станциям." )
+
 -- Замена !trains
 local wagonswaittime = 10
 local wagonslasttime = -wagonswaittime
@@ -190,3 +274,11 @@ end
 local wagons = ulx.command( "Metrostroi", "ulx trains", ulx.wagons, "!trains" )
 wagons:defaultAccess( ULib.ACCESS_ALL )
 wagons:help( "Информация о составах на сервере." )
+
+-- чат-команда для высадки пассажиров
+function ulx.expass( calling_ply )
+	calling_ply:ConCommand("metrostroi_expel_passengers")
+end
+local exps = ulx.command( CATEGORY_NAME, "ulx expass", ulx.expass, "!expass" )
+exps:defaultAccess( ULib.ACCESS_ALL )
+exps:help( "Высадить всех пассажиров." )
