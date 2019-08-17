@@ -23,6 +23,11 @@ train_list["gmod_subway_81-720"] 			= "81-720 (Яуза)"
 train_list["gmod_subway_81-722"] 			= "81-722 (Юбилейный)"
 --train_list["gmod_subway_81-760"] 			= "81-760 (Ока)"
 
+-- Регистрация прав ULX
+for k, v in pairs (train_list) do
+	ULib.ucl.registerAccess(k, ULib.ACCESS_ALL, "Спавн состава "..v, CATEGORY_NAME)
+end
+
 -- Получение местоположения состава
 local function GetTrainLoc(ent)
 	local train_station = ""
