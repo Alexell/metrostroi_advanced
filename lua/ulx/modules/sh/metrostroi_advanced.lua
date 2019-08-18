@@ -23,14 +23,6 @@ train_list["gmod_subway_81-720"] 			= "81-720 (Яуза)"
 train_list["gmod_subway_81-722"] 			= "81-722 (Юбилейный)"
 --train_list["gmod_subway_81-760"] 			= "81-760 (Ока)"
 
--- Регистрация прав ULX
-for k, v in pairs (train_list) do
-	ULib.ucl.registerAccess(k, ULib.ACCESS_ALL, "Спавн состава "..v, CATEGORY_NAME)
-end
-ULib.ucl.registerAccess("add_1wagons", ULib.ACCESS_ADMIN, "Спавн на 1 вагон больше", CATEGORY_NAME)
-ULib.ucl.registerAccess("add_2wagons", ULib.ACCESS_ADMIN, "Спавн на 2 вагона больше", CATEGORY_NAME)
-ULib.ucl.registerAccess("add_3wagons", ULib.ACCESS_ADMIN, "Спавн на 3 вагона больше", CATEGORY_NAME)
-
 -- Получение местоположения состава
 local function GetTrainLoc(ent)
 	local train_station = ""
@@ -114,7 +106,7 @@ function ulx.sts( calling_ply )
 		ULib.tsayColor(nil,false,Color(219, 116, 32),k.." - "..v.names[1])
 	end
 end
-local sts = ulx.command( CATEGORY_NAME, "ulx stations", ulx.sts, "!stations" )
+local sts = ulx.command(CATEGORY_NAME, "ulx stations", ulx.sts, "!stations" )
 sts:defaultAccess( ULib.ACCESS_ALL )
 sts:help( "Список станций на карте." )
 
@@ -197,7 +189,7 @@ function ulx.tps( calling_ply,station )
             end
         end
 end
-local tps = ulx.command( "Metrostroi", "ulx station", ulx.tps, "!station" )
+local tps = ulx.command(CATEGORY_NAME, "ulx station", ulx.tps, "!station" )
 tps:addParam{ type=ULib.cmds.StringArg, hint="Станция или ее номер", ULib.cmds.takeRestOfLine }
 tps:defaultAccess( ULib.ACCESS_ALL )
 tps:help( "Телепорт по станциям." )
@@ -279,7 +271,7 @@ function ulx.wagons( calling_ply )
         end
     end
 end
-local wagons = ulx.command( "Metrostroi", "ulx trains", ulx.wagons, "!trains" )
+local wagons = ulx.command(CATEGORY_NAME, "ulx trains", ulx.wagons, "!trains" )
 wagons:defaultAccess( ULib.ACCESS_ALL )
 wagons:help( "Информация о составах на сервере." )
 
@@ -287,6 +279,16 @@ wagons:help( "Информация о составах на сервере." )
 function ulx.expass( calling_ply )
 	calling_ply:ConCommand("metrostroi_expel_passengers")
 end
-local exps = ulx.command( CATEGORY_NAME, "ulx expass", ulx.expass, "!expass" )
+local exps = ulx.command(CATEGORY_NAME, "ulx expass", ulx.expass, "!expass" )
 exps:defaultAccess( ULib.ACCESS_ALL )
 exps:help( "Высадить всех пассажиров." )
+
+if SERVER then
+	-- Регистрация прав ULX
+	for k, v in pairs (train_list) do
+		ULib.ucl.registerAccess(k, ULib.ACCESS_ALL, "Спавн состава "..v, CATEGORY_NAME)
+	end
+	ULib.ucl.registerAccess("add_1wagons", ULib.ACCESS_ADMIN, "Спавн на 1 вагон больше", CATEGORY_NAME)
+	ULib.ucl.registerAccess("add_2wagons", ULib.ACCESS_ADMIN, "Спавн на 2 вагона больше", CATEGORY_NAME)
+	ULib.ucl.registerAccess("add_3wagons", ULib.ACCESS_ADMIN, "Спавн на 3 вагона больше", CATEGORY_NAME)
+end
