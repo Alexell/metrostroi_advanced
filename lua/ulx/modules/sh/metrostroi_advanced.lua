@@ -95,6 +95,42 @@ local function GetTrainLoc(ent)
 	return train_station
 end
 
+-- телепортация в состав
+local function GotoTrain (ply,tply,train,sit)
+    if IsValid(ply:GetVehicle()) then
+        ply:ExitVehicle()
+    end
+    local pos = train:GetPos()
+    ply:SetMoveType(8)
+    if sit == true then
+        ply:Freeze(true)
+        ply:SetPos(pos-Vector(0,0,40))
+		if ply == tply then
+			train.DriverSeat:UseClientSideAnimation() -- пусть ебучую анимацию отрабатывает клиент
+			timer.Create("TeleportIntoDriverSeat", 1, 1, function()
+				train.DriverSeat:Use(ply,ply,3,1)
+				ulx.fancyLog("#s телепортировался в свой состав.",ply:Nick())
+				ply:Freeze(false)
+			end)
+		else
+			train.InstructorsSeat:UseClientSideAnimation()
+			timer.Create("TeleportIntoInstructorsSeat", 1, 1, function()
+				train.InstructorsSeat:Use(ply,ply,3,1)
+				ulx.fancyLog("#s телепортировался в состав игрока #s.",ply:Nick(),tply:Nick())
+				ply:Freeze(false)
+			end)
+		end
+    else
+		if ply == tply then
+			ply:SetPos(pos-Vector(0,0,40))
+			ulx.fancyLog("#s телепортировался к своему составу.",ply:Nick())
+		else
+			ply:SetPos(pos-Vector(0,0,40))
+			ulx.fancyLog("#s телепортировался к составу игрока #s.",ply:Nick(),tply:Nick())
+		end
+    end
+end
+
 -- Вывод станций в чат
 local stswaittime = 10
 local stslasttime = -stswaittime
@@ -284,6 +320,60 @@ end
 local exps = ulx.command(CATEGORY_NAME, "ulx expass", ulx.expass, "!expass" )
 exps:defaultAccess( ULib.ACCESS_ALL )
 exps:help( "Высадить всех пассажиров." )
+
+-- телепорт в состав игрока
+function ulx.traintp( calling_ply, target_ply )
+	local class = target_ply:GetNW2String("TrainClass","")
+	if class !="" then
+		local teleported = false
+		local ents = ents.FindByClass(class)
+		for k,v in pairs(ents) do
+			if v.Owner:Nick() == target_ply:Nick() then
+				if (class:sub(13,18) != "81-718" and class:sub(13,18) != "81-720" and class:sub(13,18) != "81-722") then
+					if v.KVWrenchMode != 0 then if v.KV.ReverserSet != 0 then GotoTrain(calling_ply,target_ply,v,true) teleported = true end end
+				elseif class:sub(13,18) == "81-718" then
+					if v.WrenchMode != 0 then if v.KR.Position != 0 then GotoTrain(calling_ply,target_ply,v,true) teleported = true end end
+				elseif class:sub(13,18) == "81-720" then
+					if v.WrenchMode != 0 then if v.RV.KROPosition != 0 then GotoTrain(calling_ply,target_ply,v,true) teleported = true end end
+				else
+					if class:sub(13,18) == "81-722" then
+						if v.Electric.CabActive != 0 then GotoTrain(calling_ply,target_ply,v,true)  teleported = true end
+					end
+				end
+			end
+		end
+		if not teleported then
+			for k,v in pairs(ents) do
+				if v.Owner:Nick() == target_ply:Nick() then
+					GotoTrain(calling_ply,target_ply,v,false)
+					break
+				end
+			end
+		end
+	end
+end
+local ttp = ulx.command( CATEGORY_NAME, "ulx traintp", ulx.traintp, "!traintp" )
+ttp:addParam{ type=ULib.cmds.PlayerArg, target="*", default="^", ULib.cmds.optional }
+ttp:defaultAccess( ULib.ACCESS_ALL )
+ttp:help( "Телепортироваться в состав игрока." )
+
+-- телепорт к светофору по названию
+function ulx.signaltp(calling_ply,signal)
+	for _,sig in pairs(ents.FindByClass("gmod_track_signal")) do
+		if sig.Name == signal or sig.Name == string.upper(signal) or string.upper(sig.Name) == signal then
+			if calling_ply:InVehicle() then calling_ply:ExitVehicle() end
+			calling_ply:SetPos(sig:GetPos())
+			calling_ply:SetEyeAngles(sig:GetAngles()+Angle(0,-90,0))	
+			calling_ply:SetLocalVelocity( Vector( 0, 0, 0 ) ) -- Stop!				
+			return
+		end
+	end
+	ULib.tsayError( calling_ply, "Светофор "..signal.." не найден", true ) 			
+end
+local signaltp = ulx.command( CATEGORY_NAME, "ulx signaltp", ulx.signaltp, "!signaltp" )
+signaltp:addParam{ type=ULib.cmds.StringArg, hint="Светофор", ULib.cmds.takeRestOfLine }
+signaltp:defaultAccess( ULib.ACCESS_ADMIN )
+signaltp:help( "Телепортирует к сигналу")
 
 if SERVER then
 	-- Регистрация прав ULX
