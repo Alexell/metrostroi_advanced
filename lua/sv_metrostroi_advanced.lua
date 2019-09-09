@@ -16,6 +16,7 @@ local train_rest = CreateConVar("metrostroi_advanced_trainsrestrict", "0", {FCVA
 local spawn_mes = CreateConVar("metrostroi_advanced_spawnmessage", "1", {FCVAR_NEVER_AS_STRING})
 local max_wags = CreateConVar("metrostroi_advanced_maxwagons", "4", {FCVAR_NEVER_AS_STRING})
 local min_wags = CreateConVar("metrostroi_advanced_minwagons", "3", {FCVAR_NEVER_AS_STRING})
+local route_nums = CreateConVar("metrostroi_advanced_routenums", "1", {FCVAR_NEVER_AS_STRING})
 
 local train_list = {}
 train_list["gmod_subway_81-502"] 			= "81-502 (Ема-502)"
@@ -115,6 +116,38 @@ local function GetTrainLoc(ent)
 	return train_station
 end
 
+-- уникальный рандомный номер маршрута
+local function GetRouteNumber(ply)
+	local rnum = math.random(99)
+	local routes = {}
+	for k,v in pairs(train_list) do
+		local trs = ents.FindByClass(v)
+		for k2,v2 in pairs(trs) do
+			if (routes[v2:CPPIGetOwner() or v2:GetNetworkedEntity("Owner", "N/A") or "(disconnected)"] == nil and v2:CPPIGetOwner() or v2:GetNetworkedEntity("Owner", "N/A") or "(disconnected)" != ply:Nick()) then
+				if (v2:GetNW2String("RouteNumber") != "") then
+					local rnum2 = tonumber(v2:GetNW2String("RouteNumber"))
+					if table.HasValue({"gmod_subway_81-702","gmod_subway_81-703","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_ezh3ru1","gmod_subway_81-717_mvm","gmod_subway_81-717_mvm_custom","gmod_subway_81-718","gmod_subway_81-720"},v2:GetClass()) then rnum2 = rnum2 / 10 end
+					routes[v2:CPPIGetOwner() or v2:GetNetworkedEntity("Owner", "N/A") or "(disconnected)"] = rnum2
+				end
+			end
+		end
+	end
+	if routes != nil then
+		local r2 = {}
+		for k,v in pairs(routes) do
+			r2[#r2+1] = v
+		end
+		
+		for k,v in pairs(r2) do
+			if (rnum == v) then
+				rnum = math.random(99)
+				k = 1
+			end	
+		end
+	end
+	return rnum
+end
+
 hook.Add("MetrostroiSpawnerRestrict","TrainSpawnerLimits",function(ply,settings)
 	if IsValid(ply) then
 		-- ограничение составов по правам ULX
@@ -150,14 +183,18 @@ hook.Add("MetrostroiSpawnerRestrict","TrainSpawnerLimits",function(ply,settings)
 		end
         if settings.WagNum < GetConVarNumber("metrostroi_advanced_minwagons") then
 			settings.WagNum = GetConVarNumber("metrostroi_advanced_minwagons")
-			ply:ChatPrint("Запрещено спавнить короткие составы! Количество вагонов увеличено до "..tostring(GetConVarNumber("metrostroi_advanced_minwagons")))
+			ply:ChatPrint("Запрещено спавнить короткие составы!\nКоличество вагонов увеличено до "..tostring(GetConVarNumber("metrostroi_advanced_minwagons"))..".")
         end
 		if (settings.WagNum > wag_awail) then
+			local wag_str = "вагон"
+			if wag_awail >= 2 and wag_awail <= 4 then wag_str = "вагона" end
+			if wag_awail >= 5 then wag_str = "вагонов" end
 			ply:ChatPrint("Вы не можете спавнить столько вагонов!")
-			ply:ChatPrint("Вам доступно: "..wag_awail.." вагона(ов).")
+			ply:ChatPrint("Вам доступно: "..wag_awail.." "..wag_str..".")
 			return true
 		end
 	
+		--спавн в любом месте
 		if (not ULib.ucl.query(ply,"metrostroi_anyplace_spawn")) then
 			loc = GetTrainLoc(ply)
 			if (loc == "перегон") then
@@ -180,8 +217,7 @@ hook.Add("MetrostroiSpawnerRestrict","TrainSpawnerLimits",function(ply,settings)
 		end
 	
 		-- спавн разрешен
-		local spawnmes = GetConVarNumber("metrostroi_advanced_spawnmessage")
-		if (spawnmes == 1) then
+		if (GetConVarNumber("metrostroi_advanced_spawnmessage") == 1) then
 			local wag_str = "вагон"
 			local wag_num = settings.WagNum
 			if wag_num >= 2 and wag_num <= 4 then wag_str = "вагона" end
@@ -190,6 +226,42 @@ hook.Add("MetrostroiSpawnerRestrict","TrainSpawnerLimits",function(ply,settings)
 		end
 		SetGlobalInt("TrainLastSpawned",os.time())
 		return
+	end
+end)
+
+hook.Add("PlayerInitialSpawn","SetPlyParams",function(ply)
+	-- выдаем игроку уникальный номер маршрута на время сессии
+	if (GetConVarNumber("metrostroi_advanced_routenums") == 1) then
+		local rnum = GetRouteNumber(ply)
+		ply:SetNW2Int("RouteNum",rnum)
+	end
+end)
+
+hook.Add("MetrostroiCoupled","SetTrainParams",function(ent,ent2)
+	if IsValid(ent) and IsValid(ent2) then
+		-- устанавливаем номер маршрута на состав
+		if (GetConVarNumber("metrostroi_advanced_routenums") == 1) then
+			local ply = ent.Owner
+			local rnum = ply:GetNW2Int("RouteNum")
+			for k, v in pairs(train_list) do
+				if ent:GetClass() == k then
+					if table.HasValue({"gmod_subway_81-702","gmod_subway_81-703","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_ezh3ru1","gmod_subway_81-717_mvm","gmod_subway_81-717_mvm_custom","gmod_subway_81-718","gmod_subway_81-720"},ent:GetClass()) then rnum = rnum * 10 end
+					if ent:GetClass() == "gmod_subway_81-722" then
+						ent:SetNW2Int("RouteNumber",rnum)
+					else
+						ent:SetNW2String("RouteNumber",tostring(rnum))
+					end
+				end
+				if ent2:GetClass() == k then
+					if table.HasValue({"gmod_subway_81-702","gmod_subway_81-703","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_ezh3ru1","gmod_subway_81-717_mvm","gmod_subway_81-717_mvm_custom","gmod_subway_81-718","gmod_subway_81-720"},ent2:GetClass()) then rnum = rnum * 10 end
+					if ent2:GetClass() == "gmod_subway_81-722" then
+						ent2:SetNW2Int("RouteNumber",rnum)
+					else
+						ent2:SetNW2String("RouteNumber",tostring(rnum))
+					end
+				end
+			end
+		end
 	end
 end)
 
