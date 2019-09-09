@@ -266,6 +266,16 @@ hook.Add("MetrostroiCoupled","SetTrainParams",function(ent,ent2)
 	end
 end)
 
+hook.Add("EntityRemoved","DeleteTrainParams",function (ent)
+	for k, v in pairs(train_list) do
+		if ent:GetClass() == k then
+			local ply = ent.Owner
+			if not IsValid(ply) then return end
+			ply:SetNW2String("TrainC","")
+		end
+	end
+end)
+
 hook.Add("MetrostroiLoaded","MetrostroiLoadEnd",function()
 	SetGlobalInt("TrainLastSpawned",os.time())
 end)
