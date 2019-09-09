@@ -15,6 +15,7 @@ local spawn_int = CreateConVar("metrostroi_advanced_spawninterval", "0", {FCVAR_
 local train_rest = CreateConVar("metrostroi_advanced_trainsrestrict", "0", {FCVAR_NEVER_AS_STRING})
 local spawn_mes = CreateConVar("metrostroi_advanced_spawnmessage", "1", {FCVAR_NEVER_AS_STRING})
 local max_wags = CreateConVar("metrostroi_advanced_maxwagons", "4", {FCVAR_NEVER_AS_STRING})
+local min_wags = CreateConVar("metrostroi_advanced_minwagons", "3", {FCVAR_NEVER_AS_STRING})
 
 local train_list = {}
 train_list["gmod_subway_81-502"] 			= "81-502 (Ема-502)"
@@ -160,7 +161,10 @@ hook.Add("MetrostroiSpawnerRestrict","TrainSpawnerLimits",function(ply,settings)
 				end
 			end
 		end
-		
+        if settings.WagNum < GetConVarNumber("metrostroi_advanced_minwagons") then
+			settings.WagNum = GetConVarNumber("metrostroi_advanced_minwagons")
+			ply:ChatPrint("Запрещено спавнить короткие составы! Количество вагонов увеличено до "..tostring(GetConVarNumber("metrostroi_advanced_minwagons")))
+        end
 		if (settings.WagNum > wag_awail) then
 			ply:ChatPrint("Вы не можете спавнить столько вагонов!")
 			ply:ChatPrint("Вам доступно: "..wag_awail.." вагона(ов).")
