@@ -293,4 +293,5 @@ if SERVER then
 	ULib.ucl.registerAccess("add_1wagons", ULib.ACCESS_ADMIN, "Спавн на 1 вагон больше", CATEGORY_NAME)
 	ULib.ucl.registerAccess("add_2wagons", ULib.ACCESS_ADMIN, "Спавн на 2 вагона больше", CATEGORY_NAME)
 	ULib.ucl.registerAccess("add_3wagons", ULib.ACCESS_ADMIN, "Спавн на 3 вагона больше", CATEGORY_NAME)
+	ULib.ucl.registerAccess("metrostroi_anyplace_spawn", ULib.ACCESS_ADMIN, "Спавн в любом месте", CATEGORY_NAME)
 end

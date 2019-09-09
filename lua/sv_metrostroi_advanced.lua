@@ -117,19 +117,6 @@ end
 
 hook.Add("MetrostroiSpawnerRestrict","TrainSpawnerLimits",function(ply,settings)
 	if IsValid(ply) then
-		-- задержка спавна
-		local spawnint = GetConVarNumber("metrostroi_advanced_spawninterval")
-		if (spawnint > 0) then
-			local lastspawn = GetGlobalInt("TrainLastSpawned",0)
-			local curtime = os.time()
-			local curint = curtime - lastspawn
-			if (curint < spawnint) then
-				local secs = spawnint - curint
-				ply:ChatPrint("Пожалуйста подождите "..secs.." секунд прежде, чем спавнить состав.")
-				return true
-			end
-		end
-		
 		-- ограничение составов по правам ULX
 		local train_restrict = GetConVarNumber("metrostroi_advanced_trainsrestrict")
 		local train = settings.Train
@@ -170,7 +157,28 @@ hook.Add("MetrostroiSpawnerRestrict","TrainSpawnerLimits",function(ply,settings)
 			ply:ChatPrint("Вам доступно: "..wag_awail.." вагона(ов).")
 			return true
 		end
+	
+		if (not ULib.ucl.query(ply,"metrostroi_anyplace_spawn")) then
+			loc = GetTrainLoc(ply)
+			if (loc == "перегон") then
+				ply:ChatPrint("Вам запрещен спавн в этом месте!")
+				return true
+			end
+		end
 		
+		-- задержка спавна
+		local spawnint = GetConVarNumber("metrostroi_advanced_spawninterval")
+		if (spawnint > 0) then
+			local lastspawn = GetGlobalInt("TrainLastSpawned",0)
+			local curtime = os.time()
+			local curint = curtime - lastspawn
+			if (curint < spawnint) then
+				local secs = spawnint - curint
+				ply:ChatPrint("Пожалуйста подождите "..secs.." секунд прежде, чем спавнить состав.")
+				return true
+			end
+		end
+	
 		-- спавн разрешен
 		local spawnmes = GetConVarNumber("metrostroi_advanced_spawnmessage")
 		if (spawnmes == 1) then
