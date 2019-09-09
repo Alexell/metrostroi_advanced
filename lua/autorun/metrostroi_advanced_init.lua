@@ -9,6 +9,7 @@
 
 if SERVER then
 	include("sv_metrostroi_advanced.lua")
+	include("metrostroi_map_fixes.lua")
 end
 
 if CLIENT then
