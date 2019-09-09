@@ -223,8 +223,8 @@ hook.Add("MetrostroiSpawnerRestrict","TrainSpawnerLimits",function(ply,settings)
 			if wag_num >= 2 and wag_num <= 4 then wag_str = "вагона" end
 			if wag_num >= 5 then wag_str = "вагонов" end
 			ulx.fancyLog("Игрок #s заспавнил #s #s #s.\nМестоположение: #s.",ply:Nick(),tostring(wag_num),wag_str,GetTrainName(settings.Train),GetTrainLoc(ply))
-			ply:SetNW2String("TrainClass",train)
 		end
+		ply:SetNW2String("TrainC",settings.Train)
 		SetGlobalInt("TrainLastSpawned",os.time())
 		return
 	end

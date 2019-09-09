@@ -323,7 +323,7 @@ exps:help( "Высадить всех пассажиров." )
 
 -- телепорт в состав игрока
 function ulx.traintp( calling_ply, target_ply )
-	local class = target_ply:GetNW2String("TrainClass","")
+	local class = target_ply:GetNW2String("TrainC","")
 	if class !="" then
 		local teleported = false
 		local ents = ents.FindByClass(class)
@@ -374,6 +374,32 @@ local signaltp = ulx.command( CATEGORY_NAME, "ulx signaltp", ulx.signaltp, "!sig
 signaltp:addParam{ type=ULib.cmds.StringArg, hint="Светофор", ULib.cmds.takeRestOfLine }
 signaltp:defaultAccess( ULib.ACCESS_ADMIN )
 signaltp:help( "Телепортирует к сигналу")
+
+-- восстановление исходного положения удочек
+function ulx.udochka( calling_ply )
+	local cur_map = game.GetMap()
+	local boxes = {}
+	if (cur_map:find("gm_mus_loopline")) then
+		boxes = ents.FindByClass("func_tracktrain")
+	else
+		boxes = ents.FindByClass("func_physbox")
+	end
+	for k,v in pairs(boxes) do
+		for k2,v2 in pairs(box_positions) do
+			if k2 == k then v:SetPos(v2) end
+		end
+	end
+	local udcs = ents.FindByClass("gmod_track_udochka")
+	for k,v in pairs(udcs) do
+		for k2,v2 in pairs(udc_positions) do
+			if k2 == k then v:SetPos(v2) end
+		end
+	end
+	ulx.fancyLog("#s восстановил удочки в исходное положение.",calling_ply:Nick())
+end
+local udc = ulx.command( CATEGORY_NAME, "ulx udochka", ulx.udochka, "!udc" )
+udc:defaultAccess( ULib.ACCESS_ADMIN )
+udc:help( "Восстановить положения удочек." )
 
 if SERVER then
 	-- Регистрация прав ULX
