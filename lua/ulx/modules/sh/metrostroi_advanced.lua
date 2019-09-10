@@ -308,6 +308,8 @@ function ulx.wagons( calling_ply )
 			ulx.fancyLog("#s: #s #s #s. Маршрут: #s\nМестоположение: #s",ply_name,wag_num,wag_str,tr_name,r_num,tr_loc)
         end
     end
+	local wag_awail = (GetConVarNumber("metrostroi_maxtrains")*GetConVarNumber("metrostroi_advanced_maxwagons"))-GetGlobalInt("metrostroi_train_count")
+    ulx.fancyLog("Доступно вагонов для спавна: #s",wag_awail)
 end
 local wagons = ulx.command(CATEGORY_NAME, "ulx trains", ulx.wagons, "!trains" )
 wagons:defaultAccess( ULib.ACCESS_ALL )
