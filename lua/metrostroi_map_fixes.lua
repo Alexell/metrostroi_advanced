@@ -18,6 +18,7 @@ end
 -- сохраняем изначальные положения удочек
 udc_positions = {}
 box_positions = {}
+box_angles = {}
 local function get_udc_pos()
 	local boxes = {}
 	if (cur_map:find("gm_mus_loopline")) then
@@ -27,6 +28,7 @@ local function get_udc_pos()
 	end
 	for k,v in pairs(boxes) do
 		box_positions[k] = v:GetPos()
+		box_angles[k] = v:GetAngles()
 	end
 	local udcs = ents.FindByClass("gmod_track_udochka")
 	for k,v in pairs(udcs) do

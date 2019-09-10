@@ -387,15 +387,12 @@ function ulx.udochka( calling_ply )
 		boxes = ents.FindByClass("func_physbox")
 	end
 	for k,v in pairs(boxes) do
-		for k2,v2 in pairs(box_positions) do
-			if k2 == k then v:SetPos(v2) end
-		end
+		v:SetAngles(box_angles[k])
+		v:SetPos(box_positions[k])
 	end
 	local udcs = ents.FindByClass("gmod_track_udochka")
 	for k,v in pairs(udcs) do
-		for k2,v2 in pairs(udc_positions) do
-			if k2 == k then v:SetPos(v2) end
-		end
+		v:SetPos(udc_positions[k])
 	end
 	ulx.fancyLog("#s восстановил удочки в исходное положение.",calling_ply:Nick())
 end
