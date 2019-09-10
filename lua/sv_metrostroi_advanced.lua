@@ -15,7 +15,7 @@ local spawn_int = CreateConVar("metrostroi_advanced_spawninterval", "0", {FCVAR_
 local train_rest = CreateConVar("metrostroi_advanced_trainsrestrict", "0", {FCVAR_NEVER_AS_STRING})
 local spawn_mes = CreateConVar("metrostroi_advanced_spawnmessage", "1", {FCVAR_NEVER_AS_STRING})
 local max_wags = CreateConVar("metrostroi_advanced_maxwagons", "4", {FCVAR_NEVER_AS_STRING})
-local min_wags = CreateConVar("metrostroi_advanced_minwagons", "3", {FCVAR_NEVER_AS_STRING})
+local min_wags = CreateConVar("metrostroi_advanced_minwagons", "2", {FCVAR_NEVER_AS_STRING})
 local route_nums = CreateConVar("metrostroi_advanced_routenums", "1", {FCVAR_NEVER_AS_STRING})
 local auto_wags = CreateConVar("metrostroi_advanced_autowags", "0", {FCVAR_NEVER_AS_STRING})
 
@@ -209,7 +209,7 @@ hook.Add("MetrostroiSpawnerRestrict","TrainSpawnerLimits",function(ply,settings)
 		if (settings.WagNum > ply_wagons) then
 			local wag_str = "вагон"
 			if ply_wagons >= 2 and ply_wagons <= 4 then wag_str = "вагона" end
-			if ply_wagons >= 5 then wag_str = "вагонов" end
+			if ply_wagons == 0 or ply_wagons >= 5 then wag_str = "вагонов" end
 			ply:ChatPrint("Вы не можете спавнить столько вагонов!")
 			ply:ChatPrint("Для спавна доступно: "..ply_wagons.." "..wag_str..".")
 			return true
