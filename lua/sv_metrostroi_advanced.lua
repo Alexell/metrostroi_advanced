@@ -210,8 +210,13 @@ hook.Add("MetrostroiSpawnerRestrict","TrainSpawnerLimits",function(ply,settings)
 			local wag_str = "вагон"
 			if ply_wagons >= 2 and ply_wagons <= 4 then wag_str = "вагона" end
 			if ply_wagons == 0 or ply_wagons >= 5 then wag_str = "вагонов" end
-			ply:ChatPrint("Вы не можете спавнить столько вагонов!")
-			ply:ChatPrint("Для спавна доступно: "..ply_wagons.." "..wag_str..".")
+			if wag_awail == 0 then
+				ply:ChatPrint("Закончились доступные для спавна вагоны на сервере.")
+				ply:ChatPrint("Пожалуйста подождите пока кто-нибудь отключится или удалит состав.")
+			else
+				ply:ChatPrint("Вы не можете спавнить столько вагонов!")
+				ply:ChatPrint("Для спавна доступно: "..ply_wagons.." "..wag_str..".")
+			end
 			return true
 		end
 	
