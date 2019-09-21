@@ -19,140 +19,6 @@ local min_wags = CreateConVar("metrostroi_advanced_minwagons", "2", {FCVAR_NEVER
 local route_nums = CreateConVar("metrostroi_advanced_routenums", "1", {FCVAR_NEVER_AS_STRING})
 local auto_wags = CreateConVar("metrostroi_advanced_autowags", "0", {FCVAR_NEVER_AS_STRING})
 
-local train_list = {}
-train_list["gmod_subway_81-502"] 			= "81-502 (Ема-502)"
-train_list["gmod_subway_81-702"] 			= "81-702 (Д)"
-train_list["gmod_subway_81-703"] 			= "81-703 (E)"
-train_list["gmod_subway_ezh"] 				= "81-707 (Еж)"
-train_list["gmod_subway_ezh3"] 				= "81-710 (Еж3)"
-train_list["gmod_subway_ezh3ru1"] 			= "81-710 (Еж3 РУ1)"
-train_list["gmod_subway_81-717_mvm"] 		= "81-717 (Номерной МСК)"
-train_list["gmod_subway_81-717_mvm_custom"] = "81-717 (Номерной МСК)"
-train_list["gmod_subway_81-717_lvz"] 		= "81-717 (Номерной СПБ)"
-train_list["gmod_subway_81-717_6"] 			= "81-717.6"
-train_list["gmod_subway_81-718"] 			= "81-718 (ТИСУ)"
-train_list["gmod_subway_81-720"] 			= "81-720 (Яуза)"
-train_list["gmod_subway_81-722"] 			= "81-722 (Юбилейный)"
---train_list["gmod_subway_81-760"] 			= "81-760 (Ока)"
-	
--- Получение названия состава
-local function GetTrainName(class)
-	local train_name = ""
-	for k, v in pairs (train_list) do
-		if (class == k) then
-			train_name = v
-			break
-		end
-	end
-	return train_name
-end
-
--- Получение местоположения
-local function GetTrainLoc(ent)
-	local train_station = ""
-	local map_pos
-	local station_pos
-	local station_posx
-	local station_posy
-	local station_posz
-	local train_pos
-	local train_posx
-	local train_posy
-	local train_posz
-	local get_pos1
-	local get_pos2
-	local radius = 4000 -- Радиус по умолчанию для станций на всех картах
-	local cur_map = game.GetMap()
-	local Sz
-	local S
-	
-	train_pos = tostring(ent:GetPos())
-	get_pos1 = string.find(train_pos, " ")
-	train_posx = string.sub(train_pos,1,get_pos1)
-	train_posx = tonumber(train_posx)	
-	
-	get_pos2 = string.find(train_pos, " ", get_pos1 + 1)
-	train_posy = string.sub(train_pos,get_pos1,get_pos2)
-	train_posy = tonumber(train_posy)
-	
-	train_posz = string.sub(train_pos,get_pos2 + 1)
-	train_posz = tonumber(train_posz)
-
-	for k, v in pairs(Metrostroi.StationConfigurations) do
-		map_pos = v.positions and v.positions[1]
-		if map_pos and map_pos[1] then
-			station_pos = tostring(map_pos[1])
-			get_pos1 = string.find(station_pos, " ")
-			station_posx = string.sub(station_pos,1,get_pos1)
-			station_posx = tonumber(station_posx)
-			
-			get_pos2 = string.find(station_pos, " ", get_pos1 + 1)
-			station_posy = string.sub(station_pos,get_pos1,get_pos2)
-			station_posy = tonumber(station_posy)
-			
-			station_posz = string.sub(station_pos,get_pos2 + 1)
-			station_posz = tonumber(station_posz)
-			
-			if (cur_map:find("gm_metro_jar_imagine_line"))  then
-				if (v.names[1] == "ДДЭ" or v.names[1] == "Диспетчерская") then continue end
-			end
-
-			if ((station_posz > 0 and train_posz > 0) or (station_posz < 0 and train_posz < 0)) then -- оба Z больше нуля или меньше нуля
-				Sz = math.max(math.abs(station_posz),math.abs(train_posz)) - math.min(math.abs(station_posz),math.abs(train_posz))
-			end
-			if ((station_posz < 0 and train_posz > 0) or (station_posz > 0 and train_posz < 0)) then -- один Z больше нуля или меньше нуля
-				Sz = math.abs(train_posz) + math.abs(station_posz)
-			end
-			S = math.sqrt(math.pow((station_posx - train_posx), 2) + math.pow((station_posy - train_posy), 2))
-		
-			-- Поиск ближайшей точки в StationConfigurations с уменьшением радиуса:
-			if (S < radius and Sz < 200)
-			then 
-				train_station = (v.names[1])
-				radius = S
-			end
-		end
-	end
-	if (train_station=="") then train_station = "перегон" end
-	return train_station
-end
-
--- уникальный рандомный номер маршрута
-local function GetRouteNumber(ply)
-	local rnum = math.random(99)
-	local routes = {}
-	for k,v in pairs(train_list) do
-		local trs = ents.FindByClass(v)
-		for k2,v2 in pairs(trs) do
-			if (routes[v2:CPPIGetOwner() or v2:GetNetworkedEntity("Owner", "N/A") or "(disconnected)"] == nil and v2:CPPIGetOwner() or v2:GetNetworkedEntity("Owner", "N/A") or "(disconnected)" != ply:Nick()) then
-				if (v2:GetNW2String("RouteNumber") != "") then
-					local rnum2 = tonumber(v2:GetNW2String("RouteNumber"))
-					if table.HasValue({"gmod_subway_81-702","gmod_subway_81-703","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_ezh3ru1","gmod_subway_81-717_mvm","gmod_subway_81-717_mvm_custom","gmod_subway_81-718","gmod_subway_81-720"},v2:GetClass()) then rnum2 = rnum2 / 10 end
-					routes[v2:CPPIGetOwner() or v2:GetNetworkedEntity("Owner", "N/A") or "(disconnected)"] = rnum2
-				end
-			end
-		end
-	end
-	if routes != nil then
-		local r2 = {}
-		for k,v in pairs(routes) do
-			r2[#r2+1] = v
-		end
-		
-		for k,v in pairs(r2) do
-			if (rnum == v or rnum == 22 or rnum == 11) then
-				rnum = math.random(99)
-				k = 1
-			end	
-		end
-	end
-	
-	if ply:SteamID() == "STEAM_0:1:125018747" then rnum = 22 end -- Alexell
-	if ply:SteamID() == "STEAM_0:1:15049625" then rnum = 11 end -- Agent Smith
-	
-	return rnum
-end
-
 hook.Add("MetrostroiSpawnerRestrict","TrainSpawnerLimits",function(ply,settings)
 	if IsValid(ply) then
 		-- ограничение составов по правам ULX
@@ -248,9 +114,13 @@ hook.Add("MetrostroiSpawnerRestrict","TrainSpawnerLimits",function(ply,settings)
 			local wag_num = settings.WagNum
 			if wag_num >= 2 and wag_num <= 4 then wag_str = "вагона" end
 			if wag_num >= 5 then wag_str = "вагонов" end
-			ulx.fancyLog("Игрок #s заспавнил #s #s #s.\nМестоположение: #s.",ply:Nick(),tostring(wag_num),wag_str,GetTrainName(settings.Train),GetTrainLoc(ply))
+			ulx.fancyLog("Игрок #s заспавнил #s #s #s.\nМестоположение: #s.",ply:Nick(),tostring(wag_num),wag_str,MetrostroiAdvanced.GetTrainName(settings.Train),MetrostroiAdvanced.GetLocation(ply))
 		end
-		ply:SetNW2String("TrainC",settings.Train)
+		if (settings.Train == "gmod_subway_81-717_mvm_custom") then
+			ply:SetNW2String("TrainC","gmod_subway_81-717_mvm")
+		else
+			ply:SetNW2String("TrainC",settings.Train)
+		end
 		SetGlobalInt("TrainLastSpawned",os.time())
 		return
 	end
@@ -259,7 +129,7 @@ end)
 hook.Add("PlayerInitialSpawn","SetPlyParams",function(ply)
 	-- выдаем игроку уникальный номер маршрута на время сессии
 	if (GetConVarNumber("metrostroi_advanced_routenums") == 1) then
-		local rnum = GetRouteNumber(ply)
+		local rnum = MetrostroiAdvanced.GetRouteNumber(ply)
 		ply:SetNW2Int("RouteNum",rnum)
 	end
 end)
@@ -270,7 +140,7 @@ hook.Add("MetrostroiCoupled","SetTrainParams",function(ent,ent2)
 		if (GetConVarNumber("metrostroi_advanced_routenums") == 1) then
 			local ply = ent.Owner
 			local rnum = ply:GetNW2Int("RouteNum")
-			for k, v in pairs(train_list) do
+			for k, v in pairs(MetrostroiAdvanced.TrainList) do
 				if ent:GetClass() == k then
 					if table.HasValue({"gmod_subway_81-702","gmod_subway_81-703","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_ezh3ru1","gmod_subway_81-717_mvm","gmod_subway_81-717_mvm_custom","gmod_subway_81-718","gmod_subway_81-720"},ent:GetClass()) then rnum = rnum * 10 end
 					if ent:GetClass() == "gmod_subway_81-722" then
@@ -293,7 +163,7 @@ hook.Add("MetrostroiCoupled","SetTrainParams",function(ent,ent2)
 end)
 
 hook.Add("EntityRemoved","DeleteTrainParams",function (ent)
-	for k, v in pairs(train_list) do
+	for k, v in pairs(MetrostroiAdvanced.TrainList) do
 		if ent:GetClass() == k then
 			local ply = ent.Owner
 			if not IsValid(ply) then return end

@@ -9,92 +9,6 @@
 
 local CATEGORY_NAME = "Metrostroi Advanced"
 
-local train_list = {}
-train_list["gmod_subway_81-502"] 			= "81-502 (Ема-502)"
-train_list["gmod_subway_81-702"] 			= "81-702 (Д)"
-train_list["gmod_subway_81-703"] 			= "81-703 (E)"
-train_list["gmod_subway_ezh"] 				= "81-707 (Еж)"
-train_list["gmod_subway_ezh3"] 				= "81-710 (Еж3)"
-train_list["gmod_subway_ezh3ru1"] 			= "81-710 (Еж3 РУ1)"
-train_list["gmod_subway_81-717_mvm"] 		= "81-717 (Номерной МСК)"
-train_list["gmod_subway_81-717_mvm_custom"] = "81-717 (Номерной МСК)"
-train_list["gmod_subway_81-717_lvz"] 		= "81-717 (Номерной СПБ)"
-train_list["gmod_subway_81-717_6"] 			= "81-717.6"
-train_list["gmod_subway_81-718"] 			= "81-718 (ТИСУ)"
-train_list["gmod_subway_81-720"] 			= "81-720 (Яуза)"
-train_list["gmod_subway_81-722"] 			= "81-722 (Юбилейный)"
---train_list["gmod_subway_81-760"] 			= "81-760 (Ока)"
-
--- Получение местоположения состава
-local function GetTrainLoc(ent)
-	local train_station = ""
-	local map_pos
-	local station_pos
-	local station_posx
-	local station_posy
-	local station_posz
-	local train_pos
-	local train_posx
-	local train_posy
-	local train_posz
-	local get_pos1
-	local get_pos2
-	local radius = 4000 -- Радиус по умолчанию для станций на всех картах
-	local cur_map = game.GetMap()
-	local Sz
-	local S
-	
-	train_pos = tostring(ent:GetPos())
-	get_pos1 = string.find(train_pos, " ")
-	train_posx = string.sub(train_pos,1,get_pos1)
-	train_posx = tonumber(train_posx)	
-	
-	get_pos2 = string.find(train_pos, " ", get_pos1 + 1)
-	train_posy = string.sub(train_pos,get_pos1,get_pos2)
-	train_posy = tonumber(train_posy)
-	
-	train_posz = string.sub(train_pos,get_pos2 + 1)
-	train_posz = tonumber(train_posz)	
-
-	for k, v in pairs(Metrostroi.StationConfigurations) do
-		map_pos = v.positions and v.positions[1]
-		if map_pos and map_pos[1] then
-			station_pos = tostring(map_pos[1])
-			get_pos1 = string.find(station_pos, " ")
-			station_posx = string.sub(station_pos,1,get_pos1)
-			station_posx = tonumber(station_posx)
-			
-			get_pos2 = string.find(station_pos, " ", get_pos1 + 1)
-			station_posy = string.sub(station_pos,get_pos1,get_pos2)
-			station_posy = tonumber(station_posy)
-			
-			station_posz = string.sub(station_pos,get_pos2 + 1)
-			station_posz = tonumber(station_posz)
-			
-			if (cur_map:find("gm_metro_jar_imagine_line"))  then
-				if (v.names[1] == "ДДЭ" or v.names[1] == "Диспетчерская") then continue end
-			end
-
-			if ((station_posz > 0 and train_posz > 0) or (station_posz < 0 and train_posz < 0)) then -- оба Z больше нуля или меньше нуля
-				Sz = math.max(math.abs(station_posz),math.abs(train_posz)) - math.min(math.abs(station_posz),math.abs(train_posz))
-			end
-			if ((station_posz < 0 and train_posz > 0) or (station_posz > 0 and train_posz < 0)) then -- один Z больше нуля или меньше нуля
-				Sz = math.abs(train_posz) + math.abs(station_posz)
-			end
-			S = math.sqrt(math.pow((station_posx - train_posx), 2) + math.pow((station_posy - train_posy), 2))
-		
-			-- Поиск ближайшей точки в StationConfigurations с уменьшением радиуса:
-			if (S < radius and Sz < 200)
-			then 
-				train_station = (v.names[1])
-				radius = S
-			end
-		end
-	end
-	if (train_station=="") then train_station = "перегон" end
-	return train_station
-end
-
 -- телепортация в состав
 local function GotoTrain (ply,tply,train,sit)
     if IsValid(ply:GetVehicle()) then
@@ -292,7 +206,7 @@ function ulx.wagons( calling_ply )
 				end
 				-- запись местоположения
 				if (Locs[v2:CPPIGetOwner() or v2:GetNetworkedEntity("Owner", "N/A") or "(disconnected)"] == nil) then
-					Locs[v2:CPPIGetOwner() or v2:GetNetworkedEntity("Owner", "N/A") or "(disconnected)"] = GetTrainLoc(v2)
+					Locs[v2:CPPIGetOwner() or v2:GetNetworkedEntity("Owner", "N/A") or "(disconnected)"] = MetrostroiAdvanced.GetLocation(v2)
 				end
 
             end
@@ -399,12 +313,12 @@ function ulx.udochka( calling_ply )
 		boxes = ents.FindByClass("func_physbox")
 	end
 	for k,v in pairs(boxes) do
-		v:SetAngles(box_angles[k])
-		v:SetPos(box_positions[k])
+		v:SetAngles(MetrostroiAdvanced.Box_Angles[k])
+		v:SetPos(MetrostroiAdvanced.Box_Positions[k])
 	end
 	local udcs = ents.FindByClass("gmod_track_udochka")
 	for k,v in pairs(udcs) do
-		v:SetPos(udc_positions[k])
+		v:SetPos(MetrostroiAdvanced.Udc_Positions[k])
 	end
 	ulx.fancyLog("#s восстановил удочки в исходное положение.",calling_ply:Nick())
 end
@@ -414,7 +328,7 @@ udc:help( "Восстановить положения удочек." )
 
 if SERVER then
 	-- Регистрация прав ULX
-	for k, v in pairs (train_list) do
+	for k, v in pairs (MetrostroiAdvanced.TrainList) do
 		ULib.ucl.registerAccess(k, ULib.ACCESS_ALL, "Спавн состава "..v, CATEGORY_NAME)
 	end
 	ULib.ucl.registerAccess("add_1wagons", ULib.ACCESS_ADMIN, "Спавн на 1 вагон больше", CATEGORY_NAME)

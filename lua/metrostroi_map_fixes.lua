@@ -16,9 +16,9 @@ if (cur_map:find("gm_metro_jar_imagine_line")) then
 end
 
 -- сохраняем изначальные положения удочек
-udc_positions = {}
-box_positions = {}
-box_angles = {}
+MetrostroiAdvanced.Udc_Positions = {}
+MetrostroiAdvanced.Box_Positions = {}
+MetrostroiAdvanced.Box_Angles = {}
 local function get_udc_pos()
 	local boxes = {}
 	if (cur_map:find("gm_mus_loopline")) then
@@ -27,12 +27,12 @@ local function get_udc_pos()
 		boxes = ents.FindByClass("func_physbox")
 	end
 	for k,v in pairs(boxes) do
-		box_positions[k] = v:GetPos()
-		box_angles[k] = v:GetAngles()
+		MetrostroiAdvanced.Box_Positions[k] = v:GetPos()
+		MetrostroiAdvanced.Box_Angles[k] = v:GetAngles()
 	end
 	local udcs = ents.FindByClass("gmod_track_udochka")
 	for k,v in pairs(udcs) do
-		udc_positions[k] = v:GetPos()
+		MetrostroiAdvanced.Udc_Positions[k] = v:GetPos()
 	end
 end
 timer.Create("UdcGetPos", 3, 1, function() get_udc_pos() end)
