@@ -29,7 +29,7 @@ hook.Add("MetrostroiSpawnerRestrict","TrainSpawnerLimits",function(ply,settings)
 			if (not ULib.ucl.query(ply,train)) then
 				ply:ChatPrint("[Сервер] Вам запрещен данный тип состава!")
 				ply:ChatPrint("Разрешено спавнить только следующие составы:")
-				for k, v in pairs (train_list) do
+				for k, v in pairs (MetrostroiAdvanced.TrainList) do
 					if (ULib.ucl.query(ply,k)) then
 						ply:ChatPrint(v)
 					end
@@ -88,7 +88,7 @@ hook.Add("MetrostroiSpawnerRestrict","TrainSpawnerLimits",function(ply,settings)
 	
 		--спавн в любом месте
 		if (not ULib.ucl.query(ply,"metrostroi_anyplace_spawn")) then
-			loc = GetTrainLoc(ply)
+			loc = MetrostroiAdvanced.GetLocation(ply)
 			if (loc == "перегон") then
 				ply:ChatPrint("Вам запрещен спавн в этом месте!")
 				return true

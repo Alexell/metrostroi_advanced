@@ -193,7 +193,7 @@ function ulx.wagons( calling_ply )
 				-- подсчет кол-ва вагонов
                 Wags[v2:CPPIGetOwner() or v2:GetNetworkedEntity("Owner", "N/A") or "(disconnected)"] = (Wags[v2:CPPIGetOwner() or v2:GetNetworkedEntity("Owner", "N/A") or "(disconnected)"] or 0) + 1
 				-- запись типов составов
-				if (Trains[v2:CPPIGetOwner() or v2:GetNetworkedEntity("Owner", "N/A") or "(disconnected)"] == nil) then Trains[v2:CPPIGetOwner() or v2:GetNetworkedEntity("Owner", "N/A") or "(disconnected)"] = train_list[v2:GetClass()] end
+				if (Trains[v2:CPPIGetOwner() or v2:GetNetworkedEntity("Owner", "N/A") or "(disconnected)"] == nil) then Trains[v2:CPPIGetOwner() or v2:GetNetworkedEntity("Owner", "N/A") or "(disconnected)"] = MetrostroiAdvanced.TrainList[v2:GetClass()] end
 				-- запись номеров маршрутов
 				if (Routes[v2:CPPIGetOwner() or v2:GetNetworkedEntity("Owner", "N/A") or "(disconnected)"] == nil) then
 					if (v2:GetNW2String("RouteNumber") != "") then
