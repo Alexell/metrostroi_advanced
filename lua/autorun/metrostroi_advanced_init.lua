@@ -81,40 +81,44 @@ function MetrostroiAdvanced.GetLocation(ent)
 	train_posz = string.sub(train_pos,get_pos2 + 1)
 	train_posz = tonumber(train_posz)
 
-	for k, v in pairs(Metrostroi.StationConfigurations) do
-		map_pos = v.positions and v.positions[1]
-		if map_pos and map_pos[1] then
-			station_pos = tostring(map_pos[1])
-			get_pos1 = string.find(station_pos, " ")
-			station_posx = string.sub(station_pos,1,get_pos1)
-			station_posx = tonumber(station_posx)
-			
-			get_pos2 = string.find(station_pos, " ", get_pos1 + 1)
-			station_posy = string.sub(station_pos,get_pos1,get_pos2)
-			station_posy = tonumber(station_posy)
-			
-			station_posz = string.sub(station_pos,get_pos2 + 1)
-			station_posz = tonumber(station_posz)
-			
-			if (cur_map:find("gm_metro_jar_imagine_line"))  then
-				if (v.names[1] == "ДДЭ" or v.names[1] == "Диспетчерская") then continue end
-			end
+	if Metrostroi.StationConfigurations then
+		for k, v in pairs(Metrostroi.StationConfigurations) do
+			map_pos = v.positions and v.positions[1]
+			if map_pos and map_pos[1] then
+				station_pos = tostring(map_pos[1])
+				get_pos1 = string.find(station_pos, " ")
+				station_posx = string.sub(station_pos,1,get_pos1)
+				station_posx = tonumber(station_posx)
+				
+				get_pos2 = string.find(station_pos, " ", get_pos1 + 1)
+				station_posy = string.sub(station_pos,get_pos1,get_pos2)
+				station_posy = tonumber(station_posy)
+				
+				station_posz = string.sub(station_pos,get_pos2 + 1)
+				station_posz = tonumber(station_posz)
+				
+				if (cur_map:find("gm_metro_jar_imagine_line"))  then
+					if (v.names[1] == "ДДЭ" or v.names[1] == "Диспетчерская") then continue end
+				end
 
-			if ((station_posz > 0 and train_posz > 0) or (station_posz < 0 and train_posz < 0)) then -- оба Z больше нуля или меньше нуля
-				Sz = math.max(math.abs(station_posz),math.abs(train_posz)) - math.min(math.abs(station_posz),math.abs(train_posz))
-			end
-			if ((station_posz < 0 and train_posz > 0) or (station_posz > 0 and train_posz < 0)) then -- один Z больше нуля или меньше нуля
-				Sz = math.abs(train_posz) + math.abs(station_posz)
-			end
-			S = math.sqrt(math.pow((station_posx - train_posx), 2) + math.pow((station_posy - train_posy), 2))
-		
-			-- Поиск ближайшей точки в StationConfigurations с уменьшением радиуса:
-			if (S < radius and Sz < 200)
-			then 
-				ent_station = (v.names[1])
-				radius = S
+				if ((station_posz > 0 and train_posz > 0) or (station_posz < 0 and train_posz < 0)) then -- оба Z больше нуля или меньше нуля
+					Sz = math.max(math.abs(station_posz),math.abs(train_posz)) - math.min(math.abs(station_posz),math.abs(train_posz))
+				end
+				if ((station_posz < 0 and train_posz > 0) or (station_posz > 0 and train_posz < 0)) then -- один Z больше нуля или меньше нуля
+					Sz = math.abs(train_posz) + math.abs(station_posz)
+				end
+				S = math.sqrt(math.pow((station_posx - train_posx), 2) + math.pow((station_posy - train_posy), 2))
+			
+				-- Поиск ближайшей точки в StationConfigurations с уменьшением радиуса:
+				if (S < radius and Sz < 200)
+				then 
+					ent_station = (v.names[1])
+					radius = S
+				end
 			end
 		end
+	else
+		ent_station = "N/A"
 	end
 	if (ent_station=="") then ent_station = MetrostroiAdvanced.Lang["UnknownPlace"] end
 	return ent_station
