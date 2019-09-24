@@ -8,16 +8,23 @@
 -------------------------------------------------------
 
 if CLIENT then return end
-local CATEGORY_NAME = "Metrostroi Advanced"
 
 -- CVars
-local spawn_int = CreateConVar("metrostroi_advanced_spawninterval", "0", {FCVAR_NEVER_AS_STRING})
-local train_rest = CreateConVar("metrostroi_advanced_trainsrestrict", "0", {FCVAR_NEVER_AS_STRING})
-local spawn_mes = CreateConVar("metrostroi_advanced_spawnmessage", "1", {FCVAR_NEVER_AS_STRING})
-local max_wags = CreateConVar("metrostroi_advanced_maxwagons", "4", {FCVAR_NEVER_AS_STRING})
-local min_wags = CreateConVar("metrostroi_advanced_minwagons", "2", {FCVAR_NEVER_AS_STRING})
-local route_nums = CreateConVar("metrostroi_advanced_routenums", "1", {FCVAR_NEVER_AS_STRING})
-local auto_wags = CreateConVar("metrostroi_advanced_autowags", "0", {FCVAR_NEVER_AS_STRING})
+local spawn_int = CreateConVar("metrostroi_advanced_spawninterval", 0, {FCVAR_ARCHIVE})
+local train_rest = CreateConVar("metrostroi_advanced_trainsrestrict", 0, {FCVAR_ARCHIVE})
+local spawn_mes = CreateConVar("metrostroi_advanced_spawnmessage", 1, {FCVAR_ARCHIVE})
+local max_wags = CreateConVar("metrostroi_advanced_maxwagons", 4, {FCVAR_ARCHIVE})
+local min_wags = CreateConVar("metrostroi_advanced_minwagons", 2, {FCVAR_ARCHIVE})
+local route_nums = CreateConVar("metrostroi_advanced_routenums", 1, {FCVAR_ARCHIVE})
+local auto_wags = CreateConVar("metrostroi_advanced_autowags", 0, {FCVAR_ARCHIVE})
+local madv_lang = CreateConVar("metrostroi_advanced_lang", "ru", {FCVAR_ARCHIVE})
+
+-- Загрузка локализации
+MetrostroiAdvanced.LoadLanguage(GetConVarString("metrostroi_advanced_lang"))
+
+cvars.AddChangeCallback("metrostroi_advanced_lang", function(cvar, old, new)
+    MetrostroiAdvanced.LoadLanguage(new)
+end)
 
 hook.Add("MetrostroiSpawnerRestrict","TrainSpawnerLimits",function(ply,settings)
 	if IsValid(ply) then
@@ -27,8 +34,8 @@ hook.Add("MetrostroiSpawnerRestrict","TrainSpawnerLimits",function(ply,settings)
 		
 		if (train_restrict == 1) then
 			if (not ULib.ucl.query(ply,train)) then
-				ply:ChatPrint("[Сервер] Вам запрещен данный тип состава!")
-				ply:ChatPrint("Разрешено спавнить только следующие составы:")
+				ply:ChatPrint(MetrostroiAdvanced.Lang["SpawnerRestrict1"])
+				ply:ChatPrint(MetrostroiAdvanced.Lang["SpawnerRestrict1"])
 				for k, v in pairs (MetrostroiAdvanced.TrainList) do
 					if (ULib.ucl.query(ply,k)) then
 						ply:ChatPrint(v)
@@ -69,19 +76,19 @@ hook.Add("MetrostroiSpawnerRestrict","TrainSpawnerLimits",function(ply,settings)
 		
 		if settings.WagNum < GetConVarNumber("metrostroi_advanced_minwagons") then
 			settings.WagNum = GetConVarNumber("metrostroi_advanced_minwagons")
-			ply:ChatPrint("Запрещено спавнить короткие составы!\nКоличество вагонов увеличено до "..tostring(GetConVarNumber("metrostroi_advanced_minwagons"))..".")
+			ply:ChatPrint(MetrostroiAdvanced.Lang["FewWagons"].." "..tostring(GetConVarNumber("metrostroi_advanced_minwagons"))..".")
 		end
 		
 		if (settings.WagNum > ply_wagons) then
-			local wag_str = "вагон"
-			if ply_wagons >= 2 and ply_wagons <= 4 then wag_str = "вагона" end
-			if ply_wagons == 0 or ply_wagons >= 5 then wag_str = "вагонов" end
+			local wag_str = MetrostroiAdvanced.Lang["wagon1"]
+			if ply_wagons >= 2 and ply_wagons <= 4 then wag_str = MetrostroiAdvanced.Lang["wagon2"] end
+			if ply_wagons == 0 or ply_wagons >= 5 then wag_str = MetrostroiAdvanced.Lang["wagon3"] end
 			if wag_awail == 0 then
-				ply:ChatPrint("Закончились доступные для спавна вагоны на сервере.")
-				ply:ChatPrint("Пожалуйста подождите пока кто-нибудь отключится или удалит состав.")
+				ply:ChatPrint(MetrostroiAdvanced.Lang["NoWagons1"])
+				ply:ChatPrint(MetrostroiAdvanced.Lang["NoWagons2"])
 			else
-				ply:ChatPrint("Вы не можете спавнить столько вагонов!")
-				ply:ChatPrint("Для спавна доступно: "..ply_wagons.." "..wag_str..".")
+				ply:ChatPrint(MetrostroiAdvanced.Lang["Wagonsrestrict1"])
+				ply:ChatPrint(MetrostroiAdvanced.Lang["Wagonsrestrict2"].." "..ply_wagons.." "..wag_str..".")
 			end
 			return true
 		end
@@ -89,8 +96,8 @@ hook.Add("MetrostroiSpawnerRestrict","TrainSpawnerLimits",function(ply,settings)
 		--спавн в любом месте
 		if (not ULib.ucl.query(ply,"metrostroi_anyplace_spawn")) then
 			loc = MetrostroiAdvanced.GetLocation(ply)
-			if (loc == "перегон") then
-				ply:ChatPrint("Вам запрещен спавн в этом месте!")
+			if (loc == MetrostroiAdvanced.Lang["UnknownPlace"]) then
+				ply:ChatPrint(MetrostroiAdvanced.Lang["AnyPlaceRestrict"])
 				return true
 			end
 		end
@@ -103,18 +110,18 @@ hook.Add("MetrostroiSpawnerRestrict","TrainSpawnerLimits",function(ply,settings)
 			local curint = curtime - lastspawn
 			if (curint < spawnint) then
 				local secs = spawnint - curint
-				ply:ChatPrint("Пожалуйста подождите "..secs.." секунд прежде, чем спавнить состав.")
+				ply:ChatPrint(MetrostroiAdvanced.Lang["PleaseWait"].." "..secs.." "..MetrostroiAdvanced.Lang["Seconds"].." "..MetrostroiAdvanced.Lang["WaitSpawn"])
 				return true
 			end
 		end
 	
 		-- спавн разрешен
 		if (GetConVarNumber("metrostroi_advanced_spawnmessage") == 1) then
-			local wag_str = "вагон"
+			local wag_str = MetrostroiAdvanced.Lang["wagon1"]
 			local wag_num = settings.WagNum
-			if wag_num >= 2 and wag_num <= 4 then wag_str = "вагона" end
-			if wag_num >= 5 then wag_str = "вагонов" end
-			ulx.fancyLog("Игрок #s заспавнил #s #s #s.\nМестоположение: #s.",ply:Nick(),tostring(wag_num),wag_str,MetrostroiAdvanced.GetTrainName(settings.Train),MetrostroiAdvanced.GetLocation(ply))
+			if wag_num >= 2 and wag_num <= 4 then wag_str = MetrostroiAdvanced.Lang["wagon2"] end
+			if wag_num >= 5 then wag_str = MetrostroiAdvanced.Lang["wagon3"] end
+			ulx.fancyLog(MetrostroiAdvanced.Lang["Player"].." #s "..MetrostroiAdvanced.Lang["Spawned"].." #s #s #s.\n"..MetrostroiAdvanced.Lang["Location"]..": #s.",ply:Nick(),tostring(wag_num),wag_str,MetrostroiAdvanced.GetTrainName(settings.Train),MetrostroiAdvanced.GetLocation(ply))
 		end
 		if (settings.Train == "gmod_subway_81-717_mvm_custom") then
 			ply:SetNW2String("TrainC","gmod_subway_81-717_mvm")

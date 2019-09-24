@@ -23,24 +23,24 @@ local function GotoTrain (ply,tply,train,sit)
 			train.DriverSeat:UseClientSideAnimation() -- пусть ебучую анимацию отрабатывает клиент
 			timer.Create("TeleportIntoDriverSeat", 1, 1, function()
 				train.DriverSeat:Use(ply,ply,3,1)
-				ulx.fancyLog("#s телепортировался в свой состав.",ply:Nick())
+				ulx.fancyLog("#s "..MetrostroiAdvanced.Lang["Teleported"]..MetrostroiAdvanced.Lang["Teleported1"],ply:Nick())
 				ply:Freeze(false)
 			end)
 		else
 			train.InstructorsSeat:UseClientSideAnimation()
 			timer.Create("TeleportIntoInstructorsSeat", 1, 1, function()
 				train.InstructorsSeat:Use(ply,ply,3,1)
-				ulx.fancyLog("#s телепортировался в состав игрока #s.",ply:Nick(),tply:Nick())
+				ulx.fancyLog("#s "..MetrostroiAdvanced.Lang["Teleported"]..MetrostroiAdvanced.Lang["Teleported2"].." #s.",ply:Nick(),tply:Nick())
 				ply:Freeze(false)
 			end)
 		end
     else
 		if ply == tply then
 			ply:SetPos(pos-Vector(0,0,40))
-			ulx.fancyLog("#s телепортировался к своему составу.",ply:Nick())
+			ulx.fancyLog("#s "..MetrostroiAdvanced.Lang["Teleported"]..MetrostroiAdvanced.Lang["Teleported3"],ply:Nick())
 		else
 			ply:SetPos(pos-Vector(0,0,40))
-			ulx.fancyLog("#s телепортировался к составу игрока #s.",ply:Nick(),tply:Nick())
+			ulx.fancyLog("#s "..MetrostroiAdvanced.Lang["Teleported"]..MetrostroiAdvanced.Lang["Teleported4"].." #s.",ply:Nick(),tply:Nick())
 		end
     end
 end
@@ -50,7 +50,7 @@ local stswaittime = 10
 local stslasttime = -stswaittime
 function ulx.sts( calling_ply )
     if stslasttime + stswaittime > CurTime() then
-        ULib.tsayError( calling_ply, "Пожалуйста подождите " .. math.Round(stslasttime + stswaittime - CurTime()) .. " секунд перед использованием этой команды снова!", true )
+        ULib.tsayError( calling_ply, MetrostroiAdvanced.Lang["PleaseWait"].." "..math.Round(stslasttime + stswaittime - CurTime()).." "..MetrostroiAdvanced.Lang["Seconds"].." "..MetrostroiAdvanced.Lang["CommandDelay"], true )
         return
     end
     stslasttime = CurTime()
@@ -72,7 +72,7 @@ function ulx.sts( calling_ply )
 end
 local sts = ulx.command(CATEGORY_NAME, "ulx stations", ulx.sts, "!stations" )
 sts:defaultAccess( ULib.ACCESS_ALL )
-sts:help( "Список станций на карте." )
+sts:help( "List of stations on current map." )
 
 -- Замена !station
 function ulx.tps( calling_ply,station )
@@ -87,7 +87,7 @@ function ulx.tps( calling_ply,station )
         end
 
         --Проверка на наличие таблицы
-        if not Metrostroi.StationConfigurations then ULib.tsayError( calling_ply, "Карта не сконфигурирована!", true ) return end
+        if not Metrostroi.StationConfigurations then ULib.tsayError( calling_ply, MetrostroiAdvanced.Lang["MapNotCongigured"], true ) return end
 
         --Создание массива найденых станций по индкесу станции или куска имени
         local st = {}
@@ -107,10 +107,10 @@ function ulx.tps( calling_ply,station )
         end
 
         if #st == 0 then
-            ULib.tsayError( calling_ply, Format("Станция не найдена: %s",station), true )
+            ULib.tsayError( calling_ply, Format(MetrostroiAdvanced.Lang["StationNotFound"].." %s",station), true )
             return
         elseif #st > 1 then
-            ULib.tsayError( calling_ply,  Format("Найдено больше одной станции по запросу %s:",station), true )
+            ULib.tsayError( calling_ply,  Format(MetrostroiAdvanced.Lang["ManyStations"].." %s:",station), true )
             for k,v in pairs(st) do
                 local tbl = Metrostroi.StationConfigurations[v]
                 if tbl.names and tbl.names[1] then
@@ -119,7 +119,7 @@ function ulx.tps( calling_ply,station )
                     ULib.tsayError( calling_ply, Format("\t%s",k), true )
                 end
             end
-            ULib.tsayError( calling_ply, "Введите более точное название или ID станции!", true )
+            ULib.tsayError( calling_ply, MetrostroiAdvanced.Lang["StationIncorrect"], true )
             return
         end
         local key = st[1]
@@ -139,37 +139,37 @@ function ulx.tps( calling_ply,station )
                 calling_ply:SetPos(ptbl[1])
                 calling_ply:SetAngles(ptbl[2])
                 calling_ply:SetEyeAngles(ptbl[2])
-                ulx.fancyLogAdmin( calling_ply, "#A телепортировался на станцию #s", st.names and st.names[1] or key)
+                ulx.fancyLogAdmin( calling_ply, "#A "..MetrostroiAdvanced.Lang["Teleported"]..MetrostroiAdvanced.Lang["Teleported5"].." #s", st.names and st.names[1] or key)
             else
-                ULib.tsayError( calling_ply, "Ошибка конфигурации для станции "..key, true )
-                ulx.fancyLogAdmin( calling_ply, "Ошибка конфигурации для станции #s", key)
+                ULib.tsayError( calling_ply, MetrostroiAdvanced.Lang["StationConfigError"]..key, true )
+                ulx.fancyLogAdmin( calling_ply, MetrostroiAdvanced.Lang["StationConfigError"].."#s", key)
             end
 
         else
             if ptbl and ptbl[1] then
                 print(Format("DEBUG1:Teleported to %s(%s) pos:%s ang:%s",st.names and st.names[1] or key,key,ptbl[1],ptbl[2]))
             else
-                ulx.fancyLogAdmin( calling_ply, "Ошибка конфигурации для станции #s", station:gsub("^%l", string.upper))
+                ulx.fancyLogAdmin( calling_ply, MetrostroiAdvanced.Lang["StationConfigError"].."#s", station:gsub("^%l", string.upper))
             end
         end
 end
 local tps = ulx.command(CATEGORY_NAME, "ulx station", ulx.tps, "!station" )
-tps:addParam{ type=ULib.cmds.StringArg, hint="Станция или ее номер", ULib.cmds.takeRestOfLine }
+tps:addParam{ type=ULib.cmds.StringArg, hint="Station or ID", ULib.cmds.takeRestOfLine }
 tps:defaultAccess( ULib.ACCESS_ALL )
-tps:help( "Телепорт по станциям." )
+tps:help( "Teleport to a station." )
 
 -- Замена !trains
 local wagonswaittime = 10
 local wagonslasttime = -wagonswaittime
 function ulx.wagons( calling_ply )
     if wagonslasttime + wagonswaittime > CurTime() then
-        ULib.tsayError( calling_ply, "Пожалуйста подождите " .. math.Round(wagonslasttime + wagonswaittime - CurTime()) .. " секунд перед использованием этой команды снова!", true )
+        ULib.tsayError( calling_ply, MetrostroiAdvanced.Lang["PleaseWait"].." "..math.Round(wagonslasttime + wagonswaittime - CurTime()).." "..MetrostroiAdvanced.Lang["Seconds"]..MetrostroiAdvanced.Lang["CommandDelay"], true )
         return
     end
 
     wagonslasttime = CurTime()
 
-    ulx.fancyLog("Вагонов на сервере: #s", Metrostroi.TrainCount())
+    ulx.fancyLog(MetrostroiAdvanced.Lang["ServerWagons"].." #s", Metrostroi.TrainCount())
     if CPPI then
         local Wags = {}
 		local Trains = {}
@@ -179,7 +179,7 @@ function ulx.wagons( calling_ply )
 		local tr_name = ""
 		local r_num = ""
 		local wag_num = 0
-		local wag_str = "вагон"
+		local wag_str = MetrostroiAdvanced.Lang["wagon1"]
 		local inf
 		local f_st = ""
 		local c_st = ""
@@ -216,8 +216,8 @@ function ulx.wagons( calling_ply )
 			if (type(k) == "Player" and IsValid(k)) then
 				ply_name = k:GetName()
 				wag_num = tonumber(v)
-				if wag_num >= 2 and wag_num <= 4 then wag_str = "вагона" end
-				if wag_num >= 5 then wag_str = "вагонов" end
+				if wag_num >= 2 and wag_num <= 4 then wag_str = MetrostroiAdvanced.Lang["wagon2"] end
+				if wag_num >= 5 then wag_str = MetrostroiAdvanced.Lang["wagon3"] end
 				-- составы
 				for k2,v2 in pairs(Trains) do
 					if (type(k2) == "Player" and IsValid(k2) and k2:GetName() == k:GetName()) then tr_name = v2 end
@@ -231,15 +231,15 @@ function ulx.wagons( calling_ply )
 					if (type(k4) == "Player" and IsValid(k4) and k4:GetName() == k:GetName()) then tr_loc = v4 end
 				end
 			end
-			ulx.fancyLog("#s: #s #s #s. Маршрут: #s\nМестоположение: #s",ply_name,wag_num,wag_str,tr_name,r_num,tr_loc)
+			ulx.fancyLog("#s: #s #s #s. "..MetrostroiAdvanced.Lang["Route"]..": #s\n"..MetrostroiAdvanced.Lang["Location"]..": #s",ply_name,wag_num,wag_str,tr_name,r_num,tr_loc)
         end
     end
 	local wag_awail = (GetConVarNumber("metrostroi_maxtrains")*GetConVarNumber("metrostroi_advanced_maxwagons"))-GetGlobalInt("metrostroi_train_count")
-    ulx.fancyLog("Доступно вагонов для спавна: #s",wag_awail)
+    ulx.fancyLog(MetrostroiAdvanced.Lang["WagonsAwail"].." #s",wag_awail)
 end
 local wagons = ulx.command(CATEGORY_NAME, "ulx trains", ulx.wagons, "!trains" )
 wagons:defaultAccess( ULib.ACCESS_ALL )
-wagons:help( "Информация о составах на сервере." )
+wagons:help( "Info about all trains on server." )
 
 -- чат-команда для высадки пассажиров
 function ulx.expass( calling_ply )
@@ -247,7 +247,7 @@ function ulx.expass( calling_ply )
 end
 local exps = ulx.command(CATEGORY_NAME, "ulx expass", ulx.expass, "!expass" )
 exps:defaultAccess( ULib.ACCESS_ALL )
-exps:help( "Высадить всех пассажиров." )
+exps:help( "Expel all passengers." )
 
 -- телепорт в состав игрока
 function ulx.traintp( calling_ply, target_ply )
@@ -283,7 +283,7 @@ end
 local ttp = ulx.command( CATEGORY_NAME, "ulx traintp", ulx.traintp, "!traintp" )
 ttp:addParam{ type=ULib.cmds.PlayerArg, target="*", default="^", ULib.cmds.optional }
 ttp:defaultAccess( ULib.ACCESS_ALL )
-ttp:help( "Телепортироваться в состав игрока." )
+ttp:help( "Teleport to a player's train." )
 
 -- телепорт к светофору по названию
 function ulx.signaltp(calling_ply,signal)
@@ -296,12 +296,12 @@ function ulx.signaltp(calling_ply,signal)
 			return
 		end
 	end
-	ULib.tsayError( calling_ply, "Светофор "..signal.." не найден", true ) 			
+	ULib.tsayError( calling_ply, MetrostroiAdvanced.Lang["Signal"].." "..signal.." "..MetrostroiAdvanced.Lang["NotFound"], true ) 			
 end
 local signaltp = ulx.command( CATEGORY_NAME, "ulx signaltp", ulx.signaltp, "!signaltp" )
-signaltp:addParam{ type=ULib.cmds.StringArg, hint="Светофор", ULib.cmds.takeRestOfLine }
+signaltp:addParam{ type=ULib.cmds.StringArg, hint="Signal", ULib.cmds.takeRestOfLine }
 signaltp:defaultAccess( ULib.ACCESS_ADMIN )
-signaltp:help( "Телепортирует к сигналу")
+signaltp:help( "Teleport to a signal" )
 
 -- восстановление исходного положения удочек
 function ulx.udochka( calling_ply )
@@ -320,19 +320,19 @@ function ulx.udochka( calling_ply )
 	for k,v in pairs(udcs) do
 		v:SetPos(MetrostroiAdvanced.Udc_Positions[k])
 	end
-	ulx.fancyLog("#s восстановил удочки в исходное положение.",calling_ply:Nick())
+	ulx.fancyLog("#s "..MetrostroiAdvanced.Lang["UDCMessage"],calling_ply:Nick())
 end
 local udc = ulx.command( CATEGORY_NAME, "ulx udochka", ulx.udochka, "!udc" )
 udc:defaultAccess( ULib.ACCESS_ADMIN )
-udc:help( "Восстановить положения удочек." )
+udc:help( "Reset the positions of power connectors." )
 
 if SERVER then
 	-- Регистрация прав ULX
 	for k, v in pairs (MetrostroiAdvanced.TrainList) do
-		ULib.ucl.registerAccess(k, ULib.ACCESS_ALL, "Спавн состава "..v, CATEGORY_NAME)
+		ULib.ucl.registerAccess(k, ULib.ACCESS_ALL, "Spawn train type "..v, CATEGORY_NAME)
 	end
-	ULib.ucl.registerAccess("add_1wagons", ULib.ACCESS_ADMIN, "Спавн на 1 вагон больше", CATEGORY_NAME)
-	ULib.ucl.registerAccess("add_2wagons", ULib.ACCESS_ADMIN, "Спавн на 2 вагона больше", CATEGORY_NAME)
-	ULib.ucl.registerAccess("add_3wagons", ULib.ACCESS_ADMIN, "Спавн на 3 вагона больше", CATEGORY_NAME)
-	ULib.ucl.registerAccess("metrostroi_anyplace_spawn", ULib.ACCESS_ALL, "Спавн в любом месте", CATEGORY_NAME)
+	ULib.ucl.registerAccess("add_1wagons", ULib.ACCESS_ADMIN, "Spawn +1 wagon more", CATEGORY_NAME)
+	ULib.ucl.registerAccess("add_2wagons", ULib.ACCESS_ADMIN, "Spawn +2 wagons more", CATEGORY_NAME)
+	ULib.ucl.registerAccess("add_3wagons", ULib.ACCESS_ADMIN, "Spawn +3 wagons more", CATEGORY_NAME)
+	ULib.ucl.registerAccess("metrostroi_anyplace_spawn", ULib.ACCESS_ALL, "Spawn anywhere", CATEGORY_NAME)
 end

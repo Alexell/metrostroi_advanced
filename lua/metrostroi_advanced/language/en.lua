@@ -1,0 +1,61 @@
+----------------- Metrostroi Advanced -----------------
+-- Language: en
+-- Translation Author: Agent Smith
+-------------------------------------------------------
+MetrostroiAdvanced.Lang = {}
+
+-- Trains
+MetrostroiAdvanced.Lang["81-502"] 				= "81-502 (Ema-502)"
+MetrostroiAdvanced.Lang["81-702"] 				= "81-702 (D)"
+MetrostroiAdvanced.Lang["81-703"] 				= "81-703 (E)"
+MetrostroiAdvanced.Lang["ezh"] 					= "81-707 (Ezh)"
+MetrostroiAdvanced.Lang["ezh3"] 				= "81-710 (Ezh3)"
+MetrostroiAdvanced.Lang["ezh3ru1"] 				= "81-710 (Ezh3 RU1)"
+MetrostroiAdvanced.Lang["81-717_mvm"]			= "81-717 (Nomernoi MSK)"
+MetrostroiAdvanced.Lang["81-717_mvm_custom"]	= "81-717 (Nomernoi MSK)"
+MetrostroiAdvanced.Lang["81-717_lvz"] 			= "81-717 (Nomernoi SPb)"
+MetrostroiAdvanced.Lang["81-717_6"] 			= "81-717.6"
+MetrostroiAdvanced.Lang["81-718"] 				= "81-718 (TISU)"
+MetrostroiAdvanced.Lang["81-720"] 				= "81-720 (Yauza)"
+MetrostroiAdvanced.Lang["81-722"] 				= "81-722 (Yubileyniy)"
+--MetrostroiAdvanced.Lang["81-760"] 			= "81-760 (Oka)"
+
+-- SV
+MetrostroiAdvanced.Lang["UnknownPlace"] 		= "mainline"
+MetrostroiAdvanced.Lang["SpawnerRestrict1"] 	= "[Server] This type of train is restricted for your rank!"
+MetrostroiAdvanced.Lang["SpawnerRestrict1"] 	= "The following types of train are allowed:"
+MetrostroiAdvanced.Lang["FewWagons"] 			= "Too short trains are restricted!\nThe number of wagons increased to"
+MetrostroiAdvanced.Lang["wagon1"] 				= "wagon"
+MetrostroiAdvanced.Lang["wagon2"] 				= "wagons"
+MetrostroiAdvanced.Lang["wagon3"] 				= "wagons"
+MetrostroiAdvanced.Lang["NoWagons1"] 			= "You've hit the wagons to spawn limit."
+MetrostroiAdvanced.Lang["NoWagons2"] 			= "Wait for any player to disconnect or delete a train."
+MetrostroiAdvanced.Lang["Wagonsrestrict1"] 		= "You cann't spawn this number of wagons!"
+MetrostroiAdvanced.Lang["Wagonsrestrict2"] 		= "Available for spawn:"
+MetrostroiAdvanced.Lang["AnyPlaceRestrict"] 	= "Spawn is restricted for you in this place!"
+MetrostroiAdvanced.Lang["Seconds"]				= "seconds"
+MetrostroiAdvanced.Lang["PleaseWait"] 			= "Please, wait"
+MetrostroiAdvanced.Lang["WaitSpawn"] 			= "before, spawning a train."
+MetrostroiAdvanced.Lang["Player"] 				= "Player"
+MetrostroiAdvanced.Lang["Spawned"] 				= "spawned"
+MetrostroiAdvanced.Lang["Location"] 			= "Location"
+
+-- ULX
+MetrostroiAdvanced.Lang["Teleported"]			= "teleported"
+MetrostroiAdvanced.Lang["Teleported1"]			= " into own train."
+MetrostroiAdvanced.Lang["Teleported2"]			= " into train of"
+MetrostroiAdvanced.Lang["Teleported3"]			= " to own train."
+MetrostroiAdvanced.Lang["Teleported4"]			= " to train of"
+MetrostroiAdvanced.Lang["Teleported5"]			= " to station"
+MetrostroiAdvanced.Lang["CommandDelay"]			= " before using this command again!"
+MetrostroiAdvanced.Lang["MapNotCongigured"]		= "Map is not configured!"
+MetrostroiAdvanced.Lang["StationNotFound"]		= "Station not found:"
+MetrostroiAdvanced.Lang["ManyStations"]			= "Found multiple results on request"
+MetrostroiAdvanced.Lang["StationIncorrect"]		= "Specify the name or ID of station!"
+MetrostroiAdvanced.Lang["StationConfigError"]	= "Configuration error for station "
+MetrostroiAdvanced.Lang["ServerWagons"]			= "Wagons on server:"
+MetrostroiAdvanced.Lang["Route"]				= "Route"
+MetrostroiAdvanced.Lang["WagonsAwail"]			= "Wagons available for spawn:"
+MetrostroiAdvanced.Lang["Signal"]				= "Signal"
+MetrostroiAdvanced.Lang["NotFound"]				= "not found"
+MetrostroiAdvanced.Lang["UDCMessage"]			= "has reset all power connectors."

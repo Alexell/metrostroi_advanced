@@ -11,41 +11,31 @@
 if not MetrostroiAdvanced then
 	MetrostroiAdvanced = {}
 	MetrostroiAdvanced.TrainList = {}
+end
+
+-- Загрузка локализации
+function MetrostroiAdvanced.LoadLanguage(lang)
+	if MetrostroiAdvanced.Lang then MetrostroiAdvanced.Lang = nil end
+	if file.Exists("metrostroi_advanced/language/"..lang..".lua","LUA") then
+		include("metrostroi_advanced/language/"..lang..".lua")
+	else
+		include("metrostroi_advanced/language/ru.lua")
+	end
 	
-	MetrostroiAdvanced.TrainList["gmod_subway_81-502"] 				= "81-502 (Ема-502)"
-	MetrostroiAdvanced.TrainList["gmod_subway_81-702"] 				= "81-702 (Д)"
-	MetrostroiAdvanced.TrainList["gmod_subway_81-703"] 				= "81-703 (E)"
-	MetrostroiAdvanced.TrainList["gmod_subway_ezh"] 				= "81-707 (Еж)"
-	MetrostroiAdvanced.TrainList["gmod_subway_ezh3"] 				= "81-710 (Еж3)"
-	MetrostroiAdvanced.TrainList["gmod_subway_ezh3ru1"] 			= "81-710 (Еж3 РУ1)"
-	MetrostroiAdvanced.TrainList["gmod_subway_81-717_mvm"]			= "81-717 (Номерной МСК)"
-	MetrostroiAdvanced.TrainList["gmod_subway_81-717_mvm_custom"]	= "81-717 (Номерной МСК)"
-	MetrostroiAdvanced.TrainList["gmod_subway_81-717_lvz"] 			= "81-717 (Номерной СПБ)"
-	MetrostroiAdvanced.TrainList["gmod_subway_81-717_6"] 			= "81-717.6"
-	MetrostroiAdvanced.TrainList["gmod_subway_81-718"] 				= "81-718 (ТИСУ)"
-	MetrostroiAdvanced.TrainList["gmod_subway_81-720"] 				= "81-720 (Яуза)"
-	MetrostroiAdvanced.TrainList["gmod_subway_81-722"] 				= "81-722 (Юбилейный)"
-  --MetrostroiAdvanced.TrainList["gmod_subway_81-760"] 				= "81-760 (Ока)"
-end
-
-if SERVER then
-	include("sv_metrostroi_advanced.lua")
-	include("metrostroi_map_fixes.lua")
-end
-
-if CLIENT then
-	-- Оптимизация клиентов
-	RunConsoleCommand( "gmod_mcore_test", 1 )
-	RunConsoleCommand( "mat_queue_mode", 2 )
-	RunConsoleCommand( "mat_specular", 0 )
-	RunConsoleCommand( "cl_threaded_bone_setup", 1 )
-	RunConsoleCommand( "cl_threaded_client_leaf_system", 1 )
-	RunConsoleCommand( "r_threaded_client_shadow_manager", 1 )
-	RunConsoleCommand( "r_threaded_particles", 1 )
-	RunConsoleCommand( "r_threaded_renderables", 1 )
-	RunConsoleCommand( "r_queued_ropes", 1 )
-	RunConsoleCommand( "datacachesize", 512 )
-	RunConsoleCommand( "mem_max_heapsize", 2048 )
+	MetrostroiAdvanced.TrainList["gmod_subway_81-502"] 				= MetrostroiAdvanced.Lang["81-502"]
+	MetrostroiAdvanced.TrainList["gmod_subway_81-702"] 				= MetrostroiAdvanced.Lang["81-702"]
+	MetrostroiAdvanced.TrainList["gmod_subway_81-703"] 				= MetrostroiAdvanced.Lang["81-703"]
+	MetrostroiAdvanced.TrainList["gmod_subway_ezh"] 				= MetrostroiAdvanced.Lang["ezh"]
+	MetrostroiAdvanced.TrainList["gmod_subway_ezh3"] 				= MetrostroiAdvanced.Lang["ezh3"]
+	MetrostroiAdvanced.TrainList["gmod_subway_ezh3ru1"] 			= MetrostroiAdvanced.Lang["ezh3ru1"]
+	MetrostroiAdvanced.TrainList["gmod_subway_81-717_mvm"]			= MetrostroiAdvanced.Lang["81-717_mvm"]
+	MetrostroiAdvanced.TrainList["gmod_subway_81-717_mvm_custom"]	= MetrostroiAdvanced.Lang["81-717_mvm_custom"]
+	MetrostroiAdvanced.TrainList["gmod_subway_81-717_lvz"] 			= MetrostroiAdvanced.Lang["81-717_lvz"]
+	MetrostroiAdvanced.TrainList["gmod_subway_81-717_6"] 			= MetrostroiAdvanced.Lang["81-717_6"]
+	MetrostroiAdvanced.TrainList["gmod_subway_81-718"] 				= MetrostroiAdvanced.Lang["81-718"]
+	MetrostroiAdvanced.TrainList["gmod_subway_81-720"] 				= MetrostroiAdvanced.Lang["81-720"]
+	MetrostroiAdvanced.TrainList["gmod_subway_81-722"] 				= MetrostroiAdvanced.Lang["81-722"]
+	--MetrostroiAdvanced.TrainList["gmod_subway_81-760"] 			= MetrostroiAdvanced.Lang["81-760"]
 end
 
 -- Название состава по классу
@@ -126,7 +116,7 @@ function MetrostroiAdvanced.GetLocation(ent)
 			end
 		end
 	end
-	if (ent_station=="") then ent_station = "перегон" end
+	if (ent_station=="") then ent_station = MetrostroiAdvanced.Lang["UnknownPlace"] end
 	return ent_station
 end
 
@@ -164,4 +154,24 @@ function MetrostroiAdvanced.GetRouteNumber(ply)
 	if ply:SteamID() == "STEAM_0:1:15049625" then rnum = 11 end -- Agent Smith
 	
 	return rnum
+end
+
+if SERVER then
+	include("metrostroi_advanced/sv_metrostroi_advanced.lua")
+	include("metrostroi_advanced/metrostroi_map_fixes.lua")
+end
+
+if CLIENT then
+	-- Оптимизация клиентов
+	RunConsoleCommand( "gmod_mcore_test", 1 )
+	RunConsoleCommand( "mat_queue_mode", 2 )
+	RunConsoleCommand( "mat_specular", 0 )
+	RunConsoleCommand( "cl_threaded_bone_setup", 1 )
+	RunConsoleCommand( "cl_threaded_client_leaf_system", 1 )
+	RunConsoleCommand( "r_threaded_client_shadow_manager", 1 )
+	RunConsoleCommand( "r_threaded_particles", 1 )
+	RunConsoleCommand( "r_threaded_renderables", 1 )
+	RunConsoleCommand( "r_queued_ropes", 1 )
+	RunConsoleCommand( "datacachesize", 512 )
+	RunConsoleCommand( "mem_max_heapsize", 2048 )
 end
