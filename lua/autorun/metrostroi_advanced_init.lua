@@ -19,6 +19,8 @@ function MetrostroiAdvanced.LoadLanguage(lang)
 	if file.Exists("metrostroi_advanced/language/"..lang..".lua","LUA") then
 		include("metrostroi_advanced/language/"..lang..".lua")
 	else
+		print("Metrostroi Advanced: localization file not found: lua/metrostroi_advanced/language/"..lang..".lua")
+		print("Metrostroi Advanced: default language will be loaded (ru)")
 		include("metrostroi_advanced/language/ru.lua")
 	end
 	

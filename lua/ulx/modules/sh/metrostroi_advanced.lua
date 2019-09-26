@@ -326,6 +326,78 @@ local udc = ulx.command( CATEGORY_NAME, "ulx udochka", ulx.udochka, "!udc" )
 udc:defaultAccess( ULib.ACCESS_ADMIN )
 udc:help( "Reset the positions of power connectors." )
 
+-- посадить игрока в кресло машиниста
+function ulx.enter( calling_ply, target_ply )
+	if IsValid(target_ply) then
+		local train = calling_ply:GetEyeTrace().Entity
+		if not train.DriverSeat then
+			ULib.tsayError( calling_ply, MetrostroiAdvanced.Lang["WagonIncorrect"] )
+			return
+		end
+		if IsValid(target_ply:GetVehicle()) then
+			target_ply:ExitVehicle()
+		end
+		local pos = train:GetPos()
+		target_ply:SetMoveType(8)
+		target_ply:Freeze(true)
+		target_ply:SetPos(pos-Vector(0,0,40))
+		timer.Create("TimerPlyEnterDriverSeat", 0.2, 1, function()
+			train.DriverSeat:UseClientSideAnimation()
+			train.DriverSeat:Use(target_ply,target_ply,3,1)
+			target_ply:Freeze(false)
+			if train.DriverSeat == target_ply:GetVehicle() then
+				ulx.fancyLogAdmin( calling_ply, "#A "..MetrostroiAdvanced.Lang["EnterPlayer"].." #T "..MetrostroiAdvanced.Lang["IntoTrain"], target_ply )
+			else
+				ULib.tsayError( calling_ply, MetrostroiAdvanced.Lang["EnterFail"] )
+			end
+		end)
+
+	end
+end
+local enter = ulx.command( CATEGORY_NAME, "ulx enter", ulx.enter, "!enter")
+enter:addParam{ type = ULib.cmds.PlayerArg }
+enter:defaultAccess( ULib.ACCESS_ADMIN )
+enter:help( "Place a player into the driver's seat (aim at any wagon)" )
+
+-- высадить игрока с любого места в составе
+function ulx.expel( calling_ply, target_ply )
+	if IsValid(target_ply) then
+		if not IsValid(target_ply:GetVehicle()) then
+			ULib.tsayError( calling_ply, target_ply:Nick() .. " "..MetrostroiAdvanced.Lang["NotInVehicle"] )
+			return
+		else
+			target_ply:ExitVehicle()
+		end
+		ulx.fancyLogAdmin( calling_ply, "#A "..MetrostroiAdvanced.Lang["ExpelPlayer"].." #T "..MetrostroiAdvanced.Lang["OutTrain"], target_ply )
+	end
+end
+local expl = ulx.command( CATEGORY_NAME, "ulx expel", ulx.expel, "!expel")
+expl:addParam{ type = ULib.cmds.PlayerArg }
+expl:defaultAccess( ULib.ACCESS_ADMIN )
+expl:help( "Expel a player from any seat in train" )
+
+-- простая смена кабины
+function ulx.ch( calling_ply )
+	if not IsValid(calling_ply) then return end
+	local seat = calling_ply:GetVehicle()
+	if not IsValid(seat) then return end
+	local train = seat:GetNW2Entity("TrainEntity")
+	for k,v in pairs(train.WagonList) do
+		if (v:GetClass() == train:GetClass() and v ~= train) then
+			calling_ply:ExitVehicle()
+			calling_ply:SetMoveType(8)
+			v.DriverSeat:UseClientSideAnimation()
+			timer.Create("TeleportInto2CabDriverSeat", 1, 1, function()
+				v.DriverSeat:Use(calling_ply,calling_ply,3,1)
+			end)
+			break
+		end
+	end
+end
+local ch = ulx.command( CATEGORY_NAME, "ulx ch", ulx.ch, "!ch" )
+ch:defaultAccess( ULib.ACCESS_ALL )
+ch:help( "Simple cabin change" )
+
 if SERVER then
 	-- Регистрация прав ULX
 	for k, v in pairs (MetrostroiAdvanced.TrainList) do
