@@ -237,9 +237,135 @@ local function TrainStart(train)
 	end
 end
 
+local function TrainStop(train)
+	-- Проход по составам - самая большая группа - Номерной и древнее
+	if train:GetClass() and (train:GetClass():sub(13,18) != "81-718" and train:GetClass():sub(13,18) != "81-720" and train:GetClass():sub(13,18) != "81-722") then
+		if train.Pneumatic.DriverValvePosition != 5 then
+			train.Pneumatic:TriggerInput("BrakeSet", 5)
+		end
+		timer.Create("TogglesOffTimer", 0.5, 1, function ()
+			Set("R_UNch", 0, ply, train)
+			Set("R_ZS", 0, ply, train)
+			Set("R_G", 0, ply, train)
+			Set("V1", 0, ply, train)
+		end)
+		timer.Create("TogglesOffTimer", 1, 1, function ()
+			Set("KU1", 0, ply, train)	-- МК для Еж
+			Set("KU2", 0, ply, train)
+			Set("PLights", 0, ply, train) -- свет в кабине для Еж3
+			Set("VMK", 0, ply, train)
+		end)		
+		timer.Create("ValvesOffTimer", 1.5, 1, function ()
+			Set("DriverValveDisconnect", 0, ply, train)
+			Set("DriverValveBLDisconnect", 0, ply, train)
+			Set("DriverValveTLDisconnect", 0, ply, train)
+		end)		
+		timer.Create("FullServiceBreakTimer", 2, 1, function() -- таймер на полное служебное торможение	
+			Set("ALS", 0, ply, train)
+			Set("ARS", 0, ply, train)	
+			timer.Create("MiscTimer", 1, 1, function()			
+				Set("VUD1", 0, ply, train)	
+				Set("V2", 0, ply, train)			
+				train.Pneumatic:TriggerInput("BrakeSet", 2)	
+				end)
+		end)
+		if train.KVWrenchMode == 1  then
+			train.KV:TriggerInput("ControllerSet", 0)				
+		end 
+		if train.KVWrenchMode != 0  then	
+			timer.Create("KVOff", 2.5, 1, function() -- таймер на откл реверса
+				train.KV:TriggerInput("ReverserSet", 0)
+				timer.Create("KVOut", 0.5, 1, function()
+					train.KV:TriggerInput("Enabled", 0)
+					train.KVWrenchMode = 0
+				end)
+			end)					
+		end	
+	-- ТИСУ
+	elseif train:GetClass() and train:GetClass():sub(13,18) == "81-718" then
+		if train.Pneumatic.DriverValvePosition != 6 then
+			train.Pneumatic:TriggerInput("BrakeSet", 5)
+		end
+		timer.Create("FullServiceBreakTimer718", 3, 1, function() -- таймер на полное служебное торможение ТИСУ
+			Set("DriverValveDisconnect", 0, ply, train)
+		end)
+		timer.Create("TogglesOffTimer718", 4, 1, function()
+			Set("SAP39", 0, ply, train)
+			Set("SA5", 0, ply, train)
+			Set("SA16", 0, ply, train)
+		end)						
+		if train.WrenchMode != 0 then
+			timer.Create("KROff", 5, 1, function() -- таймер на откл реверса. ТИСУ
+				train.KR:TriggerInput("Set", train.KR.Position - 1)
+				Set("SA15", 0, ply, train)
+				Set("SA13", 0, ply, train)
+				timer.Create("KROff1", 1, 1, function() -- таймер на откл реверса. ТИСУ
+					train.WrenchMode = 0
+					train.Pneumatic:TriggerInput("BrakeSet", 2)
+				end)
+			end)			
+		end		
+	-- Яуза
+	elseif train:GetClass() and train:GetClass():sub(13,18) == "81-720" then
+		if train.WrenchMode != 0 then
+			train.RV:TriggerInput("KROSet", train.RV.KROPosition - 1)
+			timer.Create("RVOff", 0.5, 1, function() -- таймер на откл реверса. Яуза
+				Set("DoorClose", 0, ply, train) 
+				Set("DoorSelectL", 0, ply, train) 
+				Set("DoorSelectR", 0, ply, train) 
+			end)			
+			timer.Create("RVOut", 1, 1, function() -- таймер на откл реверса. Яуза
+				train.WrenchMode = 0
+			end)
+			timer.Create("TogglesOffTimer720", 1.5, 1, function() -- таймер на откл кнопок
+				Set("DoorClose", 0, ply, train) 
+				Set("DoorSelectL", 0, ply, train) 
+				Set("DoorSelectR", 0, ply, train) 
+			end)
+		end	
+	else 
+	-- Юбилейный (без комментариев)
+		if train:GetClass():sub(13,18) == "81-722" then 	
+			timer.Create("KRONeutral", 0.5, 1, function() 
+				train.KRO:TriggerInput("Set", 1) 
+			end)
+			timer.Create("ARSOffTimer722", 1, 1, function() 
+				Set("ALS", 0, ply, train)
+				Set("ARS", 0, ply, train)			
+			end)
+			timer.Create("CabDeactive", 1.5, 1, function() 
+				train.BUKP.Active = 0
+				train:SetPackedBool("MFDUActive", false)	
+				Set("DoorClose", 1, ply, train)				
+			end)
+		end
+	end
+end
+
 ------------------------------------------------------
 --			***	TRAIN START SCRIPT END	***			--
 ------------------------------------------------------
+
+-- Смена кабины
+local function ChangeCab (ply,train1,train2)
+    local tim = 3
+	local tim2 = tim + 1.5
+	local tim3 = tim2 + 1.5
+	if ply:GetNW2String("TrainC","") == "gmod_subway_81-720" then tim = 1  tim2 = tim + 1 tim3 = tim2 + 1 end
+	if ply:GetNW2String("TrainC","") == "gmod_subway_81-722" then tim = 1  tim2 = tim + 1 tim3 = tim2 + 1 end
+	TrainStop(train1)	
+	timer.Create("Cab1OutDriverSeat", tim, 1, function()
+		ply:ExitVehicle()
+		ply:SetMoveType(8)
+	end)
+	timer.Create("Cab2IntoDriverSeat", tim2, 1, function()
+		train2.DriverSeat:UseClientSideAnimation() -- пусть ебучую анимацию отрабатывает клиент	
+		train2.DriverSeat:Use(ply,ply,3,1)
+	end)
+	timer.Create("Cab2TrainStart", tim3, 1, function()
+		TrainStart(train2)
+	end)	
+end
 
 -- Вывод станций в чат
 local stswaittime = 10
@@ -609,6 +735,26 @@ end
 local ch = ulx.command( CATEGORY_NAME, "ulx ch", ulx.ch, "!ch" )
 ch:defaultAccess( ULib.ACCESS_ALL )
 ch:help( "Simple cabin change" )
+
+function ulx.smartch( calling_ply )
+	local seat = calling_ply:GetVehicle()
+	if not IsValid(seat) then return end
+	local seattype = seat:GetNW2String("SeatType")
+	if seattype == "driver" then
+		local train1 = seat:GetNW2Entity("TrainEntity")
+		local train2
+		if not IsValid(train1) then return end
+		for t,wag in pairs(train1.WagonList) do
+			if (wag:GetClass() == train1:GetClass() and wag ~= train1) then
+				train2 = wag
+			end
+		end
+		ChangeCab(calling_ply,train1,train2)
+	end
+end
+local sch = ulx.command( CATEGORY_NAME, "ulx sch", ulx.smartch, "!sch" )
+sch:defaultAccess( ULib.ACCESS_ALL )
+sch:help( "Smart cabin change" )
 
 function ulx.trainstart( calling_ply )
 	if not IsValid(calling_ply) then return end
