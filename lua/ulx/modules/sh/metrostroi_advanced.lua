@@ -45,6 +45,202 @@ local function GotoTrain (ply,tply,train,sit)
     end
 end
 
+------------------------------------------------------
+--		***	METROSTROI TRAIN START SCRIPT ***		--
+--				Made by Agent Smith					--
+--		https://steamcommunity.com/id/ag-sm1th/		--
+------------------------------------------------------
+
+local function Set(button,state,ply,train)
+	if IsValid(train) then
+		if train[button] then
+			train[button]:TriggerInput("Set",state)
+		end
+	end
+end
+
+local function TrainStart(train)
+	-- Проход по составам - самая большая группа - Номерной и древнее
+	if train:GetClass() and (train:GetClass():sub(13,18) != "81-718" and train:GetClass():sub(13,18) != "81-720" and train:GetClass():sub(13,18) != "81-722") then
+		if train.KVWrenchMode != 1  or train.KVWrenchMode == 1 then
+			train:PlayOnce("revers_in","cabin", 0.7)
+			train.KVWrenchMode = 1
+			train.KV:TriggerInput("Enabled", 1)
+		end
+		if train.KVWrenchMode == 1  then
+			train.KV:TriggerInput("ReverserSet", 1)
+		end 
+		if train.Pneumatic.DriverValvePosition != 2 then
+			train.Pneumatic:TriggerInput("BrakeSet", 2)
+		end
+		Set("ALS", 0, ply, train)
+		Set("ARS", 0, ply, train)	
+		Set("EPK", 0, ply, train)
+		Set("EPV", 0, ply, train)
+		timer.Create("TogglesOnTimer", 0.5, 1, function()	
+			Set("A53", 1, ply, train)
+			Set("A49", 1, ply, train)
+			Set("A63", 1, ply, train)
+			Set("VB", 1, ply, train)
+			--Set("BPSNon", 1, ply, train)
+			Set("VMK", 1, ply, train)
+			Set("V1", 1, ply, train)
+			Set("KU1", 1, ply, train)	-- МК для Еж
+			Set("VUS", 1, ply, train)	
+		end)
+		timer.Create("TogglesOnTimer2", 1, 1, function()	
+			Set("VUD1", 1, ply, train)
+			Set("V2", 1, ply, train)
+			Set("L_1", 1, ply, train)
+			Set("L_3", 1, ply, train)
+			Set("L_4", 1, ply, train)
+			Set("R_UNch", 1, ply, train)
+			Set("R_ZS", 1, ply, train)
+			Set("R_G", 1, ply, train)
+			Set("R_Radio", 1, ply, train)
+			Set("PLights", 1, ply, train) -- для Еж3
+			Set("GLights", 1, ply, train) -- для Еж3
+			Set("VU14", 1, ply, train)	-- для Еж3
+			Set("KU16", 1, ply, train)	-- Фары для Еж
+			Set("KU2", 1, ply, train)	-- двери для Еж
+		end)
+		if train.ALS_ARS then 	-- условие на наличие АРС
+			timer.Create("ARSTimer", 1.5, 1, function() -- таймер на AРC
+				Set("ALS", 1, ply, train)
+				Set("ARS", 1, ply, train)
+				Set("EPK", 1, ply, train)
+				Set("EPV", 1, ply, train)			
+			end)
+			timer.Create("DriverValveTimer013", 2.5, 1, function() -- таймер на разобщительный кран (013)
+				Set("DriverValveDisconnect", 1, ply, train)
+			end)
+			timer.Create("DriverValveTimer334", 2, 1, function() -- таймер на краны двойной тяги (334)
+				Set("DriverValveBLDisconnect", 1, ply, train)
+				Set("DriverValveTLDisconnect", 1, ply, train)
+			end)
+			timer.Create("KBPressed", 4, 2, function() -- таймер на отмену КВТ (Ема)
+				Set("KB", 1, ply, train)
+			end)
+			timer.Create("KBReleased", 5, 2, function() -- таймер на отмену КВТ (Ема)
+				Set("KB", 0, ply, train)
+			end)
+			timer.Create("KVTPressed", 4, 2, function() -- таймер на отмену КВТ
+				Set("KVT", 1, ply, train)		
+			end)	
+			timer.Create("KVTReleased", 5, 2, function() -- таймер на отмену КВТ
+				Set("KVT", 0, ply, train)		
+			end)
+		else
+			timer.Create("DriverValveTimer013", 2, 1, function() -- таймер на разобщительный кран (013)
+				Set("DriverValveDisconnect", 1, ply, train)
+			end)
+			timer.Create("DriverValveTimer334", 2, 1, function() -- таймер на краны двойной тяги (334)
+				Set("DriverValveBLDisconnect", 1, ply, train)
+				Set("DriverValveTLDisconnect", 1, ply, train)
+			end)	
+		end
+	-- ТИСУ
+	elseif train:GetClass():sub(13,18) == "81-718" then
+		if train.WrenchMode != 1 or train.WrenchMode == 1 then
+			train:PlayOnce("kr_in", "cabin",1)
+			train.WrenchMode = 1
+		end
+		if train.WrenchMode == 1 then
+			train.KR:TriggerInput("Set", train.KR.Position + 1)
+		end
+		if train.Pneumatic.DriverValvePosition != 2 then
+			train.Pneumatic:TriggerInput("BrakeSet", 2)
+		end
+		Set("SA15", 0, ply, train)
+		Set("SA13", 0, ply, train)
+		Set("EPK", 0, ply, train)	
+		Set("SA16", 1, ply, train)
+		Set("SAP39", 1, ply, train)		
+		timer.Create("TogglesOnTimer718", 0.5, 1, function() -- таймер на тумблера
+			Set("SA2/1", 1, ply, train)
+			Set("SA4/1", 1, ply, train)				
+			Set("SA5", 1, ply, train)
+		end)
+		timer.Create("ARSTimer718", 1, 1, function() -- таймер на AРC
+			Set("SA15", 1, ply, train)
+			Set("SA13", 1, ply, train)
+			Set("EPK", 1, ply, train)
+		end)
+		timer.Create("DriverValveTimer013", 1.5, 1, function() -- таймер на разобщительный кран (013)
+			Set("DriverValveDisconnect", 1, ply, train)
+		end)
+		timer.Create("SB9Pressed", 2, 1, function() -- таймер на отмену КВТ
+			Set("SB9", 1, ply, train)		
+		end)	
+		timer.Create("SB9Released", 3, 1, function() -- таймер на отмену КВТ
+			Set("SB9", 0, ply, train)		
+		end)
+	-- Яуза	
+	elseif train:GetClass():sub(13,18) == "81-720" then 	-- не проверено!
+		if train.WrenchMode != 1 or train.WrenchMode == 1 then
+			train:PlayOnce("kro_in", "cabin",1)
+			train.WrenchMode = 1
+			timer.Create("ReverserSet", 0.25, 1, function() -- таймер на переключение реверса
+				train.RV:TriggerInput("KROSet", train.RV.KROPosition + 1)
+			end)
+		end	
+		timer.Create("RearToggles", 0.5, 1, function() -- таймер на тумблера сзади
+			Set("Headlights1", 1, ply, train) -- Фары для Яузы
+			Set("Headlights2", 1, ply, train) -- Фары для Яузы
+			Set("CabLightStrength", 1, ply, train) -- Фары для Яузы				
+		end)
+		timer.Create("VityazActivate", 1, 1, function() -- таймер на переход в штатный режим
+			if train["BUKP"].State != 5 then
+				train["BUKP"].State = 5
+			end
+		end)
+		timer.Create("FrontToggles", 1.5, 1, function() -- таймер на кнопки спереди
+			Set("DoorClose", 1, ply, train) 
+			Set("DoorSelectL", 1, ply, train) 
+			Set("DoorSelectR", 0, ply, train) 
+		end)
+		timer.Create("AttentionPressed1", 3, 2, function() -- таймер на отмену (Яуза)
+			Set("AttentionMessage", 1, ply, train)
+			Set("AttentionBrake", 1, ply, train)
+		end)
+		timer.Create("AttentionReleased1", 3.25, 2, function() -- таймер на отмену (Яуза)
+			Set("AttentionMessage", 0, ply, train)
+			Set("AttentionBrake", 0, ply, train)
+		end)
+	else
+	-- Юбилейный (без комментариев)
+		if train:GetClass():sub(13,18) == "81-722" then 	
+			Set("ALS", 0, ply, train)
+			Set("ARS", 0, ply, train)
+			if train.MFDU.State != 1 then train.MFDU.State = 1 end
+			timer.Create("CabActive", 0.5, 1, function() 
+				train.BUKP.Active = 1
+				train:SetPackedBool("MFDUActive", true)	
+				Set("PassVent", 2, ply, train)					
+			end)
+			timer.Create("ARSTimer722", 1, 1, function() 
+				Set("ALS", 1, ply, train)
+				Set("ARS", 1, ply, train)			
+			end)
+			timer.Create("VigilancePressed", 1.5, 1, function() 
+				Set("Vigilance", 1, ply, train)		
+			end)	
+			timer.Create("VigilanceReleased", 2, 1, function() 
+				Set("Vigilance", 0, ply, train)		
+				Set("Headlights", 2, ply, train)
+				Set("DoorClose", 2, ply, train)
+			end)
+			timer.Create("KROForward", 2.5, 1, function() 
+				train.KRO:TriggerInput("Set", 2) 
+			end)
+		end
+	end
+end
+
+------------------------------------------------------
+--			***	TRAIN START SCRIPT END	***			--
+------------------------------------------------------
+
 -- Вывод станций в чат
 local stswaittime = 10
 local stslasttime = -stswaittime
@@ -413,6 +609,18 @@ end
 local ch = ulx.command( CATEGORY_NAME, "ulx ch", ulx.ch, "!ch" )
 ch:defaultAccess( ULib.ACCESS_ALL )
 ch:help( "Simple cabin change" )
+
+function ulx.trainstart( calling_ply )
+	if not IsValid(calling_ply) then return end
+    local train = calling_ply:GetTrain()
+	if train != nil then
+		TrainStart(train)
+		ulx.fancyLog("#s "..MetrostroiAdvanced.Lang["UseTrainStart"],calling_ply:Nick())
+	end
+end
+local trainstart = ulx.command( CATEGORY_NAME, "ulx trainstart", ulx.trainstart, "!trainstart" )
+trainstart:defaultAccess( ULib.ACCESS_ALL )
+trainstart:help( "Cabin autostart" )
 
 if SERVER then
 	-- Регистрация прав ULX
