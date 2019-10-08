@@ -768,6 +768,15 @@ local trainstart = ulx.command( CATEGORY_NAME, "ulx trainstart", ulx.trainstart,
 trainstart:defaultAccess( ULib.ACCESS_ALL )
 trainstart:help( "Cabin autostart" )
 
+function ulx.trainstop( calling_ply )
+	if not IsValid(calling_ply) then return end
+    local train = calling_ply:GetTrain()
+	if train != nil then TrainStop(train) end
+end
+local trainstop = ulx.command( CATEGORY_NAME, "ulx trainstop", ulx.trainstop, "!trainstop" )
+trainstop:defaultAccess( ULib.ACCESS_ALL )
+trainstop:help( "Cabin stop." )
+
 if SERVER then
 	-- Регистрация прав ULX
 	for k, v in pairs (MetrostroiAdvanced.TrainList) do
