@@ -3,6 +3,6 @@ Metrostroi.GetSyncTime = function(notsync)
     if notsync then
         return os.time() - Metrostroi.GetTimedT(notsync)
     else
-        return os.time() + 10800
+        return os.time() - Metrostroi.GetTimedT(notsync) + 10800
     end
 end
