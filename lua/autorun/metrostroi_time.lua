@@ -1,5 +1,5 @@
 -- переопределяем функцию и поправляем время
-Metrostroi.GetSyncTime = function(notsynk)
+Metrostroi.GetSyncTime = function(notsync)
     if notsync then
         return os.time() - Metrostroi.GetTimedT(notsync)
     else

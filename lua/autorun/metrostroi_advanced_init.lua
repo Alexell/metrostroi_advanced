@@ -11,6 +11,13 @@
 if not MetrostroiAdvanced then
 	MetrostroiAdvanced = {}
 	MetrostroiAdvanced.TrainList = {}
+	
+	-- Если вы читаете это, поверьте, вашему серверу будет лучше без этого человека
+	MetrostroiAdvanced.BlackList = {
+	"STEAM_0:1:419539120", -- плохой человек
+	"STEAM_0:0:513162959", -- его клон
+	"STEAM_0:0:514425320", -- его еще один клон
+	}
 end
 
 -- Загрузка локализации
@@ -160,6 +167,13 @@ function MetrostroiAdvanced.GetRouteNumber(ply)
 	if ply:SteamID() == "STEAM_0:1:15049625" then rnum = 11 end -- Agent Smith
 	
 	return rnum
+end
+
+function MetrostroiAdvanced.CheckBL(sid)
+	for k,v in pairs(MetrostroiAdvanced.BlackList) do
+		if sid == v then return true end
+	end
+	return false
 end
 
 if SERVER then
