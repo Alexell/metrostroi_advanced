@@ -26,8 +26,6 @@ cvars.AddChangeCallback("metrostroi_advanced_lang", function(cvar, old, new)
     MetrostroiAdvanced.LoadLanguage(new)
 end)
 
-gameevent.Listen("player_connect")
-
 hook.Add("MetrostroiSpawnerRestrict","TrainSpawnerLimits",function(ply,settings)
 	if IsValid(ply) then
 		-- ограничение составов по правам ULX
@@ -131,13 +129,6 @@ hook.Add("MetrostroiSpawnerRestrict","TrainSpawnerLimits",function(ply,settings)
 			ply:SetNW2String("TrainC",settings.Train)
 		end
 		SetGlobalInt("TrainLastSpawned",os.time())
-		return
-	end
-end)
-
-hook.Add("player_connect","CheckBL",function(data)
-	if MetrostroiAdvanced.CheckBL(data.networkid) then
-		game.KickID(data.networkid,MetrostroiAdvanced.Lang["UserFoundInBL"])
 		return
 	end
 end)
