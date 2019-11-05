@@ -155,6 +155,8 @@ hook.Add("MetrostroiCoupled","SetTrainParams",function(ent,ent2)
 				if ent:GetClass() == "gmod_subway_81-722" then
 					ent.RouteNumberSys.CurrentRouteNumber = rnum
 					ent.RouteNumberSys.RouteNumber = rnum
+				elseif ent:GetClass() == "gmod_subway_81-717_6" then
+					ent.ASNP.RouteNumber = rnum
 				else
 					ent.RouteNumber.RouteNumber = tostring(rnum)
 				end
@@ -164,6 +166,8 @@ hook.Add("MetrostroiCoupled","SetTrainParams",function(ent,ent2)
 				if ent2:GetClass() == "gmod_subway_81-722" then
 					ent2.RouteNumberSys.CurrentRouteNumber = rnum
 					ent2.RouteNumberSys.RouteNumber = rnum
+				elseif ent2:GetClass() == "gmod_subway_81-717_6" then
+					ent2.ASNP.RouteNumber = rnum
 				else
 					ent2.RouteNumber.RouteNumber = tostring(rnum)
 				end

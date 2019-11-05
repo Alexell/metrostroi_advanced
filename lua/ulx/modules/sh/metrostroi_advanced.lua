@@ -520,6 +520,8 @@ function ulx.wagons( calling_ply )
 			local rnum = 0
 			if v:GetClass() == "gmod_subway_81-722" then
 				rnum = tonumber(v.RouteNumberSys.RouteNumber)
+			elseif v:GetClass() == "gmod_subway_81-717_6" then
+				rnum = v.ASNP.RouteNumber
 			else
 				rnum = tonumber(v.RouteNumber.RouteNumber)
 			end
