@@ -143,7 +143,7 @@ function MetrostroiAdvanced.GetRouteNumber(ply)
 				routes[owner:Nick()] = rnum2
 			end
 		end
-	end	
+	end
 	if routes != nil then
 		local r2 = {}
 		for k,v in pairs(routes) do

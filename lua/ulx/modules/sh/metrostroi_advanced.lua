@@ -367,7 +367,7 @@ local function ChangeCab (ply,train1,train2)
 	end)	
 end
 
--- Вывод станций в чат
+-- Вывод станций в чат [сделать выбор названия станции в зависимости от языка]
 local stswaittime = 10
 local stslasttime = -stswaittime
 function ulx.sts( calling_ply )
@@ -480,7 +480,7 @@ tps:addParam{ type=ULib.cmds.StringArg, hint="Station or ID", ULib.cmds.takeRest
 tps:defaultAccess( ULib.ACCESS_ALL )
 tps:help( "Teleport to a station." )
 
--- Замена !trains [перестало выводить номер маршррута. попробовать переделать на овнерство, а насчет маршрутов пока хз]
+-- Замена !trains
 local wagonswaittime = 10
 local wagonslasttime = -wagonswaittime
 function ulx.wagons( calling_ply )
@@ -492,70 +492,37 @@ function ulx.wagons( calling_ply )
     wagonslasttime = CurTime()
 
     ulx.fancyLog(MetrostroiAdvanced.Lang["ServerWagons"].." #s", Metrostroi.TrainCount())
-    if CPPI then
-        local Wags = {}
-		local Trains = {}
-		local Routes = {}
-		local Locs = {}
-		local ply_name = ""
-		local tr_name = ""
-		local r_num = ""
-		local wag_num = 0
-		local wag_str = MetrostroiAdvanced.Lang["wagon1"]
-		local inf
-		local f_st = ""
-		local c_st = ""
-		local l_st = ""
-		local tr_loc = ""
+	local Wags = {}
+	local Trains = {}
+	local Routes = {}
+	local Locs = {}
+	local wag_num = 0
+	local wag_str = MetrostroiAdvanced.Lang["wagon1"]
 
-        for k,v in pairs(Metrostroi.TrainClasses) do
-			if v == "gmod_subway_base" then continue end
-            local ents = ents.FindByClass(v)
-            for k2,v2 in pairs(ents) do
-				-- подсчет кол-ва вагонов
-                Wags[v2:CPPIGetOwner() or v2:GetNetworkedEntity("Owner", "N/A") or "(disconnected)"] = (Wags[v2:CPPIGetOwner() or v2:GetNetworkedEntity("Owner", "N/A") or "(disconnected)"] or 0) + 1
-				-- запись типов составов
-				if (Trains[v2:CPPIGetOwner() or v2:GetNetworkedEntity("Owner", "N/A") or "(disconnected)"] == nil) then Trains[v2:CPPIGetOwner() or v2:GetNetworkedEntity("Owner", "N/A") or "(disconnected)"] = MetrostroiAdvanced.TrainList[v2:GetClass()] end
-				-- запись номеров маршрутов
-				if (Routes[v2:CPPIGetOwner() or v2:GetNetworkedEntity("Owner", "N/A") or "(disconnected)"] == nil) then
-					if (v2:GetNW2String("RouteNumber") != "") then
-						local rnum = tonumber(v2:GetNW2String("RouteNumber"))
-						if table.HasValue({"gmod_subway_81-702","gmod_subway_81-703","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_81-717_mvm","gmod_subway_81-717_mvm_custom","gmod_subway_81-718","gmod_subway_81-720"},v2:GetClass()) then rnum = rnum / 10 end
-						Routes[v2:CPPIGetOwner() or v2:GetNetworkedEntity("Owner", "N/A") or "(disconnected)"] = tostring(rnum)
-					else
-						Routes[v2:CPPIGetOwner() or v2:GetNetworkedEntity("Owner", "N/A") or "(disconnected)"] = "0"
-					end
-				end
-				-- запись местоположения
-				if (Locs[v2:CPPIGetOwner() or v2:GetNetworkedEntity("Owner", "N/A") or "(disconnected)"] == nil) then
-					Locs[v2:CPPIGetOwner() or v2:GetNetworkedEntity("Owner", "N/A") or "(disconnected)"] = MetrostroiAdvanced.GetLocation(v2)
-				end
-
-            end
-        end
-
-        for k,v in pairs(Wags) do
-			if (type(k) == "Player" and IsValid(k)) then
-				ply_name = k:GetName()
-				wag_num = tonumber(v)
-				if wag_num >= 2 and wag_num <= 4 then wag_str = MetrostroiAdvanced.Lang["wagon2"] end
-				if wag_num >= 5 then wag_str = MetrostroiAdvanced.Lang["wagon3"] end
-				-- составы
-				for k2,v2 in pairs(Trains) do
-					if (type(k2) == "Player" and IsValid(k2) and k2:GetName() == k:GetName()) then tr_name = v2 end
-				end
-				-- номера маршрутов
-				for k3,v3 in pairs(Routes) do
-					if (type(k3) == "Player" and IsValid(k3) and k3:GetName() == k:GetName()) then r_num = v3 end
-				end
-				-- мастоположения
-				for k4,v4 in pairs(Locs) do
-					if (type(k4) == "Player" and IsValid(k4) and k4:GetName() == k:GetName()) then tr_loc = v4 end
-				end
+	for k,v in pairs(ents.GetAll()) do
+		if v.Base ~= "gmod_subway_base" and not scripted_ents.IsBasedOn(v:GetClass(), "gmod_subway_base") or IsValid(v.FrontTrain) and IsValid(v.RearTrain) then continue end
+		local ply = v.Owner
+		if not IsValid(ply) then continue end
+		if (not Trains[ply:Nick()]) then
+			Trains[ply:Nick()] = MetrostroiAdvanced.TrainList[v:GetClass()]
+			Wags[ply:Nick()] = #v.WagonList
+			if (v:GetNW2String("RouteNumber") != "") then
+				local rnum = tonumber(v:GetNW2String("RouteNumber"))
+				if table.HasValue({"gmod_subway_81-702","gmod_subway_81-703","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_81-717_mvm","gmod_subway_81-717_mvm_custom","gmod_subway_81-718","gmod_subway_81-720"},v:GetClass()) then rnum = rnum / 10 end
+				Routes[ply:Nick()] = tostring(rnum)
+			else
+				Routes[ply:Nick()] = "0"
 			end
-			ulx.fancyLog("#s: #s #s #s. "..MetrostroiAdvanced.Lang["Route"]..": #s\n"..MetrostroiAdvanced.Lang["Location"]..": #s",ply_name,wag_num,wag_str,tr_name,r_num,tr_loc)
-        end
-    end
+			Locs[ply:Nick()] = MetrostroiAdvanced.GetLocation(v)
+		end
+	end
+	
+	for k,v in pairs(Trains) do
+		wag_num = tonumber(Wags[k])
+		if wag_num >= 2 and wag_num <= 4 then wag_str = MetrostroiAdvanced.Lang["wagon2"] end
+		if wag_num >= 5 then wag_str = MetrostroiAdvanced.Lang["wagon3"] end
+		ulx.fancyLog("#s: #s #s #s. "..MetrostroiAdvanced.Lang["Route"]..": #s\n"..MetrostroiAdvanced.Lang["Location"]..": #s",k,wag_num,wag_str,Trains[k],Routes[k],Locs[k])
+	end
 	local wag_awail = (GetConVarNumber("metrostroi_maxtrains")*GetConVarNumber("metrostroi_advanced_maxwagons"))-GetGlobalInt("metrostroi_train_count")
     ulx.fancyLog(MetrostroiAdvanced.Lang["WagonsAwail"].." #s",wag_awail)
 end
@@ -571,7 +538,7 @@ local exps = ulx.command(CATEGORY_NAME, "ulx expass", ulx.expass, "!expass" )
 exps:defaultAccess( ULib.ACCESS_ALL )
 exps:help( "Expel all passengers." )
 
--- телепорт в состав игрока [перепроверить и пофиксить, если снова в заднюю кабину будет сажать]
+-- телепорт в состав игрока
 function ulx.traintp( calling_ply, target_ply )
 	local class = target_ply:GetNW2String("MATrainClass","")
 	if class !="" then
