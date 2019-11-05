@@ -37,23 +37,21 @@ function MetrostroiAdvanced.LoadLanguage(lang)
 	MetrostroiAdvanced.TrainList["gmod_subway_81-718"] 				= MetrostroiAdvanced.Lang["81-718"]
 	MetrostroiAdvanced.TrainList["gmod_subway_81-720"] 				= MetrostroiAdvanced.Lang["81-720"]
 	MetrostroiAdvanced.TrainList["gmod_subway_81-722"] 				= MetrostroiAdvanced.Lang["81-722"]
-	--MetrostroiAdvanced.TrainList["gmod_subway_81-760"] 			= MetrostroiAdvanced.Lang["81-760"]
+	MetrostroiAdvanced.TrainList["gmod_subway_81-760"] 				= MetrostroiAdvanced.Lang["81-760"]
+	MetrostroiAdvanced.TrainList["gmod_subway_81-760a"] 			= MetrostroiAdvanced.Lang["81-760A"]
 end
 
 -- Название состава по классу
 function MetrostroiAdvanced.GetTrainName(class)
-	local train_name = ""
-	for k, v in pairs (MetrostroiAdvanced.TrainList) do
-		if (class == k) then
-			train_name = v
-			break
-		end
+	if MetrostroiAdvanced.TrainList[class] then
+		return MetrostroiAdvanced.TrainList[class]
+	else
+		return class
 	end
-	return train_name
 end
 
 -- Получение местоположения
-function MetrostroiAdvanced.GetLocation(ent)
+function MetrostroiAdvanced.GetLocation(ent,pos)
 	local ent_station = ""
 	local map_pos
 	local station_pos
@@ -71,7 +69,12 @@ function MetrostroiAdvanced.GetLocation(ent)
 	local Sz
 	local S
 	
-	train_pos = tostring(ent:GetPos())
+	if pos then
+		train_pos = tostring(pos)
+	else
+		train_pos = tostring(ent:GetPos())
+	end
+	
 	get_pos1 = string.find(train_pos, " ")
 	train_posx = string.sub(train_pos,1,get_pos1)
 	train_posx = tonumber(train_posx)	
@@ -130,18 +133,17 @@ end
 function MetrostroiAdvanced.GetRouteNumber(ply)
 	local rnum = math.random(99)
 	local routes = {}
-	for k,v in pairs(MetrostroiAdvanced.TrainList) do
-		local trs = ents.FindByClass(v)
-		for k2,v2 in pairs(trs) do
-			if (routes[v2:CPPIGetOwner() or v2:GetNetworkedEntity("Owner", "N/A") or "(disconnected)"] == nil and v2:CPPIGetOwner() or v2:GetNetworkedEntity("Owner", "N/A") or "(disconnected)" != ply:Nick()) then
-				if (v2:GetNW2String("RouteNumber") != "") then
-					local rnum2 = tonumber(v2:GetNW2String("RouteNumber"))
-					if table.HasValue({"gmod_subway_81-702","gmod_subway_81-703","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_ezh3ru1","gmod_subway_81-717_mvm","gmod_subway_81-717_mvm_custom","gmod_subway_81-718","gmod_subway_81-720"},v2:GetClass()) then rnum2 = rnum2 / 10 end
-					routes[v2:CPPIGetOwner() or v2:GetNetworkedEntity("Owner", "N/A") or "(disconnected)"] = rnum2
-				end
+	for k,v in pairs(ents.GetAll()) do
+		if v.Base ~= "gmod_subway_base" and not scripted_ents.IsBasedOn(v:GetClass(), "gmod_subway_base") or IsValid(v.FrontTrain) and IsValid(v.RearTrain) then continue end
+		local owner = v.Owner
+		if owner != ply then
+			if (v:GetNW2String("RouteNumber") != "") then
+				local rnum2 = tonumber(v:GetNW2String("RouteNumber"))
+				if table.HasValue({"gmod_subway_81-702","gmod_subway_81-703","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_ezh3ru1","gmod_subway_81-717_mvm","gmod_subway_81-717_mvm_custom","gmod_subway_81-718","gmod_subway_81-720"},v:GetClass()) then rnum2 = rnum2 / 10 end
+				routes[owner:Nick()] = rnum2
 			end
 		end
-	end
+	end	
 	if routes != nil then
 		local r2 = {}
 		for k,v in pairs(routes) do

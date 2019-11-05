@@ -18,7 +18,8 @@ MetrostroiAdvanced.Lang["81-717_6"] 			= "81-717.6"
 MetrostroiAdvanced.Lang["81-718"] 				= "81-718 (TISU)"
 MetrostroiAdvanced.Lang["81-720"] 				= "81-720 (Yauza)"
 MetrostroiAdvanced.Lang["81-722"] 				= "81-722 (Yubileyniy)"
---MetrostroiAdvanced.Lang["81-760"] 			= "81-760 (Oka)"
+MetrostroiAdvanced.Lang["81-760"] 				= "81-760 (Oka)"
+MetrostroiAdvanced.Lang["81-760A"] 				= "81-760A (Oka)"
 
 -- SV
 MetrostroiAdvanced.Lang["UnknownPlace"] 		= "mainline"

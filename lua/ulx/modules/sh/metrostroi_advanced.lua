@@ -351,8 +351,8 @@ local function ChangeCab (ply,train1,train2)
     local tim = 3
 	local tim2 = tim + 1.5
 	local tim3 = tim2 + 1.5
-	if ply:GetNW2String("TrainC","") == "gmod_subway_81-720" then tim = 1  tim2 = tim + 1 tim3 = tim2 + 1 end
-	if ply:GetNW2String("TrainC","") == "gmod_subway_81-722" then tim = 1  tim2 = tim + 1 tim3 = tim2 + 1 end
+	if ply:GetNW2String("MATrainClass","") == "gmod_subway_81-720" then tim = 1  tim2 = tim + 1 tim3 = tim2 + 1 end
+	if ply:GetNW2String("MATrainClass","") == "gmod_subway_81-722" then tim = 1  tim2 = tim + 1 tim3 = tim2 + 1 end
 	TrainStop(train1)	
 	timer.Create("Cab1OutDriverSeat", tim, 1, function()
 		ply:ExitVehicle()
@@ -480,7 +480,7 @@ tps:addParam{ type=ULib.cmds.StringArg, hint="Station or ID", ULib.cmds.takeRest
 tps:defaultAccess( ULib.ACCESS_ALL )
 tps:help( "Teleport to a station." )
 
--- Замена !trains
+-- Замена !trains [перестало выводить номер маршррута. попробовать переделать на овнерство, а насчет маршрутов пока хз]
 local wagonswaittime = 10
 local wagonslasttime = -wagonswaittime
 function ulx.wagons( calling_ply )
@@ -571,9 +571,9 @@ local exps = ulx.command(CATEGORY_NAME, "ulx expass", ulx.expass, "!expass" )
 exps:defaultAccess( ULib.ACCESS_ALL )
 exps:help( "Expel all passengers." )
 
--- телепорт в состав игрока
+-- телепорт в состав игрока [перепроверить и пофиксить, если снова в заднюю кабину будет сажать]
 function ulx.traintp( calling_ply, target_ply )
-	local class = target_ply:GetNW2String("TrainC","")
+	local class = target_ply:GetNW2String("MATrainClass","")
 	if class !="" then
 		local teleported = false
 		local ents = ents.FindByClass(class)
