@@ -367,7 +367,7 @@ local function ChangeCab (ply,train1,train2)
 	end)	
 end
 
--- Вывод станций в чат [сделать выбор названия станции в зависимости от языка]
+-- Вывод станций в чат
 local stswaittime = 10
 local stslasttime = -stswaittime
 function ulx.sts( calling_ply )
@@ -517,13 +517,14 @@ function ulx.wagons( calling_ply )
 		if (not Trains[ply:Nick()]) then
 			Trains[ply:Nick()] = MetrostroiAdvanced.TrainList[v:GetClass()]
 			Wags[ply:Nick()] = #v.WagonList
-			if (v:GetNW2String("RouteNumber") != "") then
-				local rnum = tonumber(v:GetNW2String("RouteNumber"))
-				if table.HasValue({"gmod_subway_81-702","gmod_subway_81-703","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_81-717_mvm","gmod_subway_81-717_mvm_custom","gmod_subway_81-718","gmod_subway_81-720"},v:GetClass()) then rnum = rnum / 10 end
-				Routes[ply:Nick()] = tostring(rnum)
+			local rnum = 0
+			if v:GetClass() == "gmod_subway_81-722" then
+				rnum = tonumber(v.RouteNumberSys.RouteNumber)
 			else
-				Routes[ply:Nick()] = "0"
+				rnum = tonumber(v.RouteNumber.RouteNumber)
 			end
+			if table.HasValue({"gmod_subway_81-702","gmod_subway_81-703","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_81-717_mvm","gmod_subway_81-717_mvm_custom","gmod_subway_81-718","gmod_subway_81-720"},v:GetClass()) then rnum = rnum / 10 end
+			Routes[ply:Nick()] = tostring(rnum)
 			Locs[ply:Nick()] = MetrostroiAdvanced.GetLocation(v)
 		end
 	end

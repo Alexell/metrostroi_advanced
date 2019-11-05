@@ -153,17 +153,19 @@ hook.Add("MetrostroiCoupled","SetTrainParams",function(ent,ent2)
 			if MetrostroiAdvanced.TrainList[ent:GetClass()] then
 				if table.HasValue({"gmod_subway_81-702","gmod_subway_81-703","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_ezh3ru1","gmod_subway_81-717_mvm","gmod_subway_81-717_mvm_custom","gmod_subway_81-718","gmod_subway_81-720"},ent:GetClass()) then rnum = rnum * 10 end
 				if ent:GetClass() == "gmod_subway_81-722" then
-					ent:SetNW2Int("RouteNumber",rnum)
+					ent.RouteNumberSys.CurrentRouteNumber = rnum
+					ent.RouteNumberSys.RouteNumber = rnum
 				else
-					ent:SetNW2String("RouteNumber",tostring(rnum))
+					ent.RouteNumber.RouteNumber = tostring(rnum)
 				end
 			end
 			if MetrostroiAdvanced.TrainList[ent2:GetClass()] then
 				if table.HasValue({"gmod_subway_81-702","gmod_subway_81-703","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_ezh3ru1","gmod_subway_81-717_mvm","gmod_subway_81-717_mvm_custom","gmod_subway_81-718","gmod_subway_81-720"},ent2:GetClass()) then rnum = rnum * 10 end
 				if ent2:GetClass() == "gmod_subway_81-722" then
-					ent2:SetNW2Int("RouteNumber",rnum)
+					ent2.RouteNumberSys.CurrentRouteNumber = rnum
+					ent2.RouteNumberSys.RouteNumber = rnum
 				else
-					ent2:SetNW2String("RouteNumber",tostring(rnum))
+					ent2.RouteNumber.RouteNumber = tostring(rnum)
 				end
 			end
 		end
