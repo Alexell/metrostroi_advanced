@@ -376,20 +376,31 @@ function ulx.sts( calling_ply )
         return
     end
     stslasttime = CurTime()
-    local stationtable = {}
+	local name_num = 1
+    local lang = GetConVarString("metrostroi_advanced_lang")
+	if lang ~= "ru" then name_num = 2 end
+	local stationtable = {}
     for k,v in pairs(Metrostroi.StationConfigurations) do
-        if isnumber(k) then 
-        table.insert( stationtable,{tonumber(k),tostring(v.names[1])})
+        if isnumber(k) then
+			if v.names[name_num] then
+				table.insert( stationtable,{tonumber(k),tostring(v.names[name_num])})
+			else
+				table.insert( stationtable,{tonumber(k),tostring(v.names[1])})
+			end
         end
     end
     table.sort(stationtable, function(a, b) if a[1] ~= nil and b[1] ~= nil then return a[1] < b[1] end end)
-    for k3,v3 in pairs(Metrostroi.StationConfigurations) do
-        if isstring(k3) then 
-        table.insert( stationtable,{k3,tostring(v3.names[1])})
+    for k,v in pairs(Metrostroi.StationConfigurations) do
+        if isstring(k) then 
+			if v.names[name_num] then
+				table.insert( stationtable,{k,tostring(v.names[name_num])})
+			else
+				table.insert( stationtable,{k,tostring(v.names[1])})
+			end
         end
     end
-    for k2,v2 in pairs(stationtable) do
-        ULib.tsayColor(nil,false,Color(219, 116, 32),v2[1].." - "..v2[2])
+    for k,v in pairs(stationtable) do
+        ULib.tsayColor(nil,false,Color(219, 116, 32),v[1].." - "..v[2])
     end
 end
 local sts = ulx.command(CATEGORY_NAME, "ulx stations", ulx.sts, "!stations" )
