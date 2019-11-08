@@ -510,24 +510,26 @@ function ulx.wagons( calling_ply )
 	local wag_num = 0
 	local wag_str = MetrostroiAdvanced.Lang["wagon1"]
 
-	for k,v in pairs(ents.GetAll()) do
-		if v.Base ~= "gmod_subway_base" and not scripted_ents.IsBasedOn(v:GetClass(), "gmod_subway_base") or IsValid(v.FrontTrain) and IsValid(v.RearTrain) then continue end
-		local ply = v.Owner
-		if not IsValid(ply) then continue end
-		if (not Trains[ply:Nick()]) then
-			Trains[ply:Nick()] = MetrostroiAdvanced.TrainList[v:GetClass()]
-			Wags[ply:Nick()] = #v.WagonList
-			local rnum = 0
-			if v:GetClass() == "gmod_subway_81-722" then
-				rnum = tonumber(v.RouteNumberSys.RouteNumber)
-			elseif v:GetClass() == "gmod_subway_81-717_6" then
-				rnum = v.ASNP.RouteNumber
-			else
-				rnum = tonumber(v.RouteNumber.RouteNumber)
+	for k,v in pairs(MetrostroiAdvanced.TrainList) do
+		if k == "gmod_subway_81-717_mvm_custom" then continue end
+		for _,train in pairs(ents.FindByClass(k)) do
+			local ply = train.Owner
+			if not IsValid(ply) then continue end
+			if (not Trains[ply:Nick()]) then
+				Trains[ply:Nick()] = MetrostroiAdvanced.TrainList[k]
+				Wags[ply:Nick()] = #train.WagonList
+				local rnum = 0
+				if k == "gmod_subway_81-722" then
+					rnum = tonumber(train.RouteNumberSys.RouteNumber)
+				elseif k == "gmod_subway_81-717_6" then
+					rnum = train.ASNP.RouteNumber
+				else
+					rnum = tonumber(train.RouteNumber.RouteNumber)
+				end
+				if table.HasValue({"gmod_subway_81-702","gmod_subway_81-703","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_81-717_mvm","gmod_subway_81-717_mvm_custom","gmod_subway_81-718","gmod_subway_81-720"},k) then rnum = rnum / 10 end
+				Routes[ply:Nick()] = tostring(rnum)
+				Locs[ply:Nick()] = MetrostroiAdvanced.GetLocation(train)
 			end
-			if table.HasValue({"gmod_subway_81-702","gmod_subway_81-703","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_81-717_mvm","gmod_subway_81-717_mvm_custom","gmod_subway_81-718","gmod_subway_81-720"},v:GetClass()) then rnum = rnum / 10 end
-			Routes[ply:Nick()] = tostring(rnum)
-			Locs[ply:Nick()] = MetrostroiAdvanced.GetLocation(v)
 		end
 	end
 	
