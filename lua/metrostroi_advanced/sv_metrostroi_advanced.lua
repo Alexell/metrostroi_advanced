@@ -140,7 +140,7 @@ hook.Add("PlayerInitialSpawn","SetPlyParams",function(ply)
 	-- выдаем игроку уникальный номер маршрута на время сессии
 	if (GetConVarNumber("metrostroi_advanced_routenums") == 1) then
 		local rnum = MetrostroiAdvanced.GetRouteNumber(ply)
-		ply:SetNW2Int("MARouteNum",rnum)
+		ply:SetNW2Int("MARouteNumber",rnum)
 	end
 end)
 
@@ -149,27 +149,27 @@ hook.Add("MetrostroiCoupled","SetTrainParams",function(ent,ent2)
 		-- устанавливаем номер маршрута на состав
 		if (GetConVarNumber("metrostroi_advanced_routenums") == 1) then
 			local ply = ent.Owner
-			local rnum = ply:GetNW2Int("MARouteNum")
+			local rnum = ply:GetNW2Int("MARouteNumber")
 			if MetrostroiAdvanced.TrainList[ent:GetClass()] then
 				if table.HasValue({"gmod_subway_81-702","gmod_subway_81-703","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_ezh3ru1","gmod_subway_81-717_mvm","gmod_subway_81-717_mvm_custom","gmod_subway_81-718","gmod_subway_81-720"},ent:GetClass()) then rnum = rnum * 10 end
 				if ent:GetClass() == "gmod_subway_81-722" then
 					ent.RouteNumberSys.CurrentRouteNumber = rnum
-					ent.RouteNumberSys.RouteNumber = rnum
 				elseif ent:GetClass() == "gmod_subway_81-717_6" then
 					ent.ASNP.RouteNumber = rnum
 				else
 					ent.RouteNumber.RouteNumber = tostring(rnum)
+					ent:SetNW2String("RouteNumber",tostring(rnum))
 				end
 			end
 			if MetrostroiAdvanced.TrainList[ent2:GetClass()] then
 				if table.HasValue({"gmod_subway_81-702","gmod_subway_81-703","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_ezh3ru1","gmod_subway_81-717_mvm","gmod_subway_81-717_mvm_custom","gmod_subway_81-718","gmod_subway_81-720"},ent2:GetClass()) then rnum = rnum * 10 end
 				if ent2:GetClass() == "gmod_subway_81-722" then
 					ent2.RouteNumberSys.CurrentRouteNumber = rnum
-					ent2.RouteNumberSys.RouteNumber = rnum
 				elseif ent2:GetClass() == "gmod_subway_81-717_6" then
 					ent2.ASNP.RouteNumber = rnum
 				else
 					ent2.RouteNumber.RouteNumber = tostring(rnum)
+					ent2:SetNW2String("RouteNumber",tostring(rnum))
 				end
 			end
 		end
