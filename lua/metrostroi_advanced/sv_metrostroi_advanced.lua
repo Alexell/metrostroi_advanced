@@ -170,35 +170,39 @@ hook.Add("PlayerInitialSpawn","SetPlyParams",function(ply)
 end)
 
 hook.Add("PlayerButtonDown","PlayerActions",function(ply,key)
-	ply.NextAFK = CurTime() + AFK_TIME
-	ply.WarningAFK = 0
+	if AFK_TIME > 0 then
+		ply.NextAFK = CurTime() + AFK_TIME
+		ply.WarningAFK = 0
+	end
 end)
 
 hook.Add("Think","ControlAFKPlayers", function()
-	for _, ply in pairs(player.GetAll()) do
-		if (ply:IsConnected() and ply:IsFullyAuthenticated()) then
-			if (not ply.NextAFK) then
-				ply.NextAFK = CurTime() + AFK_TIME
-			end
-			if (ply.NextAFK <= CurTime() + AFK_WARN1) and (ply.WarningAFK == 0) then
+	if AFK_TIME > 0 then
+		for _, ply in pairs(player.GetAll()) do
+			if (ply:IsConnected() and ply:IsFullyAuthenticated() and not ply:IsAdmin()) then
+				if (not ply.NextAFK) then
+					ply.NextAFK = CurTime() + AFK_TIME
+				end
+				if (ply.NextAFK <= CurTime() + AFK_WARN1) and (ply.WarningAFK == 0) then
+					local min_left =  math.Round((ply.NextAFK - CurTime()) / 60)
+					ply:ChatPrint("[Metrostroi Advanced]: "..string.format(MetrostroiAdvanced.Lang["AfkWarning"],tostring(min_left),MetrostroiAdvanced.Lang["Afkmins"]))
+					ply.WarningAFK = 1
+				end
+				if (ply.NextAFK <= CurTime() + AFK_WARN2) and (ply.WarningAFK == 1) then
 				local min_left =  math.Round((ply.NextAFK - CurTime()) / 60)
-				ply:ChatPrint("[Metrostroi Advanced]: "..string.format(MetrostroiAdvanced.Lang["AfkWarning"],tostring(min_left),MetrostroiAdvanced.Lang["Afkmins"]))
-				ply.WarningAFK = 1
-			end
-			if (ply.NextAFK <= CurTime() + AFK_WARN2) and (ply.WarningAFK == 1) then
-			local min_left =  math.Round((ply.NextAFK - CurTime()) / 60)
-				ply:ChatPrint("[Metrostroi Advanced]: "..string.format(MetrostroiAdvanced.Lang["AfkWarning"],tostring(min_left),MetrostroiAdvanced.Lang["Afkmins"]))
-				ply.WarningAFK = 2
-			end
-			if (ply.NextAFK <= CurTime() + AFK_WARN3) and (ply.WarningAFK == 2) then
-				local min_left = 1
-				ply:ChatPrint("[Metrostroi Advanced]: "..string.format(MetrostroiAdvanced.Lang["AfkWarning"],tostring(min_left),MetrostroiAdvanced.Lang["Afkmin1"]))
-				ply.WarningAFK = 3
-			end
-			if (CurTime() >= ply.NextAFK and ply.WarningAFK == 3) then
-				ply.WarningAFK = nil
-				ply.NextAFK = nil
-				ply:Kick("[Metrostroi Advanced] - "..MetrostroiAdvanced.Lang["AfkKick"])
+					ply:ChatPrint("[Metrostroi Advanced]: "..string.format(MetrostroiAdvanced.Lang["AfkWarning"],tostring(min_left),MetrostroiAdvanced.Lang["Afkmins"]))
+					ply.WarningAFK = 2
+				end
+				if (ply.NextAFK <= CurTime() + AFK_WARN3) and (ply.WarningAFK == 2) then
+					local min_left = 1
+					ply:ChatPrint("[Metrostroi Advanced]: "..string.format(MetrostroiAdvanced.Lang["AfkWarning"],tostring(min_left),MetrostroiAdvanced.Lang["Afkmin1"]))
+					ply.WarningAFK = 3
+				end
+				if (CurTime() >= ply.NextAFK and ply.WarningAFK == 3) then
+					ply.WarningAFK = nil
+					ply.NextAFK = nil
+					ply:Kick("[Metrostroi Advanced] - "..MetrostroiAdvanced.Lang["AfkKick"])
+				end
 			end
 		end
 	end
