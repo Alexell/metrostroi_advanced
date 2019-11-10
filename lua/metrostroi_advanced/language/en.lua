@@ -40,6 +40,10 @@ MetrostroiAdvanced.Lang["WaitSpawn"] 			= "before, spawning a train."
 MetrostroiAdvanced.Lang["Player"] 				= "Player"
 MetrostroiAdvanced.Lang["Spawned"] 				= "spawned"
 MetrostroiAdvanced.Lang["Location"] 			= "Location"
+MetrostroiAdvanced.Lang["AfkWarning"]			= "If you dont start moving in %s %s, you will be kicked from server."
+MetrostroiAdvanced.Lang["Afkmins"]				= "minute(s)"
+MetrostroiAdvanced.Lang["Afkmin1"]				= "minute"
+MetrostroiAdvanced.Lang["AfkKick"]				= "kicked for being AFK"
 
 -- ULX
 MetrostroiAdvanced.Lang["Teleported"]			= "teleported"

@@ -40,6 +40,10 @@ MetrostroiAdvanced.Lang["WaitSpawn"] 			= "прежде, чем спавнить
 MetrostroiAdvanced.Lang["Player"] 				= "Игрок"
 MetrostroiAdvanced.Lang["Spawned"] 				= "заспавнил"
 MetrostroiAdvanced.Lang["Location"] 			= "Местоположение"
+MetrostroiAdvanced.Lang["AfkWarning"]			= "Если вы не начнете двигаться, через %s %s вы будете отключены с сервера."
+MetrostroiAdvanced.Lang["Afkmins"]				= "минут(ы)"
+MetrostroiAdvanced.Lang["Afkmin1"]				= "минуту"
+MetrostroiAdvanced.Lang["AfkKick"]				= "отключен за бездействие"
 
 -- ULX
 MetrostroiAdvanced.Lang["Teleported"]			= "телепортировался"

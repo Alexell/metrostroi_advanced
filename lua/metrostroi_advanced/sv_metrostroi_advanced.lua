@@ -18,12 +18,23 @@ local min_wags = CreateConVar("metrostroi_advanced_minwagons", 2, {FCVAR_ARCHIVE
 local route_nums = CreateConVar("metrostroi_advanced_routenums", 1, {FCVAR_ARCHIVE})
 local auto_wags = CreateConVar("metrostroi_advanced_autowags", 0, {FCVAR_ARCHIVE})
 local madv_lang = CreateConVar("metrostroi_advanced_lang", "ru", {FCVAR_ARCHIVE})
+local afktime = CreateConVar("metrostroi_advanced_afktime", 0, {FCVAR_ARCHIVE})
+AFK_TIME = 0
+AFK_WARN1 = 0
+AFK_WARN2 = 0
+AFK_WARN3 = 60
 
 -- Загрузка локализации
 MetrostroiAdvanced.LoadLanguage(GetConVarString("metrostroi_advanced_lang"))
-
 cvars.AddChangeCallback("metrostroi_advanced_lang", function(cvar, old, new)
     MetrostroiAdvanced.LoadLanguage(new)
+end)
+
+AFK_TIME = GetConVarNumber("metrostroi_advanced_afktime") * 60
+cvars.AddChangeCallback("metrostroi_advanced_afktime", function(cvar, old, new)
+    AFK_TIME = new * 60
+	AFK_WARN1 = AFK_TIME * 0.6
+	AFK_WARN2 = AFK_TIME * 0.4
 end)
 
 local function PlayerPermission(ply,permission)
@@ -133,7 +144,9 @@ hook.Add("MetrostroiSpawnerRestrict","TrainSpawnerLimits",function(ply,settings)
 		local wag_num = settings.WagNum
 		if wag_num >= 2 and wag_num <= 4 then wag_str = MetrostroiAdvanced.Lang["wagon2"] end
 		if wag_num >= 5 then wag_str = MetrostroiAdvanced.Lang["wagon3"] end
-		ulx.fancyLog(MetrostroiAdvanced.Lang["Player"].." #s "..MetrostroiAdvanced.Lang["Spawned"].." #s #s #s.\n"..MetrostroiAdvanced.Lang["Location"]..": #s.",ply:Nick(),tostring(wag_num),wag_str,MetrostroiAdvanced.GetTrainName(settings.Train),MetrostroiAdvanced.GetLocation(ply))
+		if ulx then
+			ulx.fancyLog(MetrostroiAdvanced.Lang["Player"].." #s "..MetrostroiAdvanced.Lang["Spawned"].." #s #s #s.\n"..MetrostroiAdvanced.Lang["Location"]..": #s.",ply:Nick(),tostring(wag_num),wag_str,MetrostroiAdvanced.GetTrainName(settings.Train),MetrostroiAdvanced.GetLocation(ply))
+		end
 	end
 	if (settings.Train == "gmod_subway_81-717_mvm_custom") then
 		ply:SetNW2String("MATrainClass","gmod_subway_81-717_mvm")
@@ -149,6 +162,45 @@ hook.Add("PlayerInitialSpawn","SetPlyParams",function(ply)
 	if (GetConVarNumber("metrostroi_advanced_routenums") == 1) then
 		local rnum = MetrostroiAdvanced.GetRouteNumber(ply)
 		ply:SetNW2Int("MARouteNumber",rnum)
+	end
+	if AFK_TIME > 0 then
+		ply.NextAFK = CurTime() + AFK_TIME
+		ply.WarningAFK = 0
+	end
+end)
+
+hook.Add("PlayerButtonDown","PlayerActions",function(ply,key)
+	ply.NextAFK = CurTime() + AFK_TIME
+	ply.WarningAFK = 0
+end)
+
+hook.Add("Think","ControlAFKPlayers", function()
+	for _, ply in pairs(player.GetAll()) do
+		if (ply:IsConnected() and ply:IsFullyAuthenticated()) then
+			if (not ply.NextAFK) then
+				ply.NextAFK = CurTime() + AFK_TIME
+			end
+			if (ply.NextAFK <= CurTime() + AFK_WARN1) and (ply.WarningAFK == 0) then
+				local min_left =  math.Round((ply.NextAFK - CurTime()) / 60)
+				ply:ChatPrint("[Metrostroi Advanced]: "..string.format(MetrostroiAdvanced.Lang["AfkWarning"],tostring(min_left),MetrostroiAdvanced.Lang["Afkmins"]))
+				ply.WarningAFK = 1
+			end
+			if (ply.NextAFK <= CurTime() + AFK_WARN2) and (ply.WarningAFK == 1) then
+			local min_left =  math.Round((ply.NextAFK - CurTime()) / 60)
+				ply:ChatPrint("[Metrostroi Advanced]: "..string.format(MetrostroiAdvanced.Lang["AfkWarning"],tostring(min_left),MetrostroiAdvanced.Lang["Afkmins"]))
+				ply.WarningAFK = 2
+			end
+			if (ply.NextAFK <= CurTime() + AFK_WARN3) and (ply.WarningAFK == 2) then
+				local min_left = 1
+				ply:ChatPrint("[Metrostroi Advanced]: "..string.format(MetrostroiAdvanced.Lang["AfkWarning"],tostring(min_left),MetrostroiAdvanced.Lang["Afkmin1"]))
+				ply.WarningAFK = 3
+			end
+			if (CurTime() >= ply.NextAFK and ply.WarningAFK == 3) then
+				ply.WarningAFK = nil
+				ply.NextAFK = nil
+				ply:Kick("[Metrostroi Advanced] - "..MetrostroiAdvanced.Lang["AfkKick"])
+			end
+		end
 	end
 end)
 
