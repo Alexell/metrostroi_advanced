@@ -26,6 +26,14 @@ cvars.AddChangeCallback("metrostroi_advanced_lang", function(cvar, old, new)
     MetrostroiAdvanced.LoadLanguage(new)
 end)
 
+local function PlayerPermission(ply,permission)
+	if ULib then
+		return ULib.ucl.query(ply,permission)
+	else
+		return ply:IsSuperAdmin()
+	end
+end
+
 hook.Add("MetrostroiSpawnerRestrict","TrainSpawnerLimits",function(ply,settings)
 	if not IsValid(ply) then return end
 	-- ограничение составов по правам ULX
@@ -33,11 +41,11 @@ hook.Add("MetrostroiSpawnerRestrict","TrainSpawnerLimits",function(ply,settings)
 	local train = settings.Train
 	
 	if (train_restrict == 1) then
-		if (not ULib.ucl.query(ply,train)) then
+		if (not PlayerPermission(ply,train)) then
 			ply:ChatPrint(MetrostroiAdvanced.Lang["SpawnerRestrict1"])
 			ply:ChatPrint(MetrostroiAdvanced.Lang["SpawnerRestrict1"])
 			for k, v in pairs (MetrostroiAdvanced.TrainList) do
-				if (ULib.ucl.query(ply,k)) then
+				if (PlayerPermission(ply,k)) then
 					ply:ChatPrint(v)
 				end
 			end
@@ -60,14 +68,14 @@ hook.Add("MetrostroiSpawnerRestrict","TrainSpawnerLimits",function(ply,settings)
 		ply_wagons = GetConVarNumber("metrostroi_advanced_maxwagons")
 	end
 	
-	if (ULib.ucl.query(ply,"add_3wagons")) then
+	if (PlayerPermission(ply,"add_3wagons")) then
 		ply_wagons = ply_wagons + 3
 		if ply_wagons > GetConVarNumber("metrostroi_maxwagons") then ply_wagons = GetConVarNumber("metrostroi_maxwagons") end
 	else
-		if (ULib.ucl.query(ply,"add_2wagons")) then
+		if (PlayerPermission(ply,"add_2wagons")) then
 			ply_wagons = ply_wagons + 2
 		else
-			if (ULib.ucl.query(ply,"add_1wagons")) then
+			if (PlayerPermission(ply,"add_1wagons")) then
 				ply_wagons = ply_wagons + 1
 			end
 		end
@@ -94,7 +102,7 @@ hook.Add("MetrostroiSpawnerRestrict","TrainSpawnerLimits",function(ply,settings)
 	end
 
 	--спавн в любом месте
-	if (not ULib.ucl.query(ply,"metrostroi_anyplace_spawn")) then
+	if (not PlayerPermission(ply,"metrostroi_anyplace_spawn")) then
 		local tr = util.TraceLine(util.GetPlayerTrace(ply))
 		local loc = ""
 		if tr.Hit then
