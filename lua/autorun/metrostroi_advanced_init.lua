@@ -7,6 +7,11 @@
 -- Repo: https://github.com/Alexell/metrostroi_advanced
 -------------------------------------------------------
 
+if not Metrostroi or not Metrostroi.Version or Metrostroi.Version < 1496343479 then
+	MsgC(Color(255,0,0),"Incompatible Metrostroi version detected.\nMetrostroi Advanced can not be loaded.\n")
+	return
+end
+
 -- Создаем MetrostroiAdvanced глобально
 if not MetrostroiAdvanced then
 	MetrostroiAdvanced = {}
@@ -133,13 +138,21 @@ end
 function MetrostroiAdvanced.GetRouteNumber(ply)
 	local rnum = math.random(99)
 	local routes = {}
-	for k,v in pairs(ents.GetAll()) do
-		if v.Base ~= "gmod_subway_base" and not scripted_ents.IsBasedOn(v:GetClass(), "gmod_subway_base") or IsValid(v.FrontTrain) and IsValid(v.RearTrain) then continue end
-		local owner = v.Owner
-		if owner != ply then
-			if (v:GetNW2String("RouteNumber") != "") then
-				local rnum2 = tonumber(v:GetNW2String("RouteNumber"))
-				if table.HasValue({"gmod_subway_81-702","gmod_subway_81-703","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_ezh3ru1","gmod_subway_81-717_mvm","gmod_subway_81-717_mvm_custom","gmod_subway_81-718","gmod_subway_81-720"},v:GetClass()) then rnum2 = rnum2 / 10 end
+	for k,v in pairs(MetrostroiAdvanced.TrainList) do
+		if k == "gmod_subway_81-717_mvm_custom" then continue end
+		for _,train in pairs(ents.FindByClass(k)) do
+			local owner = train.Owner
+			if not IsValid(owner) then continue end
+			if owner != ply then
+				local rnum2 = 0
+				if k == "gmod_subway_81-722" then
+					rnum2 = tonumber(train.RouteNumberSys.RouteNumber)
+				elseif k == "gmod_subway_81-717_6" then
+					rnum2 = train.ASNP.RouteNumber
+				else
+					rnum2 = tonumber(train.RouteNumber.RouteNumber)
+				end
+				if table.HasValue({"gmod_subway_81-702","gmod_subway_81-703","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_81-717_mvm","gmod_subway_81-717_mvm_custom","gmod_subway_81-718","gmod_subway_81-720"},k) then rnum2 = rnum2 / 10 end
 				routes[owner:Nick()] = rnum2
 			end
 		end
