@@ -225,8 +225,10 @@ hook.Add("MetrostroiCoupled","SetTrainParams",function(ent,ent2)
 					ent.RouteNumber.RouteNumber = "0"..tostring(rnum)
 					ent:SetNW2String("RouteNumber","0"..tostring(rnum))
 				else
-					ent.RouteNumber.RouteNumber = tostring(rnum)
-					ent:SetNW2String("RouteNumber",tostring(rnum))
+					if ent.RouteNumber.RouteNumber then
+						ent.RouteNumber.RouteNumber = tostring(rnum)
+						ent:SetNW2String("RouteNumber",tostring(rnum))
+					end
 				end
 			end
 			if MetrostroiAdvanced.TrainList[ent2:GetClass()] then
@@ -240,8 +242,10 @@ hook.Add("MetrostroiCoupled","SetTrainParams",function(ent,ent2)
 					ent2.RouteNumber.RouteNumber = "0"..tostring(rnum)
 					ent2:SetNW2String("RouteNumber","0"..tostring(rnum))
 				else
-					ent2.RouteNumber.RouteNumber = tostring(rnum)
-					ent2:SetNW2String("RouteNumber",tostring(rnum))
+					if ent2.RouteNumber.RouteNumber then
+						ent2.RouteNumber.RouteNumber = tostring(rnum)
+						ent2:SetNW2String("RouteNumber",tostring(rnum))
+					end
 				end
 			end
 		end
