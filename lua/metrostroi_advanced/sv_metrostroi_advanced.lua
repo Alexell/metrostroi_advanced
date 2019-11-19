@@ -150,6 +150,8 @@ hook.Add("MetrostroiSpawnerRestrict","TrainSpawnerLimits",function(ply,settings)
 	end
 	if (settings.Train == "gmod_subway_81-717_mvm_custom") then
 		ply:SetNW2String("MATrainClass","gmod_subway_81-717_mvm")
+	elseif(settings.Train == "gmod_subway_81-717_lvz_custom") then
+		ply:SetNW2String("MATrainClass","gmod_subway_81-717_lvz")
 	else
 		ply:SetNW2String("MATrainClass",settings.Train)
 	end
