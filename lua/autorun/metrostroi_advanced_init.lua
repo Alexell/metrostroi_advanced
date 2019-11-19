@@ -30,14 +30,16 @@ function MetrostroiAdvanced.LoadLanguage(lang)
 	end
 	
 	MetrostroiAdvanced.TrainList["gmod_subway_81-502"] 				= MetrostroiAdvanced.Lang["81-502"]
+	MetrostroiAdvanced.TrainList["gmod_subway_81-540"] 				= MetrostroiAdvanced.Lang["81-540"]
 	MetrostroiAdvanced.TrainList["gmod_subway_81-702"] 				= MetrostroiAdvanced.Lang["81-702"]
 	MetrostroiAdvanced.TrainList["gmod_subway_81-703"] 				= MetrostroiAdvanced.Lang["81-703"]
 	MetrostroiAdvanced.TrainList["gmod_subway_ezh"] 				= MetrostroiAdvanced.Lang["ezh"]
 	MetrostroiAdvanced.TrainList["gmod_subway_ezh3"] 				= MetrostroiAdvanced.Lang["ezh3"]
 	MetrostroiAdvanced.TrainList["gmod_subway_ezh3ru1"] 			= MetrostroiAdvanced.Lang["ezh3ru1"]
 	MetrostroiAdvanced.TrainList["gmod_subway_81-717_mvm"]			= MetrostroiAdvanced.Lang["81-717_mvm"]
-	MetrostroiAdvanced.TrainList["gmod_subway_81-717_mvm_custom"]	= MetrostroiAdvanced.Lang["81-717_mvm_custom"]
+	MetrostroiAdvanced.TrainList["gmod_subway_81-717_mvm_custom"]	= MetrostroiAdvanced.Lang["81-717_mvm"]
 	MetrostroiAdvanced.TrainList["gmod_subway_81-717_lvz"] 			= MetrostroiAdvanced.Lang["81-717_lvz"]
+	MetrostroiAdvanced.TrainList["gmod_subway_81-717_lvz_custom"] 	= MetrostroiAdvanced.Lang["81-717_lvz"]
 	MetrostroiAdvanced.TrainList["gmod_subway_81-717_6"] 			= MetrostroiAdvanced.Lang["81-717_6"]
 	MetrostroiAdvanced.TrainList["gmod_subway_81-718"] 				= MetrostroiAdvanced.Lang["81-718"]
 	MetrostroiAdvanced.TrainList["gmod_subway_81-720"] 				= MetrostroiAdvanced.Lang["81-720"]

@@ -6,13 +6,13 @@ MetrostroiAdvanced.Lang = {}
 
 -- Trains
 MetrostroiAdvanced.Lang["81-502"] 				= "81-502 (Ема-502)"
+MetrostroiAdvanced.Lang["81-540"] 				= "81-540 (Номерной СПБ)"
 MetrostroiAdvanced.Lang["81-702"] 				= "81-702 (Д)"
 MetrostroiAdvanced.Lang["81-703"] 				= "81-703 (E)"
 MetrostroiAdvanced.Lang["ezh"] 					= "81-707 (Еж)"
 MetrostroiAdvanced.Lang["ezh3"] 				= "81-710 (Еж3)"
 MetrostroiAdvanced.Lang["ezh3ru1"] 				= "81-710 (Еж3 РУ1)"
 MetrostroiAdvanced.Lang["81-717_mvm"]			= "81-717 (Номерной МСК)"
-MetrostroiAdvanced.Lang["81-717_mvm_custom"]	= "81-717 (Номерной МСК)"
 MetrostroiAdvanced.Lang["81-717_lvz"] 			= "81-717 (Номерной СПБ)"
 MetrostroiAdvanced.Lang["81-717_6"] 			= "81-717.6"
 MetrostroiAdvanced.Lang["81-718"] 				= "81-718 (ТИСУ)"
