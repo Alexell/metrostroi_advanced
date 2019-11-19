@@ -138,7 +138,7 @@ end
 
 -- Получение уникального рандомного номера маршрута
 function MetrostroiAdvanced.GetRouteNumber(ply)
-	local rnum = math.random(99)
+	local rnum = math.random(23,99)
 	local routes = {}
 	for k,v in pairs(MetrostroiAdvanced.TrainList) do
 		if k == "gmod_subway_81-717_mvm_custom" then continue end
@@ -154,7 +154,7 @@ function MetrostroiAdvanced.GetRouteNumber(ply)
 				else
 					rnum2 = tonumber(train.RouteNumber.RouteNumber)
 				end
-				if table.HasValue({"gmod_subway_81-702","gmod_subway_81-703","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_81-717_mvm","gmod_subway_81-717_mvm_custom","gmod_subway_81-718","gmod_subway_81-720"},k) then rnum2 = rnum2 / 10 end
+				if table.HasValue({"gmod_subway_81-702","gmod_subway_81-703","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_81-717_mvm","gmod_subway_81-718","gmod_subway_81-720"},k) then rnum2 = rnum2 / 10 end
 				routes[owner:Nick()] = rnum2
 			end
 		end
@@ -166,8 +166,8 @@ function MetrostroiAdvanced.GetRouteNumber(ply)
 		end
 		
 		for k,v in pairs(r2) do
-			if (rnum == v or rnum == 22 or rnum == 11) then
-				rnum = math.random(99)
+			if rnum == v then
+				rnum = math.random(23,99)
 				k = 1
 			end	
 		end
