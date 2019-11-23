@@ -24,8 +24,11 @@ AFK_WARN1 = 0
 AFK_WARN2 = 0
 AFK_WARN3 = 60
 
--- Загрузка локализации
-MetrostroiAdvanced.LoadLanguage(GetConVarString("metrostroi_advanced_lang"))
+timer.Create("MetrostroiAdvancedInit",1,1,function()
+	MetrostroiAdvanced.LoadLanguage(GetConVarString("metrostroi_advanced_lang"))
+	SetGlobalInt("TrainLastSpawned",os.time())
+end)
+
 cvars.AddChangeCallback("metrostroi_advanced_lang", function(cvar, old, new)
     MetrostroiAdvanced.LoadLanguage(new)
 end)
@@ -56,6 +59,7 @@ hook.Add("MetrostroiSpawnerRestrict","TrainSpawnerLimits",function(ply,settings)
 			ply:ChatPrint(MetrostroiAdvanced.Lang["SpawnerRestrict1"])
 			ply:ChatPrint(MetrostroiAdvanced.Lang["SpawnerRestrict1"])
 			for k, v in pairs (MetrostroiAdvanced.TrainList) do
+				if string.find(k,"custom") then continue end
 				if (PlayerPermission(ply,k)) then
 					ply:ChatPrint(v)
 				end
@@ -260,8 +264,4 @@ hook.Add("EntityRemoved","DeleteTrainParams",function (ent)
 		if not IsValid(ply) then return end
 		ply:SetNW2String("MATrainClass","")
 	end
-end)
-
-hook.Add("MetrostroiLoaded","MetrostroiLoadEnd",function()
-	SetGlobalInt("TrainLastSpawned",os.time())
 end)

@@ -28,29 +28,20 @@ function MetrostroiAdvanced.LoadLanguage(lang)
 		print("Metrostroi Advanced: default language will be loaded (ru)")
 		include("metrostroi_advanced/language/ru.lua")
 	end
+
+	file.Write("metrostroi_advanced_trains.txt","") -- очищаем файл с составами для перезаписи
 	
-	MetrostroiAdvanced.TrainList["gmod_subway_81-502"] 				= MetrostroiAdvanced.Lang["81-502"]
-	MetrostroiAdvanced.TrainList["gmod_subway_81-540"] 				= MetrostroiAdvanced.Lang["81-540"]
-	MetrostroiAdvanced.TrainList["gmod_subway_81-702"] 				= MetrostroiAdvanced.Lang["81-702"]
-	MetrostroiAdvanced.TrainList["gmod_subway_81-703"] 				= MetrostroiAdvanced.Lang["81-703"]
-	MetrostroiAdvanced.TrainList["gmod_subway_ezh"] 				= MetrostroiAdvanced.Lang["ezh"]
-	MetrostroiAdvanced.TrainList["gmod_subway_ezh3"] 				= MetrostroiAdvanced.Lang["ezh3"]
-	MetrostroiAdvanced.TrainList["gmod_subway_ezh3ru1"] 			= MetrostroiAdvanced.Lang["ezh3ru1"]
-	MetrostroiAdvanced.TrainList["gmod_subway_81-717_mvm"]			= MetrostroiAdvanced.Lang["81-717_mvm"]
-	MetrostroiAdvanced.TrainList["gmod_subway_81-717_mvm_custom"]	= MetrostroiAdvanced.Lang["81-717_mvm"]
-	MetrostroiAdvanced.TrainList["gmod_subway_81-717_lvz"] 			= MetrostroiAdvanced.Lang["81-717_lvz"]
-	MetrostroiAdvanced.TrainList["gmod_subway_81-717_lvz_custom"] 	= MetrostroiAdvanced.Lang["81-717_lvz"]
-	MetrostroiAdvanced.TrainList["gmod_subway_81-717_6"] 			= MetrostroiAdvanced.Lang["81-717_6"]
-	MetrostroiAdvanced.TrainList["gmod_subway_81-718"] 				= MetrostroiAdvanced.Lang["81-718"]
-	MetrostroiAdvanced.TrainList["gmod_subway_81-720"] 				= MetrostroiAdvanced.Lang["81-720"]
-	MetrostroiAdvanced.TrainList["gmod_subway_81-722"] 				= MetrostroiAdvanced.Lang["81-722"]
-	MetrostroiAdvanced.TrainList["gmod_subway_81-760"] 				= MetrostroiAdvanced.Lang["81-760"]
-	MetrostroiAdvanced.TrainList["gmod_subway_81-760a"] 			= MetrostroiAdvanced.Lang["81-760A"]
+	for _,class in pairs(Metrostroi.TrainClasses) do
+		local ENT = scripted_ents.Get(class)
+		if not ENT.Spawner or not ENT.SubwayTrain then continue end
+		file.Append("metrostroi_advanced_trains.txt",class.."\n")
+		MetrostroiAdvanced.TrainList[class] = MetrostroiAdvanced.Lang[class] or ENT.PrintName or class
+	end
 end
 
 -- Название состава по классу
 function MetrostroiAdvanced.GetTrainName(class)
-	if MetrostroiAdvanced.TrainList[class] then
+	if MetrostroiAdvanced.TrainList[class] and MetrostroiAdvanced.TrainList[class] ~= "" then
 		return MetrostroiAdvanced.TrainList[class]
 	else
 		return class
@@ -141,7 +132,7 @@ function MetrostroiAdvanced.GetRouteNumber(ply)
 	local rnum = math.random(23,99)
 	local routes = {}
 	for k,v in pairs(MetrostroiAdvanced.TrainList) do
-		if k == "gmod_subway_81-717_mvm_custom" then continue end
+		if string.find(k,"custom") then continue end
 		for _,train in pairs(ents.FindByClass(k)) do
 			local owner = train.Owner
 			if not IsValid(owner) then continue end

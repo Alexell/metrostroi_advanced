@@ -511,7 +511,7 @@ function ulx.wagons( calling_ply )
 	local wag_str = MetrostroiAdvanced.Lang["wagon1"]
 
 	for k,v in pairs(MetrostroiAdvanced.TrainList) do
-		if k == "gmod_subway_81-717_mvm_custom" then continue end
+		if string.find(k,"custom") then continue end
 		for _,train in pairs(ents.FindByClass(k)) do
 			local ply = train.Owner
 			if not IsValid(ply) then continue end
@@ -766,8 +766,13 @@ trainstop:help( "Cabin stop." )
 
 if SERVER then
 	-- Регистрация прав ULX
-	for k, v in pairs (MetrostroiAdvanced.TrainList) do
-		ULib.ucl.registerAccess(k, ULib.ACCESS_ALL, "Spawn train type "..v, CATEGORY_NAME)
+	
+	-- Составы загружаем из файла, потому что Metrostroi.TrainClasses появляется позже, чем можно добавить права ULX
+	if file.Exists("metrostroi_advanced_trains.txt","DATA") then
+		local trains = string.Explode("\n", file.Read("metrostroi_advanced_trains.txt","DATA"))
+		for k, v in pairs (trains) do
+			if v ~= "" then ULib.ucl.registerAccess(v, ULib.ACCESS_ALL, "Spawn train "..v, CATEGORY_NAME) end
+		end
 	end
 	ULib.ucl.registerAccess("add_1wagons", ULib.ACCESS_ADMIN, "Spawn +1 wagon more", CATEGORY_NAME)
 	ULib.ucl.registerAccess("add_2wagons", ULib.ACCESS_ADMIN, "Spawn +2 wagons more", CATEGORY_NAME)
