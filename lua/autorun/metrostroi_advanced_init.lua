@@ -138,7 +138,11 @@ function MetrostroiAdvanced.GetRouteNumber(ply)
 			if not IsValid(owner) then continue end
 			if owner != ply then
 				local rnum2 = 0
-				if k == "gmod_subway_81-722" then
+				if k == "gmod_subway_81-540_2" then
+					if train.RouteNumberSys then
+						rnum2 = tonumber(train.RouteNumberSys.RouteNumber)
+					end
+				elseif k == "gmod_subway_81-722" then
 					rnum2 = tonumber(train.RouteNumberSys.RouteNumber)
 				elseif k == "gmod_subway_81-717_6" then
 					rnum2 = train.ASNP.RouteNumber

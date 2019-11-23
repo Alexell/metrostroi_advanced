@@ -223,11 +223,15 @@ hook.Add("MetrostroiCoupled","SetTrainParams",function(ent,ent2)
 			if MetrostroiAdvanced.TrainList[ent:GetClass()] then
 				if table.HasValue({"gmod_subway_81-702","gmod_subway_81-703","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_ezh3ru1","gmod_subway_81-717_mvm","gmod_subway_81-718","gmod_subway_81-720"},ent:GetClass()) then rnum = rnum * 10 end
 				
-				if ent:GetClass() == "gmod_subway_81-722" then
+				if ent:GetClass() == "gmod_subway_81-540_2" then
+					if ent.RouteNumberSys then
+						ent.RouteNumberSys.CurrentRouteNumber = rnum
+					end
+				elseif ent:GetClass() == "gmod_subway_81-722" then
 					ent.RouteNumberSys.CurrentRouteNumber = rnum
 				elseif ent:GetClass() == "gmod_subway_81-717_6" then
 					ent.ASNP.RouteNumber = rnum
-				elseif ent:GetClass() == "gmod_subway_81-540" or ent:GetClass() == "gmod_subway_81-717_lvz" then
+				elseif ent:GetClass() == "gmod_subway_81-502" or ent:GetClass() == "gmod_subway_81-540" or ent:GetClass() == "gmod_subway_81-717_lvz" then
 					ent.RouteNumber.RouteNumber = "0"..tostring(rnum)
 					ent:SetNW2String("RouteNumber","0"..tostring(rnum))
 				else
@@ -240,11 +244,15 @@ hook.Add("MetrostroiCoupled","SetTrainParams",function(ent,ent2)
 			if MetrostroiAdvanced.TrainList[ent2:GetClass()] then
 				if table.HasValue({"gmod_subway_81-702","gmod_subway_81-703","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_ezh3ru1","gmod_subway_81-717_mvm","gmod_subway_81-718","gmod_subway_81-720"},ent2:GetClass()) then rnum = rnum * 10 end
 				
-				if ent2:GetClass() == "gmod_subway_81-722" then
+				if ent2:GetClass() == "gmod_subway_81-540_2" then
+					if ent2.RouteNumberSys then
+						ent2.RouteNumberSys.CurrentRouteNumber = rnum
+					end
+				elseif ent2:GetClass() == "gmod_subway_81-722" then
 					ent2.RouteNumberSys.CurrentRouteNumber = rnum
 				elseif ent2:GetClass() == "gmod_subway_81-717_6" then
 					ent2.ASNP.RouteNumber = rnum
-				elseif ent2:GetClass() == "gmod_subway_81-540" or ent2:GetClass() == "gmod_subway_81-717_lvz" then
+				elseif ent2:GetClass() == "gmod_subway_81-502" or ent2:GetClass() == "gmod_subway_81-540" or ent2:GetClass() == "gmod_subway_81-717_lvz" then
 					ent2.RouteNumber.RouteNumber = "0"..tostring(rnum)
 					ent2:SetNW2String("RouteNumber","0"..tostring(rnum))
 				else
