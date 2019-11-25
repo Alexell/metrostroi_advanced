@@ -245,6 +245,10 @@ hook.Add("MetrostroiCoupled","SetTrainParams",function(ent,ent2)
 				elseif ent:GetClass() == "gmod_subway_81-502" or ent:GetClass() == "gmod_subway_81-540" or ent:GetClass() == "gmod_subway_81-717_lvz" then
 					ent.RouteNumber.RouteNumber = "0"..tostring(rnum)
 					ent:SetNW2String("RouteNumber","0"..tostring(rnum))
+				elseif ent:GetClass() == "gmod_subway_81-760" or ent:GetClass() == "gmod_subway_81-760a" then
+					ent.BMCIS.RouteNumber = rnum
+					ent:SetNW2Int("RouteNumber:RouteNumber",rnum)
+					ent.RouteNumber.RouteNumber = rnum
 				else
 					if ent.RouteNumber.RouteNumber then
 						ent.RouteNumber.RouteNumber = tostring(rnum)
@@ -280,6 +284,10 @@ hook.Add("MetrostroiCoupled","SetTrainParams",function(ent,ent2)
 				elseif ent2:GetClass() == "gmod_subway_81-502" or ent2:GetClass() == "gmod_subway_81-540" or ent2:GetClass() == "gmod_subway_81-717_lvz" then
 					ent2.RouteNumber.RouteNumber = "0"..tostring(rnum)
 					ent2:SetNW2String("RouteNumber","0"..tostring(rnum))
+				elseif ent2:GetClass() == "gmod_subway_81-760" or ent2:GetClass() == "gmod_subway_81-760a" then
+					ent2.BMCIS.RouteNumber = rnum
+					ent2:SetNW2Int("RouteNumber:RouteNumber",rnum)
+					ent2.RouteNumber.RouteNumber = rnum
 				else
 					if ent2.RouteNumber.RouteNumber then
 						ent2.RouteNumber.RouteNumber = tostring(rnum)
