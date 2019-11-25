@@ -579,15 +579,36 @@ function ulx.traintp( calling_ply, target_ply )
 		local ents = ents.FindByClass(class)
 		for k,v in pairs(ents) do
 			if v.Owner:Nick() == target_ply:Nick() then
-				if (class:sub(13,18) != "81-718" and class:sub(13,18) != "81-720" and class:sub(13,18) != "81-722") then
-					if v.KVWrenchMode != 0 then if v.KV.ReverserSet != 0 then GotoTrain(calling_ply,target_ply,v,true) teleported = true end end
-				elseif class:sub(13,18) == "81-718" then
-					if v.WrenchMode != 0 then if v.KR.Position != 0 then GotoTrain(calling_ply,target_ply,v,true) teleported = true end end
+				if class:sub(13,18) == "81-760" or class:sub(13,19) == "81-760a" then
+					if v.RV.KROPosition != 0 then
+						GotoTrain(calling_ply,target_ply,v,true)
+						teleported = true
+					end
+				elseif class:sub(13,18) == "81-722" then
+					if v.Electric.CabActive != 0 then
+						GotoTrain(calling_ply,target_ply,v,true) 
+						teleported = true
+					end
 				elseif class:sub(13,18) == "81-720" then
-					if v.WrenchMode != 0 then if v.RV.KROPosition != 0 then GotoTrain(calling_ply,target_ply,v,true) teleported = true end end
+					if v.WrenchMode != 0 then
+						if v.RV.KROPosition != 0 then
+							GotoTrain(calling_ply,target_ply,v,true)
+							teleported = true
+						end
+					end
+				elseif class:sub(13,18) == "81-718" then
+					if v.WrenchMode != 0 then
+						if v.KR.Position != 0 then
+							GotoTrain(calling_ply,target_ply,v,true)
+							teleported = true
+						end
+					end
 				else
-					if class:sub(13,18) == "81-722" then
-						if v.Electric.CabActive != 0 then GotoTrain(calling_ply,target_ply,v,true)  teleported = true end
+					if v.KVWrenchMode != 0 then
+						if v.KV.ReverserSet != 0 then
+							GotoTrain(calling_ply,target_ply,v,true)
+							teleported = true
+						end
 					end
 				end
 			end
@@ -742,6 +763,10 @@ function ulx.smartch( calling_ply )
 	local seattype = seat:GetNW2String("SeatType")
 	if seattype == "driver" then
 		local train1 = seat:GetNW2Entity("TrainEntity")
+		if train1:GetClass() == "gmod_subway_81-760" or train1:GetClass() == "gmod_subway_81-760a" then
+			calling_ply:ChatPrint("Oka is not supported yet.")
+			return
+		end
 		local train2
 		if not IsValid(train1) then return end
 		for t,wag in pairs(train1.WagonList) do
@@ -760,6 +785,10 @@ function ulx.trainstart( calling_ply )
 	if not IsValid(calling_ply) then return end
     local train = calling_ply:GetTrain()
 	if train != nil then
+		if train:GetClass() == "gmod_subway_81-760" or train:GetClass() == "gmod_subway_81-760a" then
+			calling_ply:ChatPrint("Oka is not supported yet.")
+			return
+		end
 		TrainStart(train)
 		ulx.fancyLog("#s "..MetrostroiAdvanced.Lang["UseTrainStart"],calling_ply:Nick())
 	end
@@ -771,7 +800,13 @@ trainstart:help( "Cabin autostart" )
 function ulx.trainstop( calling_ply )
 	if not IsValid(calling_ply) then return end
     local train = calling_ply:GetTrain()
-	if train != nil then TrainStop(train) end
+	if train != nil then
+		if train:GetClass() == "gmod_subway_81-760" or train:GetClass() == "gmod_subway_81-760a" then
+			calling_ply:ChatPrint("Oka is not supported yet.")
+			return
+		end
+		TrainStop(train)
+	end
 end
 local trainstop = ulx.command( CATEGORY_NAME, "ulx trainstop", ulx.trainstop, "!trainstop" )
 trainstop:defaultAccess( ULib.ACCESS_ALL )
