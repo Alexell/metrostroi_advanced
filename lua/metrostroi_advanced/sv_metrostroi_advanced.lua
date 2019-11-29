@@ -224,16 +224,16 @@ hook.Add("MetrostroiCoupled","SetTrainParams",function(ent,ent2)
 				if table.HasValue({"gmod_subway_81-702","gmod_subway_81-703","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_ezh3ru1","gmod_subway_81-717_mvm","gmod_subway_81-718","gmod_subway_81-720"},ent:GetClass()) then rnum = rnum * 10 end
 				
 				if ent:GetClass() == "gmod_subway_81-540_2" then
-					local rtype = ent:GetNW2String("routenumber_type")
-					if rtype == "m" then
+					local rtype = ent:GetNW2Int("Route",1)
+					if rtype == 1 then
 						ent.RouteNumbera.RouteNumbera = tostring(rnum).."0"
 						ent:SetNW2String("RouteNumbera",tostring(rnum).."0")
 					end
-					if rtype == "p" then
+					if rtype == 2 then
 						ent.RouteNumbera.RouteNumbera = "0"..tostring(rnum)
 						ent:SetNW2String("RouteNumbera","0"..tostring(rnum))
 					end
-					if rtype == "d" then
+					if rtype == 3 then
 						if ent.RouteNumberSys then
 							ent.RouteNumberSys.CurrentRouteNumber = rnum
 						end
@@ -260,22 +260,19 @@ hook.Add("MetrostroiCoupled","SetTrainParams",function(ent,ent2)
 				if table.HasValue({"gmod_subway_81-702","gmod_subway_81-703","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_ezh3ru1","gmod_subway_81-717_mvm","gmod_subway_81-718","gmod_subway_81-720"},ent2:GetClass()) then rnum = rnum * 10 end
 				
 				if ent2:GetClass() == "gmod_subway_81-540_2" then
-					local rtype = ent2:GetNW2String("routenumber_type")
-					if rtype == "m" then
+					local rtype = ent2:GetNW2Int("Route",1)
+					if rtype == 1 then
 						ent2.RouteNumbera.RouteNumbera = tostring(rnum).."0"
 						ent2:SetNW2String("RouteNumbera",tostring(rnum).."0")
 					end
-					if rtype == "p" then
+					if rtype == 2 then
 						ent2.RouteNumbera.RouteNumbera = "0"..tostring(rnum)
 						ent2:SetNW2String("RouteNumbera","0"..tostring(rnum))
 					end
-					if rtype == "d" then
+					if rtype == 3 then
 						if ent2.RouteNumberSys then
 							ent2.RouteNumberSys.CurrentRouteNumber = rnum
 						end
-					else
-						ent2.RouteNumbera.RouteNumbera = "0"..tostring(rnum)
-						ent2:SetNW2String("RouteNumbera","0"..tostring(rnum))
 					end
 				elseif ent2:GetClass() == "gmod_subway_81-722" then
 					ent2.RouteNumberSys.CurrentRouteNumber = rnum
