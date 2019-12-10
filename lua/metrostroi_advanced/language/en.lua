@@ -21,6 +21,7 @@ MetrostroiAdvanced.Lang["gmod_subway_81-717_6"] 			= "81-717.6"
 MetrostroiAdvanced.Lang["gmod_subway_81-718"] 				= "81-718 (TISU)"
 MetrostroiAdvanced.Lang["gmod_subway_81-720"] 				= "81-720 (Yauza)"
 MetrostroiAdvanced.Lang["gmod_subway_81-722"] 				= "81-722 (Yubileyniy)"
+MetrostroiAdvanced.Lang["gmod_subway_81-722_3"] 			= "81-722.3 (Yubileyniy)"
 MetrostroiAdvanced.Lang["gmod_subway_81-760"] 				= "81-760 (Oka)"
 MetrostroiAdvanced.Lang["gmod_subway_81-760a"] 				= "81-760A (Oka)"
 

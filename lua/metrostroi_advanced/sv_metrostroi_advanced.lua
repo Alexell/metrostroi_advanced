@@ -222,7 +222,6 @@ hook.Add("MetrostroiCoupled","SetTrainParams",function(ent,ent2)
 			local rnum = ply:GetNW2Int("MARouteNumber")
 			if MetrostroiAdvanced.TrainList[ent:GetClass()] then
 				if table.HasValue({"gmod_subway_81-702","gmod_subway_81-703","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_ezh3ru1","gmod_subway_81-717_mvm","gmod_subway_81-718","gmod_subway_81-720"},ent:GetClass()) then rnum = rnum * 10 end
-				
 				if ent:GetClass() == "gmod_subway_81-540_2" then
 					local rtype = ent:GetNW2Int("Route",1)
 					if rtype == 1 then
@@ -238,7 +237,7 @@ hook.Add("MetrostroiCoupled","SetTrainParams",function(ent,ent2)
 							ent.RouteNumberSys.CurrentRouteNumber = rnum
 						end
 					end
-				elseif ent:GetClass() == "gmod_subway_81-722" then
+				elseif ent:GetClass() == "gmod_subway_81-722" or ent:GetClass() == "gmod_subway_81-722_3" then
 					ent.RouteNumberSys.CurrentRouteNumber = rnum
 				elseif ent:GetClass() == "gmod_subway_81-717_6" then
 					ent.ASNP.RouteNumber = rnum
@@ -250,7 +249,7 @@ hook.Add("MetrostroiCoupled","SetTrainParams",function(ent,ent2)
 					ent:SetNW2Int("RouteNumber:RouteNumber",rnum)
 					ent.RouteNumber.RouteNumber = rnum
 				else
-					if ent.RouteNumber.RouteNumber then
+					if ent.RouteNumber then
 						ent.RouteNumber.RouteNumber = tostring(rnum)
 						ent:SetNW2String("RouteNumber",tostring(rnum))
 					end
@@ -274,7 +273,7 @@ hook.Add("MetrostroiCoupled","SetTrainParams",function(ent,ent2)
 							ent2.RouteNumberSys.CurrentRouteNumber = rnum
 						end
 					end
-				elseif ent2:GetClass() == "gmod_subway_81-722" then
+				elseif ent2:GetClass() == "gmod_subway_81-722" or ent2:GetClass() == "gmod_subway_81-722_3" then
 					ent2.RouteNumberSys.CurrentRouteNumber = rnum
 				elseif ent2:GetClass() == "gmod_subway_81-717_6" then
 					ent2.ASNP.RouteNumber = rnum
@@ -286,7 +285,7 @@ hook.Add("MetrostroiCoupled","SetTrainParams",function(ent,ent2)
 					ent2:SetNW2Int("RouteNumber:RouteNumber",rnum)
 					ent2.RouteNumber.RouteNumber = rnum
 				else
-					if ent2.RouteNumber.RouteNumber then
+					if ent2.RouteNumber then
 						ent2.RouteNumber.RouteNumber = tostring(rnum)
 						ent2:SetNW2String("RouteNumber",tostring(rnum))
 					end

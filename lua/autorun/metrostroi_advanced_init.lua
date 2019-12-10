@@ -151,7 +151,7 @@ function MetrostroiAdvanced.GetRouteNumber(ply)
 							rnum2 = tonumber(train.RouteNumberSys.RouteNumber)
 						end
 					end
-				elseif k == "gmod_subway_81-722" then
+				elseif k == "gmod_subway_81-722" or k == "gmod_subway_81-722_3" then
 					rnum2 = tonumber(train.RouteNumberSys.RouteNumber)
 				elseif k == "gmod_subway_81-717_6" then
 					rnum2 = train.ASNP.RouteNumber
