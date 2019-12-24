@@ -57,7 +57,7 @@ hook.Add("MetrostroiSpawnerRestrict","TrainSpawnerLimits",function(ply,settings)
 	if (train_restrict == 1) then
 		if (not PlayerPermission(ply,train)) then
 			ply:ChatPrint(MetrostroiAdvanced.Lang["SpawnerRestrict1"])
-			ply:ChatPrint(MetrostroiAdvanced.Lang["SpawnerRestrict1"])
+			ply:ChatPrint(MetrostroiAdvanced.Lang["SpawnerRestrict2"])
 			for k, v in pairs (MetrostroiAdvanced.TrainList) do
 				if string.find(k,"custom") then continue end
 				if (PlayerPermission(ply,k)) then

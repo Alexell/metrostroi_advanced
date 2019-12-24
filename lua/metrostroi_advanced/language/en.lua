@@ -28,7 +28,7 @@ MetrostroiAdvanced.Lang["gmod_subway_81-760a"] 				= "81-760A (Oka)"
 -- SV
 MetrostroiAdvanced.Lang["UnknownPlace"] 		= "mainline"
 MetrostroiAdvanced.Lang["SpawnerRestrict1"] 	= "[Server] This type of train is restricted for your rank!"
-MetrostroiAdvanced.Lang["SpawnerRestrict1"] 	= "The following types of train are allowed:"
+MetrostroiAdvanced.Lang["SpawnerRestrict2"] 	= "The following types of train are allowed:"
 MetrostroiAdvanced.Lang["FewWagons"] 			= "Too short trains are restricted!\nThe number of wagons increased to"
 MetrostroiAdvanced.Lang["wagon1"] 				= "wagon"
 MetrostroiAdvanced.Lang["wagon2"] 				= "wagons"

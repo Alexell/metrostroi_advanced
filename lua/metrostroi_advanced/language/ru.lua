@@ -28,7 +28,7 @@ MetrostroiAdvanced.Lang["gmod_subway_81-760a"] 				= "81-760A (Ока)"
 -- SV
 MetrostroiAdvanced.Lang["UnknownPlace"] 		= "перегон"
 MetrostroiAdvanced.Lang["SpawnerRestrict1"] 	= "[Сервер] Вам запрещен данный тип состава!"
-MetrostroiAdvanced.Lang["SpawnerRestrict1"] 	= "Разрешено спавнить только следующие составы:"
+MetrostroiAdvanced.Lang["SpawnerRestrict2"] 	= "Разрешено спавнить только следующие составы:"
 MetrostroiAdvanced.Lang["FewWagons"] 			= "Запрещено спавнить короткие составы!\nКоличество вагонов увеличено до"
 MetrostroiAdvanced.Lang["wagon1"] 				= "вагон"
 MetrostroiAdvanced.Lang["wagon2"] 				= "вагона"
