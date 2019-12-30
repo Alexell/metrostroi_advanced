@@ -7,7 +7,6 @@ MetrostroiAdvanced.Lang = {}
 -- Trains
 MetrostroiAdvanced.Lang["gmod_subway_81-502"] 				= "81-502 (Ema-502)"
 MetrostroiAdvanced.Lang["gmod_subway_81-540"] 				= "81-540 (Nomernoi SPb)"
-MetrostroiAdvanced.Lang["gmod_subway_81-540_2"] 			= "81-540.2 (Alien SPb)"
 MetrostroiAdvanced.Lang["gmod_subway_81-702"] 				= "81-702 (D)"
 MetrostroiAdvanced.Lang["gmod_subway_81-703"] 				= "81-703 (E)"
 MetrostroiAdvanced.Lang["gmod_subway_ezh"] 					= "81-707 (Ezh)"
@@ -18,6 +17,7 @@ MetrostroiAdvanced.Lang["gmod_subway_81-717_mvm_custom"]	= "81-717 (Nomernoi MSK
 MetrostroiAdvanced.Lang["gmod_subway_81-717_lvz"] 			= "81-717 (Nomernoi SPb)"
 MetrostroiAdvanced.Lang["gmod_subway_81-717_lvz_custom"] 	= "81-717 (Nomernoi SPb)"
 MetrostroiAdvanced.Lang["gmod_subway_81-717_6"] 			= "81-717.6"
+MetrostroiAdvanced.Lang["gmod_subway_81-7175p"] 			= "81-717.5P"
 MetrostroiAdvanced.Lang["gmod_subway_81-718"] 				= "81-718 (TISU)"
 MetrostroiAdvanced.Lang["gmod_subway_81-720"] 				= "81-720 (Yauza)"
 MetrostroiAdvanced.Lang["gmod_subway_81-722"] 				= "81-722 (Yubileyniy)"
