@@ -38,6 +38,7 @@ MetrostroiAdvanced.Lang["NoWagons2"] 			= "Пожалуйста подождит
 MetrostroiAdvanced.Lang["Wagonsrestrict1"] 		= "Вы не можете спавнить столько вагонов!"
 MetrostroiAdvanced.Lang["Wagonsrestrict2"] 		= "Для спавна доступно:"
 MetrostroiAdvanced.Lang["AnyPlaceRestrict"] 	= "Вам запрещен спавн в этом месте!"
+MetrostroiAdvanced.Lang["StationRestrict"] 		= "Вам запрещен спавн на станции!"
 MetrostroiAdvanced.Lang["Seconds"]				= "секунд"
 MetrostroiAdvanced.Lang["PleaseWait"] 			= "Пожалуйста подождите"
 MetrostroiAdvanced.Lang["WaitSpawn"] 			= "прежде, чем спавнить состав."

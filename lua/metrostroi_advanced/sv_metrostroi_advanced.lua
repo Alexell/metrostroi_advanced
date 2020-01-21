@@ -124,6 +124,17 @@ hook.Add("MetrostroiSpawnerRestrict","TrainSpawnerLimits",function(ply,settings)
 		if tr.Hit then
 			loc = MetrostroiAdvanced.GetLocation(ply,tr.HitPos)
 		end
+		if (not PlayerPermission(ply,"metrostroi_station_spawn")) then
+			local tab = {"Депо","депо","Depot","depot","ПТО","пто","Оборот","оборот","Oborot","oborot","Тупик","тупик","Deadlock","deadlock"}
+			local founded = false
+			for k,v in pairs(tab) do
+				if loc:find(v) then founded = true break end
+			end
+			if not founded then
+				ply:ChatPrint(MetrostroiAdvanced.Lang["StationRestrict"])
+				return true
+			end
+		end
 		if (loc == MetrostroiAdvanced.Lang["UnknownPlace"]) then
 			ply:ChatPrint(MetrostroiAdvanced.Lang["AnyPlaceRestrict"])
 			return true

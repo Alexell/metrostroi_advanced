@@ -38,6 +38,7 @@ MetrostroiAdvanced.Lang["NoWagons2"] 			= "Wait for any player to disconnect or 
 MetrostroiAdvanced.Lang["Wagonsrestrict1"] 		= "You cann't spawn this number of wagons!"
 MetrostroiAdvanced.Lang["Wagonsrestrict2"] 		= "Available for spawn:"
 MetrostroiAdvanced.Lang["AnyPlaceRestrict"] 	= "Spawn is restricted for you in this place!"
+MetrostroiAdvanced.Lang["StationRestrict"] 		= "Spawn is restricted for you at stations!"
 MetrostroiAdvanced.Lang["Seconds"]				= "seconds"
 MetrostroiAdvanced.Lang["PleaseWait"] 			= "Please, wait"
 MetrostroiAdvanced.Lang["WaitSpawn"] 			= "before, spawning a train."
