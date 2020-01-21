@@ -19,6 +19,7 @@ local route_nums = CreateConVar("metrostroi_advanced_routenums", 1, {FCVAR_ARCHI
 local auto_wags = CreateConVar("metrostroi_advanced_autowags", 0, {FCVAR_ARCHIVE})
 local madv_lang = CreateConVar("metrostroi_advanced_lang", "ru", {FCVAR_ARCHIVE})
 local afktime = CreateConVar("metrostroi_advanced_afktime", 0, {FCVAR_ARCHIVE})
+local timezone = CreateConVar("metrostroi_advanced_timezone", 3, {FCVAR_ARCHIVE})
 AFK_TIME = 0
 AFK_WARN1 = 0
 AFK_WARN2 = 0
