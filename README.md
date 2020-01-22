@@ -4,7 +4,7 @@
 
 **Website:** https://alexell.ru/
  
-![Metrostroi Advanced v1](http://mss.community/images/metrostroi_advanced.jpg)
+![Metrostroi Advanced v1](http://mss.community/images/addons/metrostroi_advanced.jpg)
 
 **Описание:**
 
