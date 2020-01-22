@@ -16,6 +16,7 @@ end
 if not MetrostroiAdvanced then
 	MetrostroiAdvanced = {}
 	MetrostroiAdvanced.TrainList = {}
+	MetrostroiAdvanced.StationsIgnore = {}
 end
 
 -- Загрузка локализации
@@ -36,6 +37,16 @@ function MetrostroiAdvanced.LoadLanguage(lang)
 		if not ENT.Spawner or not ENT.SubwayTrain then continue end
 		file.Append("metrostroi_advanced_trains.txt",class.."\n")
 		MetrostroiAdvanced.TrainList[class] = MetrostroiAdvanced.Lang[class] or ENT.PrintName or class
+	end
+end
+
+-- Список слов из точек телепорта для игнорирования запрета спавна на станциях
+function MetrostroiAdvanced.LoadStationsIgnore()
+	if file.Exists("metrostroi_advanced_stations_ignore.txt","DATA") then
+		MetrostroiAdvanced.StationsIgnore = string.Explode(",",file.Read("metrostroi_advanced_stations_ignore.txt","DATA"))
+	else
+		MetrostroiAdvanced.StationsIgnore = {"Депо","депо","Depot","depot","ПТО","пто","Оборот","оборот","Oborot","oborot","Тупик","тупик","Deadlock","deadlock"}
+		file.Write("metrostroi_advanced_stations_ignore.txt","Депо,депо,Depot,depot,ПТО,пто,Оборот,оборот,Oborot,oborot,Тупик,тупик,Deadlock,deadlock")
 	end
 end
 

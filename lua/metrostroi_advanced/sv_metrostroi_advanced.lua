@@ -27,6 +27,7 @@ AFK_WARN3 = 60
 
 timer.Create("MetrostroiAdvancedInit",1,1,function()
 	MetrostroiAdvanced.LoadLanguage(GetConVarString("metrostroi_advanced_lang"))
+	MetrostroiAdvanced.LoadStationsIgnore()
 	SetGlobalInt("TrainLastSpawned",os.time())
 end)
 
@@ -125,9 +126,8 @@ hook.Add("MetrostroiSpawnerRestrict","TrainSpawnerLimits",function(ply,settings)
 			loc = MetrostroiAdvanced.GetLocation(ply,tr.HitPos)
 		end
 		if (not PlayerPermission(ply,"metrostroi_station_spawn")) then
-			local tab = {"Депо","депо","Depot","depot","ПТО","пто","Оборот","оборот","Oborot","oborot","Тупик","тупик","Deadlock","deadlock"}
 			local founded = false
-			for k,v in pairs(tab) do
+			for k,v in pairs(MetrostroiAdvanced.StationsIgnore) do
 				if loc:find(v) then founded = true break end
 			end
 			if not founded then
