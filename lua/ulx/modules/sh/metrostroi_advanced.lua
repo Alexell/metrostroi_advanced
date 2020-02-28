@@ -803,7 +803,12 @@ if SERVER then
 	-- Регистрация прав ULX
 	
 	-- Составы загружаем из файла, потому что Metrostroi.TrainClasses появляется позже, чем можно добавить права ULX
-	if file.Exists("metrostroi_advanced_trains.txt","DATA") then
+	if file.Exists("metrostroi_advanced/trains.txt","DATA") then
+		local trains = string.Explode("\n", file.Read("metrostroi_advanced/trains.txt","DATA"))
+		for k, v in pairs (trains) do
+			if v ~= "" then ULib.ucl.registerAccess(v, ULib.ACCESS_ALL, "Spawn train "..v, CATEGORY_NAME) end
+		end
+	elseif file.Exists("metrostroi_advanced_trains.txt","DATA") then -- Временный код для автоматического перехода
 		local trains = string.Explode("\n", file.Read("metrostroi_advanced_trains.txt","DATA"))
 		for k, v in pairs (trains) do
 			if v ~= "" then ULib.ucl.registerAccess(v, ULib.ACCESS_ALL, "Spawn train "..v, CATEGORY_NAME) end

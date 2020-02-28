@@ -19,6 +19,23 @@ if not MetrostroiAdvanced then
 	MetrostroiAdvanced.StationsIgnore = {}
 end
 
+-- Перенос настроек в отдельную папку (временный код для автоматического перехода)
+if file.Exists("metrostroi_advanced_trains.txt","DATA") then
+	if not file.Exists("metrostroi_advanced","DATA") then
+		file.CreateDir("metrostroi_advanced")
+	end
+	--local trains = file.Read("metrostroi_advanced_trains.txt","DATA")
+	file.Write("metrostroi_advanced/trains.txt",file.Read("metrostroi_advanced_trains.txt","DATA"))
+	file.Delete("metrostroi_advanced_trains.txt")
+end
+if file.Exists("metrostroi_advanced_stations_ignore.txt","DATA") then
+	if not file.Exists("metrostroi_advanced","DATA") then
+		file.CreateDir("metrostroi_advanced")
+	end
+	file.Write("metrostroi_advanced/stations_ignore.txt",file.Read("metrostroi_advanced_stations_ignore.txt","DATA"))
+	file.Delete("metrostroi_advanced_stations_ignore.txt")
+end
+
 -- Загрузка локализации
 function MetrostroiAdvanced.LoadLanguage(lang)
 	if MetrostroiAdvanced.Lang then MetrostroiAdvanced.Lang = nil end
@@ -30,23 +47,23 @@ function MetrostroiAdvanced.LoadLanguage(lang)
 		include("metrostroi_advanced/language/ru.lua")
 	end
 
-	file.Write("metrostroi_advanced_trains.txt","") -- очищаем файл с составами для перезаписи
+	file.Write("metrostroi_advanced/trains.txt","") -- очищаем файл с составами для перезаписи
 	
 	for _,class in pairs(Metrostroi.TrainClasses) do
 		local ENT = scripted_ents.Get(class)
 		if not ENT.Spawner or not ENT.SubwayTrain then continue end
-		file.Append("metrostroi_advanced_trains.txt",class.."\n")
+		file.Append("metrostroi_advanced/trains.txt",class.."\n")
 		MetrostroiAdvanced.TrainList[class] = MetrostroiAdvanced.Lang[class] or ENT.PrintName or class
 	end
 end
 
 -- Список слов из точек телепорта для игнорирования запрета спавна на станциях
 function MetrostroiAdvanced.LoadStationsIgnore()
-	if file.Exists("metrostroi_advanced_stations_ignore.txt","DATA") then
-		MetrostroiAdvanced.StationsIgnore = string.Explode(",",file.Read("metrostroi_advanced_stations_ignore.txt","DATA"))
+	if file.Exists("metrostroi_advanced/stations_ignore.txt","DATA") then
+		MetrostroiAdvanced.StationsIgnore = string.Explode(",",file.Read("metrostroi_advanced/stations_ignore.txt","DATA"))
 	else
 		MetrostroiAdvanced.StationsIgnore = {"Депо","депо","Depot","depot","ПТО","пто","Оборот","оборот","Oborot","oborot","Тупик","тупик","Deadlock","deadlock"}
-		file.Write("metrostroi_advanced_stations_ignore.txt","Депо,депо,Depot,depot,ПТО,пто,Оборот,оборот,Oborot,oborot,Тупик,тупик,Deadlock,deadlock")
+		file.Write("metrostroi_advanced/stations_ignore.txt","Депо,депо,Depot,depot,ПТО,пто,Оборот,оборот,Oborot,oborot,Тупик,тупик,Deadlock,deadlock")
 	end
 end
 
