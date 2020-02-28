@@ -17,6 +17,7 @@ if not MetrostroiAdvanced then
 	MetrostroiAdvanced = {}
 	MetrostroiAdvanced.TrainList = {}
 	MetrostroiAdvanced.StationsIgnore = {}
+	MetrostroiAdvanced.MapWagons = {}
 end
 
 -- Перенос настроек в отдельную папку (временный код для автоматического перехода)
@@ -59,11 +60,23 @@ end
 
 -- Список слов из точек телепорта для игнорирования запрета спавна на станциях
 function MetrostroiAdvanced.LoadStationsIgnore()
-	if file.Exists("metrostroi_advanced/stations_ignore.txt","DATA") then
-		MetrostroiAdvanced.StationsIgnore = string.Explode(",",file.Read("metrostroi_advanced/stations_ignore.txt","DATA"))
-	else
-		MetrostroiAdvanced.StationsIgnore = {"Депо","депо","Depot","depot","ПТО","пто","Оборот","оборот","Oborot","oborot","Тупик","тупик","Deadlock","deadlock"}
+	if not file.Exists("metrostroi_advanced/stations_ignore.txt","DATA") then
 		file.Write("metrostroi_advanced/stations_ignore.txt","Депо,депо,Depot,depot,ПТО,пто,Оборот,оборот,Oborot,oborot,Тупик,тупик,Deadlock,deadlock")
+	end
+	MetrostroiAdvanced.StationsIgnore = string.Explode(",",file.Read("metrostroi_advanced/stations_ignore.txt","DATA"))
+end
+
+-- Список карт и кол-во разрешенных вагонов на состав
+function MetrostroiAdvanced.LoadMapWagonsLimit()
+	if not file.Exists("metrostroi_advanced/map_wagons.txt","DATA") then
+		file.Write("metrostroi_advanced/map_wagons.txt","gm_jar_pll_remastered_v9 4\ngm_mustox_neocrimson_line_a 4\ngm_metro_crossline_n3 6\ngm_metro_crossline_r199h 6\ngm_mus_loopline_e 5\ngm_metro_ruralline_v29 4\ngm_metro_jar_imagine_line_v4 6\ngm_mus_neoorange_d 3\ngm_metro_surfacemetro_w 4\ngm_metro_virus_v2 6\ngm_metro_mosldl_v1 8")
+	end
+	local mapwagons = string.Explode("\n",file.Read("metrostroi_advanced/map_wagons.txt","DATA"))
+	for _,str in pairs(mapwagons) do
+		local tbl = string.Explode(" ",str)
+		if tbl[1] ~= "" and tonumber(tbl[2]) then
+			MetrostroiAdvanced.MapWagons[tbl[1]] = tonumber(tbl[2]) or nil
+		end
 	end
 end
 

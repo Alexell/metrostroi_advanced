@@ -28,6 +28,7 @@ AFK_WARN3 = 60
 timer.Create("MetrostroiAdvancedInit",1,1,function()
 	MetrostroiAdvanced.LoadLanguage(GetConVarString("metrostroi_advanced_lang"))
 	MetrostroiAdvanced.LoadStationsIgnore()
+	MetrostroiAdvanced.LoadMapWagonsLimit()
 	SetGlobalInt("TrainLastSpawned",os.time())
 end)
 
@@ -104,8 +105,20 @@ hook.Add("MetrostroiSpawnerRestrict","TrainSpawnerLimits",function(ply,settings)
 		ply:ChatPrint(MetrostroiAdvanced.Lang["FewWagons"].." "..tostring(GetConVarNumber("metrostroi_advanced_minwagons"))..".")
 	end
 	
+	local map_wagons = MetrostroiAdvanced.MapWagons[game.GetMap()] or 0
+	local wag_str = MetrostroiAdvanced.Lang["wagon1"]
+	if map_wagons > 0 and not ply:IsAdmin() then
+		if settings.WagNum > map_wagons then
+			if map_wagons >= 2 and map_wagons <= 4 then wag_str = MetrostroiAdvanced.Lang["wagon2"] end
+			if map_wagons == 0 or map_wagons >= 5 then wag_str = MetrostroiAdvanced.Lang["wagon3"] end
+			ply:ChatPrint(MetrostroiAdvanced.Lang["MapWagonsLimit"])
+			ply:ChatPrint(MetrostroiAdvanced.Lang["Wagonsrestrict2"].." "..map_wagons.." "..wag_str..".")
+			return true
+		end
+	end
+	
 	if (settings.WagNum > ply_wagons) then
-		local wag_str = MetrostroiAdvanced.Lang["wagon1"]
+		wag_str = MetrostroiAdvanced.Lang["wagon1"]
 		if ply_wagons >= 2 and ply_wagons <= 4 then wag_str = MetrostroiAdvanced.Lang["wagon2"] end
 		if ply_wagons == 0 or ply_wagons >= 5 then wag_str = MetrostroiAdvanced.Lang["wagon3"] end
 		if wag_awail == 0 then
