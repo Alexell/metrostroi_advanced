@@ -188,7 +188,7 @@ function MetrostroiAdvanced.GetRouteNumber(ply)
 						rnum2 = tonumber(train.RouteNumber.RouteNumber)
 					end
 				end
-				if table.HasValue({"gmod_subway_81-702","gmod_subway_81-703","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_81-717_mvm","gmod_subway_81-718","gmod_subway_81-720"},k) then rnum2 = rnum2 / 10 end
+				if table.HasValue({"gmod_subway_81-702","gmod_subway_81-703","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_81-717_mvm","gmod_subway_81-718","gmod_subway_81-720","gmod_subway_81-720_1"},k) then rnum2 = rnum2 / 10 end
 				routes[owner:Nick()] = rnum2
 			end
 		end

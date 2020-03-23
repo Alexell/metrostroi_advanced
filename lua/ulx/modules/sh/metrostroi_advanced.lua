@@ -528,7 +528,7 @@ function ulx.wagons( calling_ply )
 						rnum = tonumber(train.RouteNumber.RouteNumber)
 					end
 				end
-				if table.HasValue({"gmod_subway_81-702","gmod_subway_81-703","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_81-717_mvm","gmod_subway_81-718","gmod_subway_81-720"},k) then
+				if table.HasValue({"gmod_subway_81-702","gmod_subway_81-703","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_81-717_mvm","gmod_subway_81-718","gmod_subway_81-720","gmod_subway_81-720_1"},k) then
 					rnum = rnum / 10
 				end
 				Routes[ply:Nick()] = tostring(rnum)
@@ -817,6 +817,7 @@ if SERVER then
 	ULib.ucl.registerAccess("add_1wagons", ULib.ACCESS_ADMIN, "Spawn +1 wagon more", CATEGORY_NAME)
 	ULib.ucl.registerAccess("add_2wagons", ULib.ACCESS_ADMIN, "Spawn +2 wagons more", CATEGORY_NAME)
 	ULib.ucl.registerAccess("add_3wagons", ULib.ACCESS_ADMIN, "Spawn +3 wagons more", CATEGORY_NAME)
+	ULib.ucl.registerAccess("add_4wagons", ULib.ACCESS_ADMIN, "Spawn +4 wagons more", CATEGORY_NAME)
 	ULib.ucl.registerAccess("metrostroi_station_spawn", ULib.ACCESS_ALL, "Spawn in stations", CATEGORY_NAME)
 	ULib.ucl.registerAccess("metrostroi_anyplace_spawn", ULib.ACCESS_ALL, "Spawn anywhere", CATEGORY_NAME)
 end
