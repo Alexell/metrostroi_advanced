@@ -3,7 +3,7 @@
 -- Версия: 1.0
 -- Лицензия: MIT
 -- Сайт: https://alexell.ru/
--- Steam: https://steamcommunity.com/id/alexell
+-- Steam: https://steamcommunity.com/id/alexellpro
 -- Repo: https://github.com/Alexell/metrostroi_advanced
 -------------------------------------------------------
 
