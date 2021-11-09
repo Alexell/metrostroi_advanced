@@ -654,6 +654,33 @@ entitytp:addParam{ type=ULib.cmds.StringArg, hint="ID", ULib.cmds.takeRestOfLine
 entitytp:defaultAccess( ULib.ACCESS_ADMIN )
 entitytp:help("Teleport to any entity by its ID (eg. signalling debug")
 
+-- установить собственный бортовой номер вагона (с проверкой на дубликаты!)
+function ulx.setwagnumber(ply, WagNumber)
+	if IsValid(ply) then
+		local train = ply:GetEyeTrace().Entity
+		if not train.WagonNumber then
+			ULib.tsayError(ply, "Aim at wagon to change its number")
+			return
+		end
+		local double = false
+		for k, v in pairs(Metrostroi.SpawnedTrains) do
+			if k.WagonNumber == WagNumber then
+				double = true
+			end
+		end 
+		if not double then
+			train.WagonNumber = WagNumber
+			train:SetNW2Int("WagonNumber",train.WagonNumber)
+		else
+			ULib.tsayError(ply, "Oops, this number already exists! \nTry another one")
+		end
+	end
+end
+local setwagnumber = ulx.command( CATEGORY_NAME, "ulx setwagnumber", ulx.setwagnumber, "!swn")
+setwagnumber:addParam{type=ULib.cmds.StringArg, hint="Номер вагона", ULib.cmds.takeRestOfLine }
+setwagnumber:defaultAccess(ULib.ACCESS_ADMIN)
+setwagnumber:help("Set wagon number (aim at any wagon)")
+
 -- восстановление исходного положения удочек
 function ulx.udochka( calling_ply )
 	local cur_map = game.GetMap()
