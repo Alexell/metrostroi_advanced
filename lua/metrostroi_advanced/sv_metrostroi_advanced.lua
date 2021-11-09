@@ -77,7 +77,7 @@ hook.Add("MetrostroiSpawnerRestrict","TrainSpawnerLimits",function(ply,settings)
 	local ply_wagons
 	local wag_awail = max_wagons-cur_wagons
 	if GetConVarNumber("metrostroi_advanced_autowags") == 1 then
-		if (cur_wagons <= 8) then
+		if (cur_wagons < 8) then
 			ply_wagons = 4
 		else
 			ply_wagons = 3
@@ -250,7 +250,23 @@ hook.Add("MetrostroiCoupled","SetTrainParams",function(ent,ent2)
 			local rnum = ply:GetNW2Int("MARouteNumber")
 			if MetrostroiAdvanced.TrainList[ent:GetClass()] then
 				if table.HasValue({"gmod_subway_81-702","gmod_subway_81-703","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_ezh3ru1","gmod_subway_81-717_mvm","gmod_subway_81-718","gmod_subway_81-720","gmod_subway_81-720_1"},ent:GetClass()) then rnum = rnum * 10 end
-				if ent:GetClass() == "gmod_subway_81-722" or ent:GetClass() == "gmod_subway_81-722_3" or ent:GetClass() == "gmod_subway_81-7175p" then
+
+				if ent:GetClass() == "gmod_subway_81-540_2" then
+					local rtype = ent:GetNW2Int("Route",1)
+					if rtype == 1 then
+						ent.RouteNumbera.RouteNumbera = tostring(rnum).."0"
+						ent:SetNW2String("RouteNumbera",tostring(rnum).."0")
+					end
+					if rtype == 2 then
+						ent.RouteNumbera.RouteNumbera = "0"..tostring(rnum)
+						ent:SetNW2String("RouteNumbera","0"..tostring(rnum))
+					end
+					if rtype == 3 then
+						if ent.RouteNumberSys then
+							ent.RouteNumberSys.CurrentRouteNumber = rnum
+						end
+					end
+				elseif ent:GetClass() == "gmod_subway_81-722" or ent:GetClass() == "gmod_subway_81-722_3" or ent:GetClass() == "gmod_subway_81-7175p" then
 					ent.RouteNumberSys.CurrentRouteNumber = rnum
 				elseif ent:GetClass() == "gmod_subway_81-717_6" then
 					ent.ASNP.RouteNumber = rnum
@@ -307,6 +323,7 @@ hook.Add("MetrostroiCoupled","SetTrainParams",function(ent,ent2)
 		end
 	end
 end)
+
 
 hook.Add("EntityRemoved","DeleteTrainParams",function (ent)
 	if MetrostroiAdvanced.TrainList[ent:GetClass()] then

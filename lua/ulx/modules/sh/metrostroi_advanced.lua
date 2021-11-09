@@ -379,29 +379,23 @@ function ulx.sts( calling_ply )
 	local name_num = 1
     local lang = GetConVarString("metrostroi_advanced_lang")
 	if lang ~= "ru" then name_num = 2 end
-	local stationtable = {}
+	--Проверка на наличие таблицы
+	if not Metrostroi.StationConfigurations then ULib.tsayError(calling_ply, "This map is not configured", true) return end	
+	local stationstable = {}
     for k,v in pairs(Metrostroi.StationConfigurations) do
-        if isnumber(k) then
-			if v.names[name_num] then
-				table.insert( stationtable,{tonumber(k),tostring(v.names[name_num])})
-			else
-				table.insert( stationtable,{tonumber(k),tostring(v.names[1])})
-			end
-        end
-    end
-    table.sort(stationtable, function(a, b) if a[1] ~= nil and b[1] ~= nil then return a[1] < b[1] end end)
-    for k,v in pairs(Metrostroi.StationConfigurations) do
-        if isstring(k) then 
-			if v.names[name_num] then
-				table.insert( stationtable,{k,tostring(v.names[name_num])})
-			else
-				table.insert( stationtable,{k,tostring(v.names[1])})
-			end
-        end
-    end
-    for k,v in pairs(stationtable) do
-        ULib.tsayColor(nil,false,Color(219, 116, 32),v[1].." - "..v[2])
-    end
+		if v.names[name_num] then
+			table.insert(stationstable,{id = tostring(k), name = tostring(v.names[name_num])})
+		else
+			table.insert(stationstable,{id = tostring(k), name = tostring(v.names[1])})
+		end
+    end 
+	table.SortByMember(stationstable, "id",true)
+	timer.Simple(0.1, function() 
+		for k,v in pairs(stationstable) do
+			--ULib.tsayColor(nil,false,Color(219, 116, 32),v[1].." - "..v[2])
+			calling_ply:ChatPrint(v.id.." - "..v.name)	-- избавился от принта в общий чат
+		end
+	end)
 end
 local sts = ulx.command(CATEGORY_NAME, "ulx stations", ulx.sts, "!stations" )
 sts:defaultAccess( ULib.ACCESS_ALL )
@@ -551,12 +545,21 @@ wagons:defaultAccess( ULib.ACCESS_ALL )
 wagons:help( "Info about all trains on server." )
 
 -- чат-команда для высадки пассажиров
-function ulx.expass( calling_ply )
+function ulx.expass(calling_ply)
 	calling_ply:ConCommand("metrostroi_expel_passengers")
 end
-local exps = ulx.command(CATEGORY_NAME, "ulx expass", ulx.expass, "!expass" )
-exps:defaultAccess( ULib.ACCESS_ALL )
-exps:help( "Expel all passengers." )
+local exps = ulx.command(CATEGORY_NAME, "ulx expass", ulx.expass, "!expass")
+exps:defaultAccess(ULib.ACCESS_ALL)
+exps:help("Expel all passengers.")
+
+--metrostroi_binds_menu
+-- чат-команда для меню клавиш
+function ulx.binds(calling_ply)
+	calling_ply:ConCommand("metrostroi_binds_menu")
+end
+local kbinds = ulx.command(CATEGORY_NAME, "ulx binds", ulx.binds, "!binds")
+kbinds:defaultAccess(ULib.ACCESS_ALL)
+kbinds:help("Show key bindings for train.")
 
 -- телепорт в состав игрока
 function ulx.traintp( calling_ply, target_ply )
@@ -632,6 +635,24 @@ local signaltp = ulx.command( CATEGORY_NAME, "ulx signaltp", ulx.signaltp, "!sig
 signaltp:addParam{ type=ULib.cmds.StringArg, hint="Signal", ULib.cmds.takeRestOfLine }
 signaltp:defaultAccess( ULib.ACCESS_ADMIN )
 signaltp:help( "Teleport to a signal" )
+
+-- телепорт к любому предмету по его ID (для отладки СЦБ)
+function ulx.entitytp(calling_ply, ID)
+	for _,ent in pairs(ents.GetAll()) do
+		if ent:EntIndex() == tonumber(ID) then
+			if calling_ply:InVehicle() then calling_ply:ExitVehicle() end
+			calling_ply:SetPos(ent:GetPos())
+			calling_ply:SetEyeAngles(ent:GetAngles()+Angle(0,-90,0))	
+			calling_ply:SetLocalVelocity( Vector( 0, 0, 0 ) ) -- Stop!				
+			return
+		end
+	end
+	ULib.tsayError( calling_ply, ID.." "..MetrostroiAdvanced.Lang["NotFound"], true ) 			
+end
+local entitytp = ulx.command( CATEGORY_NAME, "ulx entitytp", ulx.entitytp, "!entitytp" )
+entitytp:addParam{ type=ULib.cmds.StringArg, hint="ID", ULib.cmds.takeRestOfLine }
+entitytp:defaultAccess( ULib.ACCESS_ADMIN )
+entitytp:help("Teleport to any entity by its ID (eg. signalling debug")
 
 -- восстановление исходного положения удочек
 function ulx.udochka( calling_ply )
