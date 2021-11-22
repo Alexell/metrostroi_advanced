@@ -49,6 +49,9 @@ net.Receive("MA.ServerCommands",function(ln,ply)
 	if (not ply:IsAdmin()) then return end
 	local com = net.ReadString()
 	local val = net.ReadString()
+	if (com == "ma_voltage") then com = "metrostroi_voltage" end
+	if (com == "ma_curlim") then com = "metrostroi_current_limit" end
+	if (com == "ma_requirethirdrail") then com = "metrostroi_train_requirethirdrail" end
 	RunConsoleCommand(com,val)
 end)
 
@@ -221,6 +224,10 @@ hook.Add("PlayerInitialSpawn","SetPlyParams",function(ply)
 		ply:ConCommand("metrostroi_advanced_autowags "..GetConVarNumber("metrostroi_advanced_autowags"))
 		ply:ConCommand("metrostroi_advanced_afktime "..GetConVarNumber("metrostroi_advanced_afktime"))
 		ply:ConCommand("metrostroi_advanced_timezone "..GetConVarNumber("metrostroi_advanced_timezone"))
+		--
+		ply:ConCommand("ma_voltage "..GetConVarNumber("metrostroi_voltage"))
+		ply:ConCommand("ma_curlim "..GetConVarNumber("metrostroi_current_limit"))
+		ply:ConCommand("ma_requirethirdrail "..GetConVarNumber("metrostroi_train_requirethirdrail"))
 	end
 end)
 
@@ -376,16 +383,12 @@ timer.Simple(1,function()
 			trainpos_id = trainpos[1].node1.id
 			if ((trainpos_id > (pmidpos_id - 1)) and (trainpos_id < (pmidpos_id + 1))) then
 				if (ctrain.BMCIS) then
-					ply:ChatPrint("BMCIS Detected!")
 					if ctrain:GetNW2Bool("BMCISArrived",true) then return end
 					if (#ctrain.Announcer.Schedule ~= 0) then return end
-					ply:ChatPrint("Play!")
 					ctrain.BMCIS:Trigger("R_Program1",1)
 				elseif (ctrain.ASNP) then
-					ply:ChatPrint("ASNP Detected!")
 					if ctrain:GetNW2Bool("ASNP:Arrived",true) then return end
 					if ctrain:GetNW2Bool("ASNP:Playing") then return end
-					ply:ChatPrint("Play!")
 					ctrain.ASNP:Trigger("R_Program1",1)
 				end
 			end

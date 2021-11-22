@@ -12,6 +12,9 @@ if SERVER then return end
 CreateClientConVar("ma_autoinformator","1",true,true)
 CreateClientConVar("ma_routenums","1",true,true)
 CreateClientConVar("ma_clientoptimize","1",true,true)
+CreateClientConVar("ma_voltage","0",false,false)
+CreateClientConVar("ma_curlim","0",false,false)
+CreateClientConVar("ma_requirethirdrail","0",false,false)
 
 -- Дублирующие серверные квары для админов
 CreateClientConVar("metrostroi_advanced_spawninterval","0",false,false)
@@ -67,6 +70,20 @@ hook.Add("InitPostEntity","MA_PlayerInit",function()
 			if (old == new) then return end
 			SendCommand(cvar,new)
 		end)
+		--
+		cvars.AddChangeCallback("ma_voltage",function(cvar,old,new)
+			if (old == new) then return end
+			SendCommand(cvar,new)
+		end)
+		cvars.AddChangeCallback("ma_curlim",function(cvar,old,new)
+			if not tonumber(new) then return end
+			if (tonumber(old) == tonumber(new)) then return end
+			SendCommand(cvar,tonumber(new))
+		end)
+		cvars.AddChangeCallback("ma_requirethirdrail",function(cvar,old,new)
+			if (old == new) then return end
+			SendCommand(cvar,new)
+		end)
 	end)
 end)
 
@@ -102,8 +119,6 @@ local function ClientPanel(panel)
 	panel:CheckBox("Использовать автоинформатор","ma_autoinformator")
 end
 
--- + вывести команду metrostroi_electric??? Посмотреть другие, посмотреть что еше интересного
-
 local function AdminPanel(panel)
     if not LocalPlayer():IsAdmin() then return end
 	panel:ClearControls()
@@ -126,7 +141,10 @@ local function AdminPanel(panel)
 	panel:Help("") -- отступ
 	panel:Help("") -- отступ
 	panel:ControlHelp("Серверные настройки Metrostroi:")
-	panel:NumSlider("Напряжение на КР","metrostroi_voltage",0,999,0)
+	panel:CheckBox("Вкл. необходимость наличия КР","ma_requirethirdrail")
+	panel:NumSlider("Напряжение на КР","ma_voltage",0,999,0)
+	panel:Help("Мощность подстанции:")
+	panel:TextEntry("","ma_curlim")
 	panel:Help("") -- отступ
 	panel:Help("") -- отступ
 	panel:ControlHelp("Инструменты:")
