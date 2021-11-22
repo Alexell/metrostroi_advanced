@@ -219,6 +219,8 @@ if SERVER then
 end
 
 if CLIENT then
+	CreateClientConVar("ma_autoinformator","1",true,true)
+	
 	-- Оптимизация клиентов
 	RunConsoleCommand( "gmod_mcore_test", 1 )
 	RunConsoleCommand( "mat_queue_mode", 2 )

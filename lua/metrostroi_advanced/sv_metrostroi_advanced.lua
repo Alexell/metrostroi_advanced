@@ -332,3 +332,43 @@ hook.Add("EntityRemoved","DeleteTrainParams",function (ent)
 		ply:SetNW2String("MATrainClass","")
 	end
 end)
+
+-- Система автоматического проигрывания записи информатора по прибытию на станцию
+timer.Simple(1,function()
+	for k,v in pairs(ents.FindByClass("gmod_track_platform")) do
+		local OriginalThink = v.Think
+		local Think = function()
+			OriginalThink(v)
+			if (not v.AITimer) then v.AITimer = CurTime() end
+			if ((CurTime() - v.AITimer) < 1 ) then return end -- задержка выполнения
+			v.AITimer = CurTime()
+			if (not IsValid(v.CurrentTrain)) then return end
+			local ctrain = v.CurrentTrain
+			if (not IsValid(ctrain)) then return end
+			if (not MetrostroiAdvanced.IsFrontWagon(ctrain)) then return end
+			local ply = ctrain.Owner
+			if (not IsValid(ply)) then return end
+			if (ply:GetInfoNum("ma_autoinformator",1) == 0) then return end
+			pmidpos = Metrostroi.GetPositionOnTrack(LerpVector(0.5,v.PlatformStart,v.PlatformEnd))
+			pmidpos_id = pmidpos[1].node1.id
+			trainpos = Metrostroi.GetPositionOnTrack(ctrain:GetPos())
+			trainpos_id = trainpos[1].node1.id
+			if ((trainpos_id > (pmidpos_id - 1)) and (trainpos_id < (pmidpos_id + 1))) then
+				if (ctrain.BMCIS) then
+					ply:ChatPrint("BMCIS Detected!")
+					if ctrain:GetNW2Bool("BMCISArrived",true) then return end
+					if (#ctrain.Announcer.Schedule ~= 0) then return end
+					ply:ChatPrint("Play!")
+					ctrain.BMCIS:Trigger("R_Program1",1)
+				elseif (ctrain.ASNP) then
+					ply:ChatPrint("ASNP Detected!")
+					if ctrain:GetNW2Bool("ASNP:Arrived",true) then return end
+					if ctrain:GetNW2Bool("ASNP:Playing") then return end
+					ply:ChatPrint("Play!")
+					ctrain.ASNP:Trigger("R_Program1",1)
+				end
+			end
+		end
+		v.Think = Think
+	end
+end)
