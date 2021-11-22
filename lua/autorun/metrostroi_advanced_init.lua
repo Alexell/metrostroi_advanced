@@ -1,6 +1,6 @@
 ----------------- Metrostroi Advanced -----------------
 -- Авторы: Alexell и Agent Smith
--- Версия: 1.0
+-- Версия: 2.0
 -- Лицензия: MIT
 -- Сайт: https://alexell.ru/
 -- Steam: https://steamcommunity.com/id/alexellpro
@@ -213,24 +213,46 @@ function MetrostroiAdvanced.GetRouteNumber(ply)
 	return rnum
 end
 
+function MetrostroiAdvanced.IsFrontWagon(ent)
+	if (not IsValid(ent)) then return false end
+	if (not MetrostroiAdvanced.TrainList[ent:GetClass()]) then return false end -- только головные
+	local class = ent:GetClass()
+	if class:sub(13,18) == "81-760" or class:sub(13,19) == "81-760a" then
+		if ent.RV.KROPosition != 0 then
+			return true
+		end
+	elseif class:sub(13,18) == "81-722" then
+		if ent.Electric.CabActive != 0 then
+			return true
+		end
+	elseif class:sub(13,18) == "81-720" then
+		if ent.WrenchMode != 0 then
+			if ent.RV.KROPosition != 0 then
+				return true
+			end
+		end
+	elseif class:sub(13,18) == "81-718" then
+		if ent.WrenchMode != 0 then
+			if ent.KR.Position != 0 then
+				return true
+			end
+		end
+	else
+		if ent.KVWrenchMode != 0 then
+			if ent.KV.ReverserSet != 0 then
+				return true
+			end
+		end
+	end
+	return false
+end
+
 if SERVER then
 	include("metrostroi_advanced/sv_metrostroi_advanced.lua")
 	include("metrostroi_advanced/metrostroi_map_fixes.lua")
+	AddCSLuaFile("metrostroi_advanced/cl_metrostroi_advanced.lua")
 end
 
 if CLIENT then
-	CreateClientConVar("ma_autoinformator","1",true,true)
-	
-	-- Оптимизация клиентов
-	RunConsoleCommand( "gmod_mcore_test", 1 )
-	RunConsoleCommand( "mat_queue_mode", 2 )
-	RunConsoleCommand( "mat_specular", 0 )
-	RunConsoleCommand( "cl_threaded_bone_setup", 1 )
-	RunConsoleCommand( "cl_threaded_client_leaf_system", 1 )
-	RunConsoleCommand( "r_threaded_client_shadow_manager", 1 )
-	RunConsoleCommand( "r_threaded_particles", 1 )
-	RunConsoleCommand( "r_threaded_renderables", 1 )
-	RunConsoleCommand( "r_queued_ropes", 1 )
-	RunConsoleCommand( "datacachesize", 512 )
-	RunConsoleCommand( "mem_max_heapsize", 2048 )
+	include("metrostroi_advanced/cl_metrostroi_advanced.lua")
 end

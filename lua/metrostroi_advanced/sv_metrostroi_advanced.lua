@@ -1,6 +1,6 @@
 ----------------- Metrostroi Advanced -----------------
 -- Авторы: Alexell и Agent Smith
--- Версия: 1.0
+-- Версия: 2.0
 -- Лицензия: MIT
 -- Сайт: https://alexell.ru/
 -- Steam: https://steamcommunity.com/id/alexellpro
@@ -193,7 +193,7 @@ end)
 	
 hook.Add("PlayerInitialSpawn","SetPlyParams",function(ply)
 	-- выдаем игроку уникальный номер маршрута на время сессии
-	if (GetConVarNumber("metrostroi_advanced_routenums") == 1) then
+	if (ply:GetInfoNum("ma_routenums",1) == 1) then
 		local rnum = MetrostroiAdvanced.GetRouteNumber(ply)
 		ply:SetNW2Int("MARouteNumber",rnum)
 	end
