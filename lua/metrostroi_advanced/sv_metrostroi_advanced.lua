@@ -15,11 +15,13 @@ local train_rest = CreateConVar("metrostroi_advanced_trainsrestrict", 0, {FCVAR_
 local spawn_mes = CreateConVar("metrostroi_advanced_spawnmessage", 1, {FCVAR_ARCHIVE})
 local max_wags = CreateConVar("metrostroi_advanced_maxwagons", 4, {FCVAR_ARCHIVE})
 local min_wags = CreateConVar("metrostroi_advanced_minwagons", 2, {FCVAR_ARCHIVE})
-local route_nums = CreateConVar("metrostroi_advanced_routenums", 1, {FCVAR_ARCHIVE})
 local auto_wags = CreateConVar("metrostroi_advanced_autowags", 0, {FCVAR_ARCHIVE})
 local madv_lang = CreateConVar("metrostroi_advanced_lang", "ru", {FCVAR_ARCHIVE})
 local afktime = CreateConVar("metrostroi_advanced_afktime", 0, {FCVAR_ARCHIVE})
 local timezone = CreateConVar("metrostroi_advanced_timezone", 3, {FCVAR_ARCHIVE})
+
+util.AddNetworkString("MA.ServerCommands")
+
 AFK_TIME = 0
 AFK_WARN1 = 0
 AFK_WARN2 = 0
@@ -41,6 +43,13 @@ cvars.AddChangeCallback("metrostroi_advanced_afktime", function(cvar, old, new)
     AFK_TIME = new * 60
 	AFK_WARN1 = AFK_TIME * 0.6
 	AFK_WARN2 = AFK_TIME * 0.4
+end)
+
+net.Receive("MA.ServerCommands",function(ln,ply)
+	if (not ply:IsAdmin()) then return end
+	local com = net.ReadString()
+	local val = net.ReadString()
+	RunConsoleCommand(com,val)
 end)
 
 local function PlayerPermission(ply,permission)
@@ -200,6 +209,18 @@ hook.Add("PlayerInitialSpawn","SetPlyParams",function(ply)
 	if AFK_TIME > 0 then
 		ply.NextAFK = CurTime() + AFK_TIME
 		ply.WarningAFK = 0
+	end
+	
+	-- выставляем кварам клиента серверное значение при спавне
+	if (ply:IsAdmin()) then
+		ply:ConCommand("metrostroi_advanced_spawninterval "..GetConVarNumber("metrostroi_advanced_spawninterval"))
+		ply:ConCommand("metrostroi_advanced_trainsrestrict "..GetConVarNumber("metrostroi_advanced_trainsrestrict"))
+		ply:ConCommand("metrostroi_advanced_spawnmessage "..GetConVarNumber("metrostroi_advanced_spawnmessage"))
+		ply:ConCommand("metrostroi_advanced_minwagons "..GetConVarNumber("metrostroi_advanced_minwagons"))
+		ply:ConCommand("metrostroi_advanced_maxwagons "..GetConVarNumber("metrostroi_advanced_maxwagons"))
+		ply:ConCommand("metrostroi_advanced_autowags "..GetConVarNumber("metrostroi_advanced_autowags"))
+		ply:ConCommand("metrostroi_advanced_afktime "..GetConVarNumber("metrostroi_advanced_afktime"))
+		ply:ConCommand("metrostroi_advanced_timezone "..GetConVarNumber("metrostroi_advanced_timezone"))
 	end
 end)
 
