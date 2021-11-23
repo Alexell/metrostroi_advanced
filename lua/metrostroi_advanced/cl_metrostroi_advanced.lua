@@ -11,7 +11,7 @@ if SERVER then return end
 
 CreateClientConVar("ma_autoinformator","1",true,true)
 CreateClientConVar("ma_routenums","1",true,true)
-CreateClientConVar("ma_clientoptimize","1",true,true)
+CreateClientConVar("ma_clientoptimize","1",true,false)
 CreateClientConVar("ma_voltage","0",false,false)
 CreateClientConVar("ma_curlim","0",false,false)
 CreateClientConVar("ma_requirethirdrail","0",false,false)
@@ -97,20 +97,40 @@ hook.Add("InitPostEntity","MA_PlayerInit",function()
 end)
 
 -- Оптимизация клиента
-local optimize = GetConVar("ma_clientoptimize"):GetInt()
-if (optimize) then
-	RunConsoleCommand( "gmod_mcore_test", 1 )
-	RunConsoleCommand( "mat_queue_mode", 2 )
-	RunConsoleCommand( "mat_specular", 0 )
-	RunConsoleCommand( "cl_threaded_bone_setup", 1 )
-	RunConsoleCommand( "cl_threaded_client_leaf_system", 1 )
-	RunConsoleCommand( "r_threaded_client_shadow_manager", 1 )
-	RunConsoleCommand( "r_threaded_particles", 1 )
-	RunConsoleCommand( "r_threaded_renderables", 1 )
-	RunConsoleCommand( "r_queued_ropes", 1 )
-	RunConsoleCommand( "datacachesize", 512 )
-	RunConsoleCommand( "mem_max_heapsize", 2048 )
+local function ClientOptimize(opt)
+	if (tonumber(opt) == 1) then
+		print("ClientOptimize YES")
+		RunConsoleCommand("gmod_mcore_test",1)
+		RunConsoleCommand("mat_queue_mode",2)
+		RunConsoleCommand("mat_specular",0)
+		RunConsoleCommand("cl_threaded_bone_setup",1)
+		RunConsoleCommand("cl_threaded_client_leaf_system",1)
+		RunConsoleCommand("r_threaded_client_shadow_manager",1)
+		RunConsoleCommand("r_threaded_particles",1)
+		RunConsoleCommand("r_threaded_renderables",1)
+		RunConsoleCommand("r_queued_ropes",1)
+		RunConsoleCommand("datacachesize",512)
+		RunConsoleCommand("mem_max_heapsize",2048)
+	else
+		print("ClientOptimize NO")
+		RunConsoleCommand("gmod_mcore_test",0)
+		RunConsoleCommand("mat_queue_mode",-1)
+		RunConsoleCommand("mat_specular",1)
+		RunConsoleCommand("cl_threaded_bone_setup",0)
+		RunConsoleCommand("cl_threaded_client_leaf_system",0)
+		RunConsoleCommand("r_threaded_client_shadow_manager",0)
+		RunConsoleCommand("r_threaded_particles",1)
+		RunConsoleCommand("r_threaded_renderables",0)
+		RunConsoleCommand("r_queued_ropes",1)
+		RunConsoleCommand("datacachesize",64)
+		RunConsoleCommand("mem_max_heapsize",256)
+	end
 end
+ClientOptimize(GetConVar("ma_clientoptimize"):GetInt())
+cvars.AddChangeCallback("ma_clientoptimize",function(cvar,old,new)
+	if (old == new) then return end
+	ClientOptimize(new)
+end)
 
 -- Панели в меню [Q]
 local function ClientPanel(panel)
