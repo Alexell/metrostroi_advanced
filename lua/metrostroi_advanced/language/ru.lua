@@ -82,6 +82,9 @@ MetrostroiAdvanced.Lang["EnterFail"]			= "Не удалось посадить �
 MetrostroiAdvanced.Lang["NotInVehicle"]			= "не в составе!"
 MetrostroiAdvanced.Lang["UseTrainStart"]		= "использовал автозапуск кабины."
 MetrostroiAdvanced.Lang["UserFoundInBL"]		= "Пользователь в черном списке"
+MetrostroiAdvanced.Lang["SetWagNum1"]			= "Пожалуйста наведите указатель на вагон для изменения его номера."
+MetrostroiAdvanced.Lang["SetWagNum2"]			= "Это не ваш вагон!"
+MetrostroiAdvanced.Lang["SetWagNum3"]			= "Упс, такой номер вагона уже существует! \nПопробуйте другой."
 
 -- CL
 MetrostroiAdvanced.Lang["CPOptimization"]		= "Оптимизация:"

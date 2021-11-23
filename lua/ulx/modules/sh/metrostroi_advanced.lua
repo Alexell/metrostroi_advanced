@@ -662,8 +662,12 @@ entitytp:help("Teleport to any entity by its ID (eg. signalling debug")
 function ulx.setwagnumber(ply, WagNumber)
 	if IsValid(ply) then
 		local train = ply:GetEyeTrace().Entity
-		if not train.WagonNumber then
-			ULib.tsayError(ply, "Aim at wagon to change its number")
+		if ((not IsValid(train)) or (not train.WagonNumber)) then
+			ULib.tsayError(ply, lang("SetWagNum1"))
+			return
+		end
+		if (train.Owner ~= ply) then
+			ULib.tsayError(ply, lang("SetWagNum2"))
 			return
 		end
 		local double = false
@@ -676,12 +680,12 @@ function ulx.setwagnumber(ply, WagNumber)
 			train.WagonNumber = WagNumber
 			train:SetNW2Int("WagonNumber",train.WagonNumber)
 		else
-			ULib.tsayError(ply, "Oops, this number already exists! \nTry another one")
+			ULib.tsayError(ply, lang("SetWagNum3"))
 		end
 	end
 end
 local setwagnumber = ulx.command( CATEGORY_NAME, "ulx setwagnumber", ulx.setwagnumber, "!swn")
-setwagnumber:addParam{type=ULib.cmds.StringArg, hint="Номер вагона", ULib.cmds.takeRestOfLine }
+setwagnumber:addParam{type=ULib.cmds.StringArg, hint="Wagon Number", ULib.cmds.takeRestOfLine }
 setwagnumber:defaultAccess(ULib.ACCESS_ADMIN)
 setwagnumber:help("Set wagon number (aim at any wagon)")
 

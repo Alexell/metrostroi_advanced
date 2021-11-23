@@ -82,3 +82,6 @@ MetrostroiAdvanced.Lang["EnterFail"]			= "Failed to place the player into the dr
 MetrostroiAdvanced.Lang["NotInVehicle"]			= "is not in train!"
 MetrostroiAdvanced.Lang["UseTrainStart"]		= "used cabin autostart."
 MetrostroiAdvanced.Lang["UserFoundInBL"]		= "User found in blacklist"
+MetrostroiAdvanced.Lang["SetWagNum1"]			= "Please aim at wagon to change its number."
+MetrostroiAdvanced.Lang["SetWagNum2"]			= "This is not your wagon!"
+MetrostroiAdvanced.Lang["SetWagNum3"]			= "Oops, this number already exists! \nTry another one."
