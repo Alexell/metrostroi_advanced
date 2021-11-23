@@ -28,6 +28,9 @@ AFK_WARN2 = 0
 AFK_WARN3 = 60
 
 timer.Create("MetrostroiAdvancedInit",1,1,function()
+	if (not file.Exists("metrostroi_advanced","DATA")) then
+		file.CreateDir("metrostroi_advanced")
+	end
 	MetrostroiAdvanced.LoadLanguage(GetConVarString("metrostroi_advanced_lang"))
 	MetrostroiAdvanced.LoadStationsIgnore()
 	MetrostroiAdvanced.LoadMapWagonsLimit()

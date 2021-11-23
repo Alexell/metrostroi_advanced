@@ -20,23 +20,6 @@ if not MetrostroiAdvanced then
 	MetrostroiAdvanced.MapWagons = {}
 end
 
--- Перенос настроек в отдельную папку (временный код для автоматического перехода)
-if file.Exists("metrostroi_advanced_trains.txt","DATA") then
-	if not file.Exists("metrostroi_advanced","DATA") then
-		file.CreateDir("metrostroi_advanced")
-	end
-	--local trains = file.Read("metrostroi_advanced_trains.txt","DATA")
-	file.Write("metrostroi_advanced/trains.txt",file.Read("metrostroi_advanced_trains.txt","DATA"))
-	file.Delete("metrostroi_advanced_trains.txt")
-end
-if file.Exists("metrostroi_advanced_stations_ignore.txt","DATA") then
-	if not file.Exists("metrostroi_advanced","DATA") then
-		file.CreateDir("metrostroi_advanced")
-	end
-	file.Write("metrostroi_advanced/stations_ignore.txt",file.Read("metrostroi_advanced_stations_ignore.txt","DATA"))
-	file.Delete("metrostroi_advanced_stations_ignore.txt")
-end
-
 -- Загрузка локализации
 function MetrostroiAdvanced.LoadLanguage(lang)
 	if MetrostroiAdvanced.Lang then MetrostroiAdvanced.Lang = nil end
@@ -69,7 +52,7 @@ end
 -- Список карт и кол-во разрешенных вагонов на состав
 function MetrostroiAdvanced.LoadMapWagonsLimit()
 	if not file.Exists("metrostroi_advanced/map_wagons.txt","DATA") then
-		file.Write("metrostroi_advanced/map_wagons.txt","gm_jar_pll_remastered_v9 4\ngm_mustox_neocrimson_line_a 4\ngm_metro_crossline_n3 6\ngm_metro_crossline_r199h 6\ngm_mus_loopline_e 5\ngm_metro_ruralline_v29 4\ngm_metro_jar_imagine_line_v4 6\ngm_mus_neoorange_d 3\ngm_metro_surfacemetro_w 4\ngm_metro_virus_v2 6\ngm_metro_mosldl_v1 8")
+		file.Write("metrostroi_advanced/map_wagons.txt","gm_jar_pll_remastered_v9 4\ngm_mustox_neocrimson_line_a 4\ngm_metro_crossline_n3 6\ngm_metro_crossline_r199h 6\ngm_mus_loopline_e 5\ngm_metro_ruralline_v29 4\ngm_metro_jar_imagine_line_v4 6\ngm_mus_neoorange_d 3\ngm_metro_surfacemetro_w 4\ngm_metro_virus_v2 6\ngm_metro_mosldl_v1 8\ngm_metro_nsk_line_2_v4 4\ngm_metro_nekrasovskaya_line_v5 5\ngm_metro_kalinin_v1 4")
 	end
 	local mapwagons = string.Explode("\n",file.Read("metrostroi_advanced/map_wagons.txt","DATA"))
 	for _,str in pairs(mapwagons) do
