@@ -1,11 +1,11 @@
------------------ Metrostroi Advanced -----------------
--- Авторы: Alexell и Agent Smith
--- Версия: 2.0
--- Лицензия: MIT
--- Сайт: https://alexell.ru/
--- Steam: https://steamcommunity.com/id/alexellpro
--- Repo: https://github.com/Alexell/metrostroi_advanced
--------------------------------------------------------
+------------------------ Metrostroi Advanced -------------------------
+-- Developers:
+-- Alexell | https://steamcommunity.com/profiles/76561198210303223
+-- Agent Smith | https://steamcommunity.com/profiles/76561197990364979
+-- Version: 2.0
+-- License: MIT
+-- Source code: https://github.com/Alexell/metrostroi_advanced
+----------------------------------------------------------------------
 
 if CLIENT then return end
 

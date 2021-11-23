@@ -1,7 +1,9 @@
------------------ Metrostroi Advanced -----------------
--- Original Language: ru
--- Original Authors: Alexell & Agent Smith
--------------------------------------------------------
+------------------------ Metrostroi Advanced -------------------------
+-- Language: ru
+-- Translation Authors:
+-- Alexell | https://steamcommunity.com/profiles/76561198210303223
+-- Agent Smith | https://steamcommunity.com/profiles/76561197990364979
+----------------------------------------------------------------------
 MetrostroiAdvanced.Lang = {}
 
 -- Trains

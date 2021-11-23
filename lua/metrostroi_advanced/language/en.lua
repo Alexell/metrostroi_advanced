@@ -1,7 +1,8 @@
------------------ Metrostroi Advanced -----------------
--- Language: en
--- Translation Author: Agent Smith
--------------------------------------------------------
+------------------------ Metrostroi Advanced -------------------------
+-- Language: ru
+-- Translation Authors:
+-- Agent Smith | https://steamcommunity.com/profiles/76561197990364979
+----------------------------------------------------------------------
 MetrostroiAdvanced.Lang = {}
 
 -- Trains
@@ -85,3 +86,30 @@ MetrostroiAdvanced.Lang["UserFoundInBL"]		= "User found in blacklist"
 MetrostroiAdvanced.Lang["SetWagNum1"]			= "Please aim at wagon to change its number."
 MetrostroiAdvanced.Lang["SetWagNum2"]			= "This is not your wagon!"
 MetrostroiAdvanced.Lang["SetWagNum3"]			= "Oops, this number already exists! \nTry another one."
+
+-- CL
+MetrostroiAdvanced.Lang["CPOptimization"]		= "Optimization:"
+MetrostroiAdvanced.Lang["CPOptimizationUse"]	= "Enable recommended optimization preset"
+MetrostroiAdvanced.Lang["CPOptions"]			= "Options:"
+MetrostroiAdvanced.Lang["CPRouteNum"]			= "Auto-generate route number on train spawn"
+MetrostroiAdvanced.Lang["CPNeedReconnect"]		= "(requires reconnect)"
+MetrostroiAdvanced.Lang["CPUseAutoinform"]		= "Enable autoannouncer"
+MetrostroiAdvanced.Lang["APServerOptions"]		= "Server settings"
+MetrostroiAdvanced.Lang["APSpawnInterval"]		= "Train spawn delay:"
+MetrostroiAdvanced.Lang["APTrainRestrict"]		= "Rank-based spawn restrictions"
+MetrostroiAdvanced.Lang["APSpawnMessage"]		= "Enable chat outputs on train spawn"
+MetrostroiAdvanced.Lang["APWagMin"]				= "Min wagons for spawn:"
+MetrostroiAdvanced.Lang["APWagMax"]				= "Max wagons for spawn:"
+MetrostroiAdvanced.Lang["APAutoWags"]			= "Automatic wagon limit for spawn"
+MetrostroiAdvanced.Lang["APAFKTime"]			= "AFK time before auto kick:"
+MetrostroiAdvanced.Lang["APServerTimezone"]		= "Server timezone"
+MetrostroiAdvanced.Lang["APReqThirdRail"]		= "Require third rail"
+MetrostroiAdvanced.Lang["APThirdRailVol"]		= "Third rail voltage"
+MetrostroiAdvanced.Lang["APCurLim"]				= "Third rail current limit"
+MetrostroiAdvanced.Lang["APTools"]				= "Tools:"
+MetrostroiAdvanced.Lang["APSignSave"]			= "Save signals"
+MetrostroiAdvanced.Lang["APSignReload"]			= "Load signals"
+MetrostroiAdvanced.Lang["APTrackEditor"]		= "Track editor"
+MetrostroiAdvanced.Lang["APToggleNodes"]		= "Show/Hide nodes"
+MetrostroiAdvanced.Lang["ACPAdmin"]				= "Admin"
+MetrostroiAdvanced.Lang["ACPClient"]			= "Client"
