@@ -99,7 +99,6 @@ end)
 -- Оптимизация клиента
 local function ClientOptimize(opt)
 	if (tonumber(opt) == 1) then
-		print("ClientOptimize YES")
 		RunConsoleCommand("gmod_mcore_test",1)
 		RunConsoleCommand("mat_queue_mode",2)
 		RunConsoleCommand("mat_specular",0)
@@ -112,7 +111,6 @@ local function ClientOptimize(opt)
 		RunConsoleCommand("datacachesize",512)
 		RunConsoleCommand("mem_max_heapsize",2048)
 	else
-		print("ClientOptimize NO")
 		RunConsoleCommand("gmod_mcore_test",0)
 		RunConsoleCommand("mat_queue_mode",-1)
 		RunConsoleCommand("mat_specular",1)

@@ -9,6 +9,10 @@
 
 local CATEGORY_NAME = "Metrostroi Advanced"
 
+local function lang(str)
+	return MetrostroiAdvanced.Lang[str]
+end
+
 -- телепортация в состав
 local function GotoTrain (ply,tply,train,sit)
     if IsValid(ply:GetVehicle()) then
@@ -23,24 +27,24 @@ local function GotoTrain (ply,tply,train,sit)
 			train.DriverSeat:UseClientSideAnimation() -- пусть ебучую анимацию отрабатывает клиент
 			timer.Create("TeleportIntoDriverSeat", 1, 1, function()
 				train.DriverSeat:Use(ply,ply,3,1)
-				ulx.fancyLog("#s "..MetrostroiAdvanced.Lang["Teleported"]..MetrostroiAdvanced.Lang["Teleported1"],ply:Nick())
+				ulx.fancyLog("#s "..lang("Teleported")..lang("Teleported1"),ply:Nick())
 				ply:Freeze(false)
 			end)
 		else
 			train.InstructorsSeat:UseClientSideAnimation()
 			timer.Create("TeleportIntoInstructorsSeat", 1, 1, function()
 				train.InstructorsSeat:Use(ply,ply,3,1)
-				ulx.fancyLog("#s "..MetrostroiAdvanced.Lang["Teleported"]..MetrostroiAdvanced.Lang["Teleported2"].." #s.",ply:Nick(),tply:Nick())
+				ulx.fancyLog("#s "..lang("Teleported")..lang("Teleported2").." #s.",ply:Nick(),tply:Nick())
 				ply:Freeze(false)
 			end)
 		end
     else
 		if ply == tply then
 			ply:SetPos(pos-Vector(0,0,40))
-			ulx.fancyLog("#s "..MetrostroiAdvanced.Lang["Teleported"]..MetrostroiAdvanced.Lang["Teleported3"],ply:Nick())
+			ulx.fancyLog("#s "..lang("Teleported")..lang("Teleported3"),ply:Nick())
 		else
 			ply:SetPos(pos-Vector(0,0,40))
-			ulx.fancyLog("#s "..MetrostroiAdvanced.Lang["Teleported"]..MetrostroiAdvanced.Lang["Teleported4"].." #s.",ply:Nick(),tply:Nick())
+			ulx.fancyLog("#s "..lang("Teleported")..lang("Teleported4").." #s.",ply:Nick(),tply:Nick())
 		end
     end
 end
@@ -372,13 +376,13 @@ local stswaittime = 10
 local stslasttime = -stswaittime
 function ulx.sts( calling_ply )
     if stslasttime + stswaittime > CurTime() then
-        ULib.tsayError( calling_ply, MetrostroiAdvanced.Lang["PleaseWait"].." "..math.Round(stslasttime + stswaittime - CurTime()).." "..MetrostroiAdvanced.Lang["Seconds"].." "..MetrostroiAdvanced.Lang["CommandDelay"], true )
+        ULib.tsayError( calling_ply, lang("PleaseWait").." "..math.Round(stslasttime + stswaittime - CurTime()).." "..lang("Seconds").." "..lang("CommandDelay"), true )
         return
     end
     stslasttime = CurTime()
 	local name_num = 1
-    local lang = GetConVarString("metrostroi_advanced_lang")
-	if lang ~= "ru" then name_num = 2 end
+    local lng = GetConVarString("metrostroi_advanced_lang")
+	if lng ~= "ru" then name_num = 2 end
 	--Проверка на наличие таблицы
 	if not Metrostroi.StationConfigurations then ULib.tsayError(calling_ply, "This map is not configured", true) return end	
 	local stationstable = {}
@@ -414,7 +418,7 @@ function ulx.tps( calling_ply,station )
         end
 
         --Проверка на наличие таблицы
-        if not Metrostroi.StationConfigurations then ULib.tsayError( calling_ply, MetrostroiAdvanced.Lang["MapNotCongigured"], true ) return end
+        if not Metrostroi.StationConfigurations then ULib.tsayError( calling_ply, lang("MapNotCongigured"), true ) return end
 
         --Создание массива найденых станций по индкесу станции или куска имени
         local st = {}
@@ -434,10 +438,10 @@ function ulx.tps( calling_ply,station )
         end
 
         if #st == 0 then
-            ULib.tsayError( calling_ply, Format(MetrostroiAdvanced.Lang["StationNotFound"].." %s",station), true )
+            ULib.tsayError( calling_ply, Format(lang("StationNotFound").." %s",station), true )
             return
         elseif #st > 1 then
-            ULib.tsayError( calling_ply,  Format(MetrostroiAdvanced.Lang["ManyStations"].." %s:",station), true )
+            ULib.tsayError( calling_ply,  Format(lang("ManyStations").." %s:",station), true )
             for k,v in pairs(st) do
                 local tbl = Metrostroi.StationConfigurations[v]
                 if tbl.names and tbl.names[1] then
@@ -446,7 +450,7 @@ function ulx.tps( calling_ply,station )
                     ULib.tsayError( calling_ply, Format("\t%s",k), true )
                 end
             end
-            ULib.tsayError( calling_ply, MetrostroiAdvanced.Lang["StationIncorrect"], true )
+            ULib.tsayError( calling_ply, lang("StationIncorrect"), true )
             return
         end
         local key = st[1]
@@ -466,17 +470,17 @@ function ulx.tps( calling_ply,station )
                 calling_ply:SetPos(ptbl[1])
                 calling_ply:SetAngles(ptbl[2])
                 calling_ply:SetEyeAngles(ptbl[2])
-                ulx.fancyLogAdmin( calling_ply, "#A "..MetrostroiAdvanced.Lang["Teleported"]..MetrostroiAdvanced.Lang["Teleported5"].." #s", st.names and st.names[1] or key)
+                ulx.fancyLogAdmin( calling_ply, "#A "..lang("Teleported")..lang("Teleported5").." #s", st.names and st.names[1] or key)
             else
-                ULib.tsayError( calling_ply, MetrostroiAdvanced.Lang["StationConfigError"]..key, true )
-                ulx.fancyLogAdmin( calling_ply, MetrostroiAdvanced.Lang["StationConfigError"].."#s", key)
+                ULib.tsayError( calling_ply, lang("StationConfigError")..key, true )
+                ulx.fancyLogAdmin( calling_ply, lang("StationConfigError").."#s", key)
             end
 
         else
             if ptbl and ptbl[1] then
                 print(Format("DEBUG1:Teleported to %s(%s) pos:%s ang:%s",st.names and st.names[1] or key,key,ptbl[1],ptbl[2]))
             else
-                ulx.fancyLogAdmin( calling_ply, MetrostroiAdvanced.Lang["StationConfigError"].."#s", station:gsub("^%l", string.upper))
+                ulx.fancyLogAdmin( calling_ply, lang("StationConfigError").."#s", station:gsub("^%l", string.upper))
             end
         end
 end
@@ -490,19 +494,19 @@ local wagonswaittime = 10
 local wagonslasttime = -wagonswaittime
 function ulx.wagons( calling_ply )
     if wagonslasttime + wagonswaittime > CurTime() then
-        ULib.tsayError( calling_ply, MetrostroiAdvanced.Lang["PleaseWait"].." "..math.Round(wagonslasttime + wagonswaittime - CurTime()).." "..MetrostroiAdvanced.Lang["Seconds"]..MetrostroiAdvanced.Lang["CommandDelay"], true )
+        ULib.tsayError( calling_ply, lang("PleaseWait").." "..math.Round(wagonslasttime + wagonswaittime - CurTime()).." "..lang("Seconds")..lang("CommandDelay"), true )
         return
     end
 
     wagonslasttime = CurTime()
 
-    ulx.fancyLog(MetrostroiAdvanced.Lang["ServerWagons"].." #s", Metrostroi.TrainCount())
+    ulx.fancyLog(lang("ServerWagons").." #s", Metrostroi.TrainCount())
 	local Wags = {}
 	local Trains = {}
 	local Routes = {}
 	local Locs = {}
 	local wag_num = 0
-	local wag_str = MetrostroiAdvanced.Lang["wagon1"]
+	local wag_str = lang("wagon1")
 
 	for k,v in pairs(MetrostroiAdvanced.TrainList) do
 		if string.find(k,"custom") then continue end
@@ -533,12 +537,12 @@ function ulx.wagons( calling_ply )
 	
 	for k,v in pairs(Trains) do
 		wag_num = tonumber(Wags[k])
-		if wag_num >= 2 and wag_num <= 4 then wag_str = MetrostroiAdvanced.Lang["wagon2"] end
-		if wag_num >= 5 then wag_str = MetrostroiAdvanced.Lang["wagon3"] end
-		ulx.fancyLog("#s: #s #s #s. "..MetrostroiAdvanced.Lang["Route"]..": #s\n"..MetrostroiAdvanced.Lang["Location"]..": #s",k,wag_num,wag_str,Trains[k],Routes[k],Locs[k])
+		if wag_num >= 2 and wag_num <= 4 then wag_str = lang("wagon2") end
+		if wag_num >= 5 then wag_str = lang("wagon3") end
+		ulx.fancyLog("#s: #s #s #s. "..lang("Route")..": #s\n"..lang("Location")..": #s",k,wag_num,wag_str,Trains[k],Routes[k],Locs[k])
 	end
 	local wag_awail = (GetConVarNumber("metrostroi_maxtrains")*GetConVarNumber("metrostroi_advanced_maxwagons"))-GetGlobalInt("metrostroi_train_count")
-    ulx.fancyLog(MetrostroiAdvanced.Lang["WagonsAwail"].." #s",wag_awail)
+    ulx.fancyLog(lang("WagonsAwail").." #s",wag_awail)
 end
 local wagons = ulx.command(CATEGORY_NAME, "ulx trains", ulx.wagons, "!trains" )
 wagons:defaultAccess( ULib.ACCESS_ALL )
@@ -629,7 +633,7 @@ function ulx.signaltp(calling_ply,signal)
 			return
 		end
 	end
-	ULib.tsayError( calling_ply, MetrostroiAdvanced.Lang["Signal"].." "..signal.." "..MetrostroiAdvanced.Lang["NotFound"], true ) 			
+	ULib.tsayError( calling_ply, lang("Signal").." "..signal.." "..lang("NotFound"), true ) 			
 end
 local signaltp = ulx.command( CATEGORY_NAME, "ulx signaltp", ulx.signaltp, "!signaltp" )
 signaltp:addParam{ type=ULib.cmds.StringArg, hint="Signal", ULib.cmds.takeRestOfLine }
@@ -647,7 +651,7 @@ function ulx.entitytp(calling_ply, ID)
 			return
 		end
 	end
-	ULib.tsayError( calling_ply, ID.." "..MetrostroiAdvanced.Lang["NotFound"], true ) 			
+	ULib.tsayError( calling_ply, ID.." "..lang("NotFound"), true ) 			
 end
 local entitytp = ulx.command( CATEGORY_NAME, "ulx entitytp", ulx.entitytp, "!entitytp" )
 entitytp:addParam{ type=ULib.cmds.StringArg, hint="ID", ULib.cmds.takeRestOfLine }
@@ -698,7 +702,7 @@ function ulx.udochka( calling_ply )
 	for k,v in pairs(udcs) do
 		v:SetPos(MetrostroiAdvanced.Udc_Positions[k])
 	end
-	ulx.fancyLog("#s "..MetrostroiAdvanced.Lang["UDCMessage"],calling_ply:Nick())
+	ulx.fancyLog("#s "..lang("UDCMessage"),calling_ply:Nick())
 end
 local udc = ulx.command( CATEGORY_NAME, "ulx udochka", ulx.udochka, "!udc" )
 udc:defaultAccess( ULib.ACCESS_ADMIN )
@@ -709,7 +713,7 @@ function ulx.enter( calling_ply, target_ply )
 	if IsValid(target_ply) then
 		local train = calling_ply:GetEyeTrace().Entity
 		if not train.DriverSeat then
-			ULib.tsayError( calling_ply, MetrostroiAdvanced.Lang["WagonIncorrect"] )
+			ULib.tsayError( calling_ply, lang("WagonIncorrect") )
 			return
 		end
 		if IsValid(target_ply:GetVehicle()) then
@@ -724,9 +728,9 @@ function ulx.enter( calling_ply, target_ply )
 			train.DriverSeat:Use(target_ply,target_ply,3,1)
 			target_ply:Freeze(false)
 			if train.DriverSeat == target_ply:GetVehicle() then
-				ulx.fancyLogAdmin( calling_ply, "#A "..MetrostroiAdvanced.Lang["EnterPlayer"].." #T "..MetrostroiAdvanced.Lang["IntoTrain"], target_ply )
+				ulx.fancyLogAdmin( calling_ply, "#A "..lang("EnterPlayer").." #T "..lang("IntoTrain"), target_ply )
 			else
-				ULib.tsayError( calling_ply, MetrostroiAdvanced.Lang["EnterFail"] )
+				ULib.tsayError( calling_ply, lang("EnterFail") )
 			end
 		end)
 
@@ -741,12 +745,12 @@ enter:help( "Place a player into the driver's seat (aim at any wagon)" )
 function ulx.expel( calling_ply, target_ply )
 	if IsValid(target_ply) then
 		if not IsValid(target_ply:GetVehicle()) then
-			ULib.tsayError( calling_ply, target_ply:Nick() .. " "..MetrostroiAdvanced.Lang["NotInVehicle"] )
+			ULib.tsayError( calling_ply, target_ply:Nick() .. " "..lang("NotInVehicle") )
 			return
 		else
 			target_ply:ExitVehicle()
 		end
-		ulx.fancyLogAdmin( calling_ply, "#A "..MetrostroiAdvanced.Lang["ExpelPlayer"].." #T "..MetrostroiAdvanced.Lang["OutTrain"], target_ply )
+		ulx.fancyLogAdmin( calling_ply, "#A "..lang("ExpelPlayer").." #T "..lang("OutTrain"), target_ply )
 	end
 end
 local expl = ulx.command( CATEGORY_NAME, "ulx expel", ulx.expel, "!expel")
@@ -825,7 +829,7 @@ function ulx.trainstart( calling_ply )
 			return
 		end
 		TrainStart(train)
-		ulx.fancyLog("#s "..MetrostroiAdvanced.Lang["UseTrainStart"],calling_ply:Nick())
+		ulx.fancyLog("#s "..lang("UseTrainStart"),calling_ply:Nick())
 	end
 end
 local trainstart = ulx.command( CATEGORY_NAME, "ulx trainstart", ulx.trainstart, "!trainstart" )
