@@ -31,13 +31,14 @@ function MetrostroiAdvanced.LoadLanguage(lang)
 		include("metrostroi_advanced/language/ru.lua")
 	end
 
-	file.Write("metrostroi_advanced/trains.txt","") -- очищаем файл с составами для перезаписи
-	
-	for _,class in pairs(Metrostroi.TrainClasses) do
-		local ENT = scripted_ents.Get(class)
-		if not ENT.Spawner or not ENT.SubwayTrain then continue end
-		file.Append("metrostroi_advanced/trains.txt",class.."\n")
-		MetrostroiAdvanced.TrainList[class] = MetrostroiAdvanced.Lang[class] or ENT.PrintName or class
+	if SERVER then
+		file.Write("metrostroi_advanced/trains.txt","") -- очищаем файл с составами для перезаписи
+		for _,class in pairs(Metrostroi.TrainClasses) do
+			local ENT = scripted_ents.Get(class)
+			if not ENT.Spawner or not ENT.SubwayTrain then continue end
+			file.Append("metrostroi_advanced/trains.txt",class.."\n")
+			MetrostroiAdvanced.TrainList[class] = MetrostroiAdvanced.Lang[class] or ENT.PrintName or class
+		end
 	end
 end
 
@@ -234,6 +235,11 @@ end --SERVER
 
 -- Подключение файлов
 if SERVER then
+	-- отправка локалей на клиент
+	for k, fl in pairs(file.Find("metrostroi_advanced/language/*.lua","LUA")) do
+		AddCSLuaFile("metrostroi_advanced/language/"..fl)
+	end
+	
 	include("metrostroi_advanced/sv_metrostroi_advanced.lua")
 	include("metrostroi_advanced/metrostroi_map_fixes.lua")
 	AddCSLuaFile("metrostroi_advanced/cl_metrostroi_advanced.lua")
