@@ -152,26 +152,28 @@ hook.Add("MetrostroiSpawnerRestrict","TrainSpawnerLimits",function(ply,settings)
 		return true
 	end
 
-	--спавн в любом месте
-	if (not PlayerPermission(ply,"metrostroi_anyplace_spawn")) then
-		local tr = util.TraceLine(util.GetPlayerTrace(ply))
-		local loc = ""
-		if tr.Hit then
-			loc = MetrostroiAdvanced.GetLocation(ply,tr.HitPos)
-		end
-		if (not PlayerPermission(ply,"metrostroi_station_spawn")) then
-			local founded = false
-			for k,v in pairs(MetrostroiAdvanced.StationsIgnore) do
-				if loc:find(v) then founded = true break end
+	--спавн в любом месте / спавн на станции
+	if Metrostroi.StationConfigurations then
+		if (not PlayerPermission(ply,"metrostroi_anyplace_spawn")) then
+			local tr = util.TraceLine(util.GetPlayerTrace(ply))
+			local loc = ""
+			if tr.Hit then
+				loc = MetrostroiAdvanced.GetLocation(ply,tr.HitPos)
 			end
-			if not founded then
-				ply:ChatPrint(lang("StationRestrict"))
+			if (not PlayerPermission(ply,"metrostroi_station_spawn")) then
+				local founded = false
+				for k,v in pairs(MetrostroiAdvanced.StationsIgnore) do
+					if loc:find(v) then founded = true break end
+				end
+				if not founded then
+					ply:ChatPrint(lang("StationRestrict"))
+					return true
+				end
+			end
+			if (loc == lang("UnknownPlace")) then
+				ply:ChatPrint(lang("AnyPlaceRestrict"))
 				return true
 			end
-		end
-		if (loc == lang("UnknownPlace")) then
-			ply:ChatPrint(lang("AnyPlaceRestrict"))
-			return true
 		end
 	end
 	
