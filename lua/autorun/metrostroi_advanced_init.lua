@@ -164,7 +164,7 @@ if SERVER then
 				if not IsValid(owner) then continue end
 				if owner != ply then
 					local rnum2 = 0
-					if k == "gmod_subway_81-722" or k == "gmod_subway_81-722_3" or k == "gmod_subway_81-7175p" then
+					if k == "gmod_subway_81-722" or k == "gmod_subway_81-722_3" or k == "gmod_subway_81-722_new" or k == "gmod_subway_81-7175p" then
 						rnum2 = tonumber(train.RouteNumberSys.RouteNumber)
 					elseif k == "gmod_subway_81-717_6" then
 						rnum2 = train.ASNP.RouteNumber
@@ -173,7 +173,7 @@ if SERVER then
 							rnum2 = tonumber(train.RouteNumber.RouteNumber)
 						end
 					end
-					if table.HasValue({"gmod_subway_81-702","gmod_subway_81-703","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_81-717_mvm","gmod_subway_81-718","gmod_subway_81-720","gmod_subway_81-720_1"},k) then rnum2 = rnum2 / 10 end
+					if table.HasValue({"gmod_subway_81-702","gmod_subway_81-703","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_ezh3ru1","gmod_subway_81-717_mvm","gmod_subway_81-718","gmod_subway_81-720","gmod_subway_81-720_1","gmod_subway_81-717_freight"},k) then rnum2 = rnum2 / 10 end
 					routes[owner:Nick()] = rnum2
 				end
 			end
