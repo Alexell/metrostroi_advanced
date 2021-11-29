@@ -92,7 +92,11 @@ MetrostroiAdvanced.Lang["SetWagNum2"]			= "This is not your wagon!"
 MetrostroiAdvanced.Lang["SetWagNum3"]			= "Oops, this number already exists! \nTry another one."
 
 -- CL
+MetrostroiAdvanced.Lang["CPGameStart"]			= "On game load:"
 MetrostroiAdvanced.Lang["CPOptimization"]		= "Optimization:"
+MetrostroiAdvanced.Lang["CPOptimization2"]		= "Use recommended preset"
+MetrostroiAdvanced.Lang["CPOptimization1"]		= "Use standard preset"
+MetrostroiAdvanced.Lang["CPOptimization0"]		= "Do nothing"
 MetrostroiAdvanced.Lang["CPOptimizationUse"]	= "Enable recommended optimization preset"
 MetrostroiAdvanced.Lang["CPOptions"]			= "Options:"
 MetrostroiAdvanced.Lang["CPRouteNum"]			= "Auto-generate route number on train spawn"

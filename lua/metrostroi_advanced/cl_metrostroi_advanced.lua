@@ -98,7 +98,7 @@ end)
 
 -- Оптимизация клиента
 local function ClientOptimize(opt)
-	if (tonumber(opt) == 1) then
+	if (tonumber(opt) == 2) then
 		RunConsoleCommand("gmod_mcore_test",1)
 		RunConsoleCommand("mat_queue_mode",2)
 		RunConsoleCommand("mat_specular",0)
@@ -110,7 +110,7 @@ local function ClientOptimize(opt)
 		RunConsoleCommand("r_queued_ropes",1)
 		RunConsoleCommand("datacachesize",512)
 		RunConsoleCommand("mem_max_heapsize",2048)
-	else
+	elseif (tonumber(opt) == 1) then
 		RunConsoleCommand("gmod_mcore_test",0)
 		RunConsoleCommand("mat_queue_mode",-1)
 		RunConsoleCommand("mat_specular",1)
@@ -125,10 +125,6 @@ local function ClientOptimize(opt)
 	end
 end
 ClientOptimize(GetConVar("ma_clientoptimize"):GetInt())
-cvars.AddChangeCallback("ma_clientoptimize",function(cvar,old,new)
-	if (old == new) then return end
-	ClientOptimize(new)
-end)
 
 -- Панели в меню [Q]
 local function ClientPanel(panel)
@@ -136,8 +132,11 @@ local function ClientPanel(panel)
     panel:SetPadding(0)
     panel:SetSpacing(0)
     panel:Dock(FILL)
-	panel:ControlHelp(lang("CPOptimization"))
-	panel:CheckBox(lang("CPOptimizationUse"),"ma_clientoptimize")
+	panel:ControlHelp(lang("CPGameStart"))
+	local cbox,lb = panel:ComboBox(lang("CPOptimization"),"ma_clientoptimize")
+	cbox:AddChoice(lang("CPOptimization2"),2)
+	cbox:AddChoice(lang("CPOptimization1"),1)
+	cbox:AddChoice(lang("CPOptimization0"),0)
 	panel:Help("") -- отступ
 	panel:Help("") -- отступ
 	panel:ControlHelp(lang("CPOptions"))

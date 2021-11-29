@@ -93,8 +93,11 @@ MetrostroiAdvanced.Lang["SetWagNum2"]			= "Это не ваш вагон!"
 MetrostroiAdvanced.Lang["SetWagNum3"]			= "Упс, такой номер вагона уже существует! \nПопробуйте другой."
 
 -- CL
+MetrostroiAdvanced.Lang["CPGameStart"]			= "При запуске игры:"
 MetrostroiAdvanced.Lang["CPOptimization"]		= "Оптимизация:"
-MetrostroiAdvanced.Lang["CPOptimizationUse"]	= "Использовать рекоменд. оптимизацию клиента"
+MetrostroiAdvanced.Lang["CPOptimization2"]		= "Исп. рекомендуемый пресет"
+MetrostroiAdvanced.Lang["CPOptimization1"]		= "Исп. стандартный пресет"
+MetrostroiAdvanced.Lang["CPOptimization0"]		= "Ничего не делать"
 MetrostroiAdvanced.Lang["CPOptions"]			= "Опции:"
 MetrostroiAdvanced.Lang["CPRouteNum"]			= "Автоматически выдавать номер маршрута"
 MetrostroiAdvanced.Lang["CPNeedReconnect"]		= "(необходимо переподключиться к серверу)"
