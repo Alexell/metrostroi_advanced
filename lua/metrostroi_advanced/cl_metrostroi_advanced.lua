@@ -2,7 +2,7 @@
 -- Developers:
 -- Alexell | https://steamcommunity.com/profiles/76561198210303223
 -- Agent Smith | https://steamcommunity.com/profiles/76561197990364979
--- Version: 2.0
+-- Version: 2.1
 -- License: MIT
 -- Source code: https://github.com/Alexell/metrostroi_advanced
 ----------------------------------------------------------------------

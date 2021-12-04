@@ -2,7 +2,7 @@
 -- Developers:
 -- Alexell | https://steamcommunity.com/profiles/76561198210303223
 -- Agent Smith | https://steamcommunity.com/profiles/76561197990364979
--- Version: 2.0
+-- Version: 2.1
 -- License: MIT
 -- Source code: https://github.com/Alexell/metrostroi_advanced
 ----------------------------------------------------------------------
@@ -829,7 +829,7 @@ function ulx.trainstart( calling_ply )
     local train = calling_ply:GetTrain()
 	if train != nil then
 		if train:GetClass() == "gmod_subway_81-760" or train:GetClass() == "gmod_subway_81-760a" then
-			calling_ply:ChatPrint("Oka is not supported yet.")
+			calling_ply:ChatPrint(lang("TS760"))
 			return
 		end
 		TrainStart(train)

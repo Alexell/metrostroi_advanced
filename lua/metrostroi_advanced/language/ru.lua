@@ -91,6 +91,7 @@ MetrostroiAdvanced.Lang["UserFoundInBL"]		= "Пользователь в чер�
 MetrostroiAdvanced.Lang["SetWagNum1"]			= "Пожалуйста наведите указатель на вагон для изменения его номера."
 MetrostroiAdvanced.Lang["SetWagNum2"]			= "Это не ваш вагон!"
 MetrostroiAdvanced.Lang["SetWagNum3"]			= "Упс, такой номер вагона уже существует! \nПопробуйте другой."
+MetrostroiAdvanced.Lang["TS760"]				= "Установите реверс по ходу 'вперед'."
 
 -- CL
 MetrostroiAdvanced.Lang["CPGameStart"]			= "При запуске игры:"
