@@ -198,7 +198,7 @@ if SERVER then
 		return rnum
 	end
 
-	function MetrostroiAdvanced.IsFrontWagon(ent)
+	function MetrostroiAdvanced.IsHeadWagon(ent)
 		if (not IsValid(ent)) then return false end
 		if (not MetrostroiAdvanced.TrainList[ent:GetClass()]) then return false end -- только головные
 		local class = ent:GetClass()
@@ -243,6 +243,7 @@ if SERVER then
 	include("metrostroi_advanced/sv_metrostroi_advanced.lua")
 	include("metrostroi_advanced/metrostroi_map_fixes.lua")
 	AddCSLuaFile("metrostroi_advanced/cl_metrostroi_advanced.lua")
+	--resource.AddWorkshop("1838480881") -- если появится клиентский контент
 end
 
 if CLIENT then

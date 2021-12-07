@@ -386,7 +386,7 @@ timer.Simple(1,function()
 			if (not IsValid(v.CurrentTrain)) then return end
 			local ctrain = v.CurrentTrain
 			if (not IsValid(ctrain)) then return end
-			if (not MetrostroiAdvanced.IsFrontWagon(ctrain)) then return end
+			if (not MetrostroiAdvanced.IsHeadWagon(ctrain)) then return end
 			local ply = ctrain.Owner
 			if (not IsValid(ply)) then return end
 			if (ply:GetInfoNum("ma_autoinformator",1) == 0) then return end
