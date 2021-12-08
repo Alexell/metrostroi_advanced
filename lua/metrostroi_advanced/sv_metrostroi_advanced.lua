@@ -19,8 +19,10 @@ local auto_wags = CreateConVar("metrostroi_advanced_autowags", 0, {FCVAR_ARCHIVE
 local madv_lang = CreateConVar("metrostroi_advanced_lang", "ru", {FCVAR_ARCHIVE})
 local afktime = CreateConVar("metrostroi_advanced_afktime", 0, {FCVAR_ARCHIVE})
 local timezone = CreateConVar("metrostroi_advanced_timezone", 3, {FCVAR_ARCHIVE})
+local buttonmessage = CreateConVar("metrostroi_advanced_buttonmessage", 1, {FCVAR_ARCHIVE})
 
 util.AddNetworkString("MA.ServerCommands")
+util.AddNetworkString("MA.AddNewButtons")
 
 AFK_TIME = 0
 AFK_WARN1 = 0
@@ -34,9 +36,18 @@ timer.Create("MetrostroiAdvancedInit",1,1,function()
 	MetrostroiAdvanced.LoadLanguage(GetConVarString("metrostroi_advanced_lang"))
 	MetrostroiAdvanced.LoadStationsIgnore()
 	MetrostroiAdvanced.LoadMapWagonsLimit()
+	MetrostroiAdvanced.LoadMapButtons()
 	SetGlobalInt("TrainLastSpawned",os.time())
 end)
 
+concommand.Add("ma_save_buttonoutput", function( ply, cmd, args )
+	if not ply:IsAdmin() then return end
+	local fl = file.Read("metrostroi_advanced/map_buttons.txt","DATA")
+	local tab = fl and util.JSONToTable(fl) or {}
+	tab[game.GetMap()] = MetrostroiAdvanced.MapButtonNames
+	file.Write("metrostroi_advanced/map_buttons.txt",util.TableToJSON(tab,true))
+end)
+	
 cvars.AddChangeCallback("metrostroi_advanced_lang", function(cvar, old, new)
     MetrostroiAdvanced.LoadLanguage(new)
 end)
@@ -59,6 +70,13 @@ net.Receive("MA.ServerCommands",function(ln,ply)
 	if (com == "ma_curlim") then com = "metrostroi_current_limit" end
 	if (com == "ma_requirethirdrail") then com = "metrostroi_train_requirethirdrail" end
 	RunConsoleCommand(com,val)
+end)
+
+net.Receive("MA.AddNewButtons",function(ln,ply)
+	if not IsValid(ply) then return end
+	local sourcename = net.ReadString()
+	local outputname = net.ReadString()
+	MetrostroiAdvanced.MapButtonNames[sourcename] = outputname
 end)
 
 local function PlayerPermission(ply,permission)
@@ -232,6 +250,7 @@ hook.Add("PlayerInitialSpawn","SetPlyParams",function(ply)
 		ply:ConCommand("metrostroi_advanced_autowags "..GetConVarNumber("metrostroi_advanced_autowags"))
 		ply:ConCommand("metrostroi_advanced_afktime "..GetConVarNumber("metrostroi_advanced_afktime"))
 		ply:ConCommand("metrostroi_advanced_timezone "..GetConVarNumber("metrostroi_advanced_timezone"))
+		ply:ConCommand("metrostroi_advanced_buttonmessage "..GetConVarNumber("metrostroi_advanced_buttonmessage"))
 		--
 		ply:ConCommand("ma_voltage "..GetConVarNumber("metrostroi_voltage"))
 		ply:ConCommand("ma_curlim "..GetConVarNumber("metrostroi_current_limit"))
@@ -408,4 +427,31 @@ timer.Simple(1,function()
 		end
 		v.Think = Think
 	end
+end)
+
+-- Вывод в чат нажатия кнопок на карте
+timer.Simple(5,function()	-- отсекаем лишний высер в лог на старте карт
+	hook.Add("AcceptInput", "MA.ButtonUsedOutputs", function(ent, input, activator, caller, value)
+		if(GetConVar("metrostroi_advanced_buttonmessage"):GetInt() == 0) then return end
+		if IsValid(ent) and ent:GetClass() == "func_button" then
+			local Nick
+			local ButtonName
+			if MetrostroiAdvanced.MapButtonNames[ent:GetName()] == nil then
+				ButtonName = ent:GetName()
+			else 
+				ButtonName = MetrostroiAdvanced.MapButtonNames[ent:GetName()]
+			end
+			if input == "Use" then
+				if IsValid(activator) and activator:GetClass() == "player" then				
+					if IsValid(caller) and caller:GetClass() == "player" then 
+						Nick = caller:Nick()
+						ulx.fancyLog("#s "..lang("PressedButton").." #s",Nick,ButtonName)
+					end	
+				end
+			elseif input == "Press" then
+				Nick = "Someone"
+				ulx.fancyLog("#s "..lang("PressedButton").." #s",Nick,ButtonName)
+			end
+		end
+	end)
 end)

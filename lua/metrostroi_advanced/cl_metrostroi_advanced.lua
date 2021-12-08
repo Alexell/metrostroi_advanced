@@ -15,6 +15,8 @@ CreateClientConVar("ma_clientoptimize","1",true,false)
 CreateClientConVar("ma_voltage","0",false,false)
 CreateClientConVar("ma_curlim","0",false,false)
 CreateClientConVar("ma_requirethirdrail","0",false,false)
+CreateClientConVar("ma_button_sourcename", "", false, false)
+CreateClientConVar("ma_button_output", "", false, false)
 
 -- Дублирующие серверные квары для админов
 CreateClientConVar("metrostroi_advanced_spawninterval","0",false,false)
@@ -25,6 +27,7 @@ CreateClientConVar("metrostroi_advanced_maxwagons","0",false,false)
 CreateClientConVar("metrostroi_advanced_autowags","0",false,false)
 CreateClientConVar("metrostroi_advanced_afktime","0",false,false)
 CreateClientConVar("metrostroi_advanced_timezone","0",false,false)
+CreateClientConVar("metrostroi_advanced_buttonmessage","0",false,false)
 
 -- Локализация
 MetrostroiAdvanced.LoadLanguage(GetConVarString("metrostroi_language"))
@@ -43,6 +46,16 @@ local function SendCommand(com,val)
 		net.WriteString(val)
 	net.SendToServer()
 end
+
+concommand.Add("ma_add_buttonoutput",function(ply,cmd,args)
+	if not ply:IsAdmin() then return end
+	local btn_name = GetConVar("ma_button_sourcename"):GetString()
+	local btn_text = GetConVar("ma_button_output"):GetString()
+	net.Start("MA.AddNewButtons")
+		net.WriteString(btn_name)
+		net.WriteString(btn_text)
+	net.SendToServer()
+end)
 
 hook.Add("InitPostEntity","MA_PlayerInit",function()
 	if not LocalPlayer():IsAdmin() then return end
@@ -76,6 +89,10 @@ hook.Add("InitPostEntity","MA_PlayerInit",function()
 			SendCommand(cvar,new)
 		end)
 		cvars.AddChangeCallback("metrostroi_advanced_timezone",function(cvar,old,new)
+			if (old == new) then return end
+			SendCommand(cvar,new)
+		end)
+		cvars.AddChangeCallback("metrostroi_advanced_buttonmessage",function(cvar,old,new)
 			if (old == new) then return end
 			SendCommand(cvar,new)
 		end)
@@ -172,8 +189,16 @@ local function AdminPanel(panel)
 	panel:Help(lang("APCurLim").." (A):")
 	panel:TextEntry("","ma_curlim")
 	panel:Help("") -- отступ
-	panel:Help("") -- отступ
 	panel:ControlHelp(lang("APTools"))
+	panel:Help(lang("ACPBtnHeader"))
+	panel:CheckBox(lang("ACPBtnCheckBox"),"metrostroi_advanced_buttonmessage")
+	panel:Help(lang("ACPBtnCheckBox"))
+	panel:TextEntry(lang("ACPBtnSource"),"ma_button_sourcename")
+	panel:TextEntry(lang("ACPBtnVisible"),"ma_button_output")
+	panel:Button(lang("ACPBtnAdd"),"ma_add_buttonoutput",true)
+	panel:Button(lang("ACPBtnSave"),"ma_save_buttonoutput",true)
+	panel:Help("") -- отступ
+	panel:Help(lang("ACPSigTools"))
 	panel:Button(lang("APSignSave"),"metrostroi_save",true)
 	panel:Button(lang("APSignReload"),"metrostroi_load",true)
 	panel:Button(lang("APTrackEditor"),"metrostroi_trackeditor",true)
