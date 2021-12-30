@@ -468,8 +468,8 @@ function ulx.tps( calling_ply,station )
                 calling_ply.ulx_prevpos = calling_ply:GetPos()--ulx return
                 calling_ply.ulx_prevang = calling_ply:EyeAngles()
                 calling_ply:SetPos(ptbl[1])
-                calling_ply:SetAngles(ptbl[2])
-                calling_ply:SetEyeAngles(ptbl[2])
+                calling_ply:SetAngles(ptbl[2] or Angle(0,0,0))
+                calling_ply:SetEyeAngles(ptbl[2] or Angle(0,0,0))
                 ulx.fancyLogAdmin( calling_ply, "#A "..lang("Teleported")..lang("Teleported5").." #s", st.names and st.names[1] or key)
             else
                 ULib.tsayError( calling_ply, lang("StationConfigError")..key, true )
