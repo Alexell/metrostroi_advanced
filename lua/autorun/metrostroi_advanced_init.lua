@@ -240,7 +240,7 @@ if SERVER then
 			for _,train in pairs(ents.FindByClass(k)) do
 				local owner = train.Owner
 				if not IsValid(owner) then continue end
-				if owner != ply then
+				if owner ~= ply then
 					local rnum2 = 0
 					if k == "gmod_subway_81-722" or k == "gmod_subway_81-722_3" or k == "gmod_subway_81-722_new" or k == "gmod_subway_81-7175p" then
 						rnum2 = tonumber(train.RouteNumberSys.RouteNumber)
@@ -256,7 +256,7 @@ if SERVER then
 				end
 			end
 		end
-		if routes != nil then
+		if routes ~= nil then
 			local r2 = {}
 			for k,v in pairs(routes) do
 				r2[#r2+1] = v
@@ -281,33 +281,106 @@ if SERVER then
 		if (not MetrostroiAdvanced.TrainList[ent:GetClass()]) then return false end -- только головные
 		local class = ent:GetClass()
 		if class:sub(13,18) == "81-760" or class:sub(13,19) == "81-760a" then
-			if ent.RV.KROPosition != 0 then
+			if ent.RV.KROPosition ~= 0 then
 				return true
 			end
 		elseif class:sub(13,18) == "81-722" then
-			if ent.Electric.CabActive != 0 then
+			if ent.Electric.CabActive ~= 0 then
 				return true
 			end
 		elseif class:sub(13,18) == "81-720" then
-			if ent.WrenchMode != 0 then
-				if ent.RV.KROPosition != 0 then
+			if ent.WrenchMode ~= 0 then
+				if ent.RV.KROPosition ~= 0 then
 					return true
 				end
 			end
 		elseif class:sub(13,18) == "81-718" then
-			if ent.WrenchMode != 0 then
-				if ent.KR.Position != 0 then
+			if ent.WrenchMode ~= 0 then
+				if ent.KR.Position ~= 0 then
 					return true
 				end
 			end
 		else
-			if ent.KVWrenchMode != 0 then
-				if ent.KV.ReverserSet != 0 then
+			if ent.KVWrenchMode ~= 0 then
+				if ent.KV.ReverserSet ~= 0 then
 					return true
 				end
 			end
 		end
 		return false
+	end
+	
+	-- Получение установленной конечной из информатора/табло/трафарета поезда
+	function MetrostroiAdvanced.GetLastStationID(train)
+		if game.GetMap():find("gm_metro_crossline") then return -1 end -- там нет трафаретов + с конфигами ЦИС и списком станций все через жопу
+		if game.GetMap():find("gm_metro_nsk_line") then return -1 end -- там нет трафаретов, информаторов и конфига ЦИС
+		if game.GetMap():find("gm_smr_1987") then return -1 end -- трафареты есть, но пустые
+		
+		if not IsValid(train) then return -1 end
+		local station = -1
+		
+		-- 81-540.2K
+		if train:GetClass():find("81-540_2k",1,true) and train.ASNP then
+			if (train:GetNW2String("Inf:Tablo1") == "обкатка" or train:GetNW2String("Inf:Tablo1") == "перегонка") then return 1111 end
+			-- у меня на табло станци не отображаются, будем брать с информатора
+			if train.ASNP.State < 2 then return 1111 end
+			local tbl = Metrostroi.ASNPSetup[train:GetNW2Int("Announcer",1)] and Metrostroi.ASNPSetup[train:GetNW2Int("Announcer",1)][train.ASNP.Line]
+			if tbl and tbl.Loop then tbl = nil return -1 end -- информатор не стандартный, как его настраивать не понятно
+			station = tbl and tbl[train.ASNP.Path and train.ASNP.FirstStation or train.ASNP.LastStation][1] or -1
+			tbl = nil
+		end
+		
+		-- 81-* трафареты
+		if (station == -1 and train.LastStation and train.LastStation.ID and train.LastStation.TableName) then
+			station = table.KeyFromValue(Metrostroi.Skins[train.LastStation.TableName],(tonumber(train.LastStation.ID) == 0 and 1 or train.LastStation.ID)) or -1 -- по ID 0 в Metrostroi.Skins ничего не находит
+			if station == "" and game.GetMap():find("gm_mus_loop") then return -1 end -- для таблички "Кольцевой" на MSS
+		end
+		
+		-- 81-720.1 и 81-717.5A (только ASNP)
+		if (station == -1 and (train:GetClass():find("81-720_1",1,true) or train:GetClass():find("81-717_5a",1,true)) and train.ASNP) then
+			if train.ASNP.State < 7 then return 1111 end
+			local tbl = Metrostroi.ASNPSetup[train:GetNW2Int("Announcer",1)] and Metrostroi.ASNPSetup[train:GetNW2Int("Announcer",1)][train.ASNP.Line]
+			if tbl and (tbl.Loop and train.ASNP.LastStation == 0) then tbl = nil return -1 end -- когда выбран "Кольцевой", срабатывать не будет
+			station = tbl and tbl[train.ASNP.Path and train.ASNP.FirstStation or train.ASNP.LastStation][1] or -1
+			tbl = nil
+		end
+		
+		-- 81-722
+		if (station == -1 and train:GetClass():find("81-722",1,true) and train.SarmatUPO) then
+			if train.SarmatUPO.Line < 1 then return 1111 end -- сервисная надпись табло
+			local tbl = Metrostroi.SarmatUPOSetup[train:GetNW2Int("Announcer",1)] and Metrostroi.SarmatUPOSetup[train:GetNW2Int("Announcer",1)][train.SarmatUPO.Line]
+			if tbl and (tbl.Loop and train.SarmatUPO.LastStationName == "Кольцевой") then tbl = nil return -1 end
+			station = tbl and tbl[train.SarmatUPO.Path and train.SarmatUPO.StartStation or train.SarmatUPO.EndStation][1] or -1
+			tbl = nil
+		end
+		
+		-- 81-* LVZ (на остальных нельзя выбирать конечную и нет трафаретов)
+		
+		-- 81-760
+		if (station == -1 and train:GetClass():find("81-760",1,true) and train.BMCIS) then
+			if train.BMCIS.Line < 1 then return 1111 end -- сервисная надпись табло
+			if train.BMCIS.State1 < 7 then return 1111 end
+			local tbl = Metrostroi.CISConfig[train.CISConfig] and Metrostroi.CISConfig[train.CISConfig][train.BMCIS.Line]
+			if tbl and (tbl.Loop and train.BMCIS.LastStationEntered == 0) then return -1 end
+			station = tbl and (train.BMCIS.LastStationEntered == 0 and (train.BMCIS.Path and tbl[train.BMCIS.FirstStation][1] or tbl[train.BMCIS.LastStation][1]) or tbl[train.BMCIS.laststbl[train.BMCIS.LastStationEntered]][1]) or -1
+			tbl = nil
+		end
+		return tonumber(station,10) or 1111 -- любой трафарет со строковым индексом будет считаться сервисным
+	end
+	
+	-- Проверяем, является ли полученный id станции реальной конечной (т.е. первой или последней станцией на линии)
+	function MetrostroiAdvanced.IsRealLastStation(id)
+		if not Metrostroi.StationConfigurations then return true end
+		if game.GetMap():find("pll_remastered_v") then return table.HasValue({150,156,157,159},id) end -- костыль, т.к. id станций обеих линий в одной сотне
+		if game.GetMap():find("mus_neoorange") then return table.HasValue({401,411,451,462},id) end -- костыль, т.к. у трафаретов id отличаются от id в платформах
+		local s_id = math.floor(id/100)
+		local station_ids = {}
+		for k,v in pairs(Metrostroi.StationConfigurations) do
+			if not isnumber(k) then continue end
+			if (math.floor(k/100) == s_id) then table.insert(station_ids,k) end -- собираем ids с той же линии, если их две
+		end
+		table.SortDesc(station_ids)
+		if (id == station_ids[1] or id == station_ids[#station_ids]) then return true else return false end
 	end
 end --SERVER
 
@@ -321,7 +394,7 @@ if SERVER then
 	include("metrostroi_advanced/sv_metrostroi_advanced.lua")
 	include("metrostroi_advanced/metrostroi_map_fixes.lua")
 	AddCSLuaFile("metrostroi_advanced/cl_metrostroi_advanced.lua")
-	--resource.AddWorkshop("1838480881") -- если появится клиентский контент
+	resource.AddWorkshop("1838480881")
 end
 
 if CLIENT then

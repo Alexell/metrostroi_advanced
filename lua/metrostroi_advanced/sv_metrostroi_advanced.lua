@@ -20,6 +20,7 @@ local madv_lang = CreateConVar("metrostroi_advanced_lang", "ru", {FCVAR_ARCHIVE}
 local afktime = CreateConVar("metrostroi_advanced_afktime", 0, {FCVAR_ARCHIVE})
 local timezone = CreateConVar("metrostroi_advanced_timezone", 3, {FCVAR_ARCHIVE})
 local buttonmessage = CreateConVar("metrostroi_advanced_buttonmessage", 1, {FCVAR_ARCHIVE})
+local noentry_ann = CreateConVar("metrostroi_advanced_noentryann", 1, {FCVAR_ARCHIVE})
 
 util.AddNetworkString("MA.ServerCommands")
 util.AddNetworkString("MA.AddNewButtons")
@@ -38,6 +39,11 @@ timer.Create("MetrostroiAdvancedInit",1,1,function()
 	MetrostroiAdvanced.LoadMapWagonsLimit()
 	MetrostroiAdvanced.LoadMapButtons()
 	SetGlobalInt("TrainLastSpawned",os.time())
+	if not file.Exists("sound/metrostroi_advanced/no_entry_ann/"..madv_lang:GetString(),"GAME") then
+		RunConsoleCommand("metrostroi_advanced_noentryann",0)
+		print("Metrostroi Advanced: Sounds for '"..madv_lang:GetString().."' language not found!")
+		print("Metrostroi Advanced: No Entry Announces DISABLED.")
+	end
 end)
 
 concommand.Add("ma_save_buttonoutput", function( ply, cmd, args )
@@ -393,7 +399,15 @@ hook.Add("EntityRemoved","DeleteTrainParams",function (ent)
 	end
 end)
 
--- Система автоматического проигрывания записи информатора по прибытию на станцию
+-- Список объявлений
+local snd_dir = "metrostroi_advanced/no_entry_ann/"..madv_lang:GetString()
+local ann_sounds = {}
+ann_sounds[1] = {snd_dir.."/p1/1.mp3",snd_dir.."/p1/2.mp3",snd_dir.."/p1/3.mp3",snd_dir.."/p1/4.mp3",snd_dir.."/p1/5.mp3"}
+ann_sounds[2] = {snd_dir.."/p2/1.mp3",snd_dir.."/p2/2.mp3",snd_dir.."/p2/3.mp3",snd_dir.."/p2/4.mp3",snd_dir.."/p2/5.mp3"}
+ann_sounds[3] = {snd_dir.."/p3/1.mp3"}
+ann_sounds[4] = {snd_dir.."/p4/1.mp3"}
+
+-- Инжект в код платформ
 timer.Simple(1,function()
 	for k,v in pairs(ents.FindByClass("gmod_track_platform")) do
 		local OriginalThink = v.Think
@@ -404,8 +418,49 @@ timer.Simple(1,function()
 			v.AITimer = CurTime()
 			if (not IsValid(v.CurrentTrain)) then return end
 			local ctrain = v.CurrentTrain
-			if (not IsValid(ctrain)) then return end
 			if (not MetrostroiAdvanced.IsHeadWagon(ctrain)) then return end
+			
+			-- Объявление на станции, если на прибывающий поезд посадки нет
+			if noentry_ann:GetInt() == 1 then
+				if ctrain.Speed > 15 and (not v.LastCurrentTrain or ctrain ~= v.LastCurrentTrain) then
+					v.LastCurrentTrain = ctrain
+					local last_st = MetrostroiAdvanced.GetLastStationID(ctrain)
+					if last_st > -1 then
+						local play_snd
+						if v.PlatformIndex > 2 then
+							play_snd = ann_sounds[v.PlatformIndex][1]
+						else
+							play_snd = ann_sounds[v.PlatformIndex][math.random(5)]
+						end
+
+						if last_st < 1000 then
+							if (tonumber(v.StationIndex) == last_st and not MetrostroiAdvanced.IsRealLastStation(v.StationIndex)) then
+								--v:PlayAnnounce(2,play_snd) не хочет работать :(
+								sound.Play(play_snd,LerpVector(0.33,v.PlatformStart,v.PlatformEnd),120,100,0.5)
+								sound.Play(play_snd,LerpVector(0.33,v.PlatformEnd,v.PlatformStart),120,100,0.5)
+								for _,wag in pairs(ctrain.WagonList) do wag.AnnouncementToLeaveWagon = true end -- высадка пассажиров
+							end
+						else
+							local rtrain
+							for t,wag in pairs(ctrain.WagonList) do
+								if (wag:GetClass() == ctrain:GetClass() and wag ~= ctrain) then
+									rtrain = wag
+								end
+							end
+							if not MetrostroiAdvanced.IsRealLastStation(v.StationIndex) or (MetrostroiAdvanced.IsRealLastStation(v.StationIndex) and IsValid(rtrain) and rtrain:ReadCell(49162) == 0) then -- на реальной конечной только при выезде из тупика
+								--v:PlayAnnounce(2,play_snd) не хочет работать :(
+								sound.Play(play_snd,LerpVector(0.33,v.PlatformStart,v.PlatformEnd),120,100,0.5)
+								sound.Play(play_snd,LerpVector(0.33,v.PlatformEnd,v.PlatformStart),120,100,0.5)
+								for _,wag in pairs(ctrain.WagonList) do wag.AnnouncementToLeaveWagon = true end -- высадка пассажиров
+							end
+						end
+					end
+				elseif not v.CurrentTrain then
+					v.LastCurrentTrain = nil
+				end
+			end
+			
+			-- Автоматическое проигрывание записи информатора по прибытию на станцию
 			local ply = ctrain.Owner
 			if (not IsValid(ply)) then return end
 			if (ply:GetInfoNum("ma_autoinformator",1) == 0) then return end
