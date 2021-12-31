@@ -304,7 +304,7 @@ hook.Add("MetrostroiCoupled","SetTrainParams",function(ent,ent2)
 		if (ply:GetInfoNum("ma_routenums",1) == 0) then return end
 		local rnum = ply:GetNW2Int("MARouteNumber")
 		if MetrostroiAdvanced.TrainList[ent:GetClass()] then
-			if table.HasValue({"gmod_subway_81-702","gmod_subway_81-703","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_ezh3ru1","gmod_subway_81-717_mvm","gmod_subway_81-718","gmod_subway_81-720","gmod_subway_81-720_1","gmod_subway_81-717_freight"},ent:GetClass()) then rnum = rnum * 10 end
+			if table.HasValue({"gmod_subway_81-702","gmod_subway_81-703","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_ezh3ru1","gmod_subway_81-717_mvm","gmod_subway_81-718","gmod_subway_81-720","gmod_subway_81-720_1","gmod_subway_81-720a","gmod_subway_81-717_freight"},ent:GetClass()) then rnum = rnum * 10 end
 
 			if ent:GetClass() == "gmod_subway_81-540_2" then
 				local rtype = ent:GetNW2Int("Route",1)
@@ -343,7 +343,7 @@ hook.Add("MetrostroiCoupled","SetTrainParams",function(ent,ent2)
 			end
 		end
 		if MetrostroiAdvanced.TrainList[ent2:GetClass()] then
-			if table.HasValue({"gmod_subway_81-702","gmod_subway_81-703","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_ezh3ru1","gmod_subway_81-717_mvm","gmod_subway_81-718","gmod_subway_81-720","gmod_subway_81-720_1","gmod_subway_81-717_freight"},ent2:GetClass()) then rnum = rnum * 10 end
+			if table.HasValue({"gmod_subway_81-702","gmod_subway_81-703","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_ezh3ru1","gmod_subway_81-717_mvm","gmod_subway_81-718","gmod_subway_81-720","gmod_subway_81-720_1","gmod_subway_81-720a","gmod_subway_81-717_freight"},ent2:GetClass()) then rnum = rnum * 10 end
 			
 			if ent2:GetClass() == "gmod_subway_81-540_2" then
 				local rtype = ent2:GetNW2Int("Route",1)

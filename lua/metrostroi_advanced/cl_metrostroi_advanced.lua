@@ -111,6 +111,7 @@ hook.Add("InitPostEntity","MA_PlayerInit",function()
 			SendCommand(cvar,new)
 		end)
 	end)
+	hook.Remove("InitPostEntity","MA_PlayerInit")
 end)
 
 -- Оптимизация клиента
