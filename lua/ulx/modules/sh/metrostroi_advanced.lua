@@ -2,7 +2,7 @@
 -- Developers:
 -- Alexell | https://steamcommunity.com/profiles/76561198210303223
 -- Agent Smith | https://steamcommunity.com/profiles/76561197990364979
--- Version: 2.3
+-- Version: 2.4
 -- License: MIT
 -- Source code: https://github.com/Alexell/metrostroi_advanced
 ----------------------------------------------------------------------
@@ -15,6 +15,7 @@ end
 
 -- телепортация в состав
 local function GotoTrain (ply,tply,train,sit)
+	if not IsValid(train) then return end
     if IsValid(ply:GetVehicle()) then
         ply:ExitVehicle()
     end
@@ -25,14 +26,14 @@ local function GotoTrain (ply,tply,train,sit)
         ply:SetPos(pos-Vector(0,0,40))
 		if ply == tply then
 			train.DriverSeat:UseClientSideAnimation() -- пусть ебучую анимацию отрабатывает клиент
-			timer.Create("TeleportIntoDriverSeat", 1, 1, function()
+			timer.Simple(1, function()
 				train.DriverSeat:Use(ply,ply,3,1)
 				ulx.fancyLog("#s "..lang("Teleported")..lang("Teleported1"),ply:Nick())
 				ply:Freeze(false)
 			end)
 		else
 			train.InstructorsSeat:UseClientSideAnimation()
-			timer.Create("TeleportIntoInstructorsSeat", 1, 1, function()
+			timer.Simple(1, function()
 				train.InstructorsSeat:Use(ply,ply,3,1)
 				ulx.fancyLog("#s "..lang("Teleported")..lang("Teleported2").." #s.",ply:Nick(),tply:Nick())
 				ply:Freeze(false)
@@ -55,18 +56,18 @@ end
 --		https://steamcommunity.com/id/ag-sm1th/		--
 ------------------------------------------------------
 
-local function Set(button,state,ply,train)
-	if IsValid(train) then
-		if train[button] then
-			train[button]:TriggerInput("Set",state)
-		end
+local function Set(button,state,train)
+	if not IsValid(train) then return end
+	if train[button] then
+		train[button]:TriggerInput("Set",state)
 	end
 end
 
 local function TrainStart(train)
+	if not IsValid(train) then return end
 	-- Проход по составам - самая большая группа - Номерной и древнее
-	if train:GetClass() and (train:GetClass():sub(13,18) != "81-718" and train:GetClass():sub(13,18) != "81-720" and train:GetClass():sub(13,18) != "81-722") then
-		if train.KVWrenchMode != 1  or train.KVWrenchMode == 1 then
+	if train:GetClass() and (train:GetClass():sub(13,18) ~= "81-718" and train:GetClass():sub(13,18) ~= "81-720" and train:GetClass():sub(13,18) ~= "81-722") then
+		if train.KVWrenchMode ~= 1  or train.KVWrenchMode == 1 then
 			train:PlayOnce("revers_in","cabin", 0.7)
 			train.KVWrenchMode = 1
 			train.KV:TriggerInput("Enabled", 1)
@@ -74,167 +75,167 @@ local function TrainStart(train)
 		if train.KVWrenchMode == 1  then
 			train.KV:TriggerInput("ReverserSet", 1)
 		end 
-		if train.Pneumatic.DriverValvePosition != 2 then
+		if train.Pneumatic.DriverValvePosition ~= 2 then
 			train.Pneumatic:TriggerInput("BrakeSet", 2)
 		end
-		Set("ALS", 0, ply, train)
-		Set("ARS", 0, ply, train)	
-		Set("EPK", 0, ply, train)
-		Set("EPV", 0, ply, train)
-		timer.Create("TogglesOnTimer", 0.5, 1, function()	
-			Set("A53", 1, ply, train)
-			Set("A49", 1, ply, train)
-			Set("A63", 1, ply, train)
-			Set("VB", 1, ply, train)
-			--Set("BPSNon", 1, ply, train)
-			Set("VMK", 1, ply, train)
-			Set("V1", 1, ply, train)
-			Set("KU1", 1, ply, train)	-- МК для Еж
-			Set("VUS", 1, ply, train)	
+		Set("ALS",0, train)
+		Set("ARS", 0, train)	
+		Set("EPK", 0, train)
+		Set("EPV", 0, train)
+		timer.Simple(0.5, function()	
+			Set("A53", 1, train)
+			Set("A49", 1, train)
+			Set("A63", 1, train)
+			Set("VB", 1, train)
+			--Set("BPSNon", 1, train)
+			Set("VMK", 1, train)
+			Set("V1", 1, train)
+			Set("KU1", 1, train)	-- МК для Еж
+			Set("VUS", 1, train)	
 		end)
-		timer.Create("TogglesOnTimer2", 1, 1, function()	
-			Set("VUD1", 1, ply, train)
-			Set("V2", 1, ply, train)
-			Set("L_1", 1, ply, train)
-			Set("L_3", 1, ply, train)
-			Set("L_4", 1, ply, train)
-			Set("R_UNch", 1, ply, train)
-			Set("R_ZS", 1, ply, train)
-			Set("R_G", 1, ply, train)
-			Set("R_Radio", 1, ply, train)
-			Set("PLights", 1, ply, train) -- для Еж3
-			Set("GLights", 1, ply, train) -- для Еж3
-			Set("VU14", 1, ply, train)	-- для Еж3
-			Set("KU16", 1, ply, train)	-- Фары для Еж
-			Set("KU2", 1, ply, train)	-- двери для Еж
+		timer.Simple(1, function()	
+			Set("VUD1", 1, train)
+			Set("V2", 1, train)
+			Set("L_1", 1, train)
+			Set("L_3", 1, train)
+			Set("L_4", 1, train)
+			Set("R_UNch", 1, train)
+			Set("R_ZS", 1, train)
+			Set("R_G", 1, train)
+			Set("R_Radio", 1, train)
+			Set("PLights", 1, train) -- для Еж3
+			Set("GLights", 1, train) -- для Еж3
+			Set("VU14", 1, train)	-- для Еж3
+			Set("KU16", 1, train)	-- Фары для Еж
+			Set("KU2", 1, train)	-- двери для Еж
 		end)
 		if train.ALS_ARS then 	-- условие на наличие АРС
-			timer.Create("ARSTimer", 1.5, 1, function() -- таймер на AРC
-				Set("ALS", 1, ply, train)
-				Set("ARS", 1, ply, train)
-				Set("EPK", 1, ply, train)
-				Set("EPV", 1, ply, train)			
+			timer.Simple(1.5, function() -- таймер на AРC
+				Set("ALS", 1, train)
+				Set("ARS", 1, train)
+				Set("EPK", 1, train)
+				Set("EPV", 1, train)			
 			end)
-			timer.Create("DriverValveTimer013", 2.5, 1, function() -- таймер на разобщительный кран (013)
-				Set("DriverValveDisconnect", 1, ply, train)
+			timer.Simple(2.5, function() -- таймер на разобщительный кран (013)
+				Set("DriverValveDisconnect", 1, train)
 			end)
-			timer.Create("DriverValveTimer334", 2, 1, function() -- таймер на краны двойной тяги (334)
-				Set("DriverValveBLDisconnect", 1, ply, train)
-				Set("DriverValveTLDisconnect", 1, ply, train)
+			timer.Simple(2, function() -- таймер на краны двойной тяги (334)
+				Set("DriverValveBLDisconnect", 1, train)
+				Set("DriverValveTLDisconnect", 1, train)
 			end)
 			timer.Create("KBPressed", 4, 2, function() -- таймер на отмену КВТ (Ема)
-				Set("KB", 1, ply, train)
+				Set("KB", 1, train)
 			end)
 			timer.Create("KBReleased", 5, 2, function() -- таймер на отмену КВТ (Ема)
-				Set("KB", 0, ply, train)
+				Set("KB", 0, train)
 			end)
 			timer.Create("KVTPressed", 4, 2, function() -- таймер на отмену КВТ
-				Set("KVT", 1, ply, train)		
+				Set("KVT", 1, train)		
 			end)	
 			timer.Create("KVTReleased", 5, 2, function() -- таймер на отмену КВТ
-				Set("KVT", 0, ply, train)		
+				Set("KVT", 0, train)		
 			end)
 		else
-			timer.Create("DriverValveTimer013", 2, 1, function() -- таймер на разобщительный кран (013)
-				Set("DriverValveDisconnect", 1, ply, train)
+			timer.Simple(2, function() -- таймер на разобщительный кран (013)
+				Set("DriverValveDisconnect", 1, train)
 			end)
-			timer.Create("DriverValveTimer334", 2, 1, function() -- таймер на краны двойной тяги (334)
-				Set("DriverValveBLDisconnect", 1, ply, train)
-				Set("DriverValveTLDisconnect", 1, ply, train)
+			timer.Simple(2, function() -- таймер на краны двойной тяги (334)
+				Set("DriverValveBLDisconnect", 1, train)
+				Set("DriverValveTLDisconnect", 1, train)
 			end)	
 		end
 	-- ТИСУ
 	elseif train:GetClass():sub(13,18) == "81-718" then
-		if train.WrenchMode != 1 or train.WrenchMode == 1 then
+		if train.WrenchMode ~= 1 or train.WrenchMode == 1 then
 			train:PlayOnce("kr_in", "cabin",1)
 			train.WrenchMode = 1
 		end
 		if train.WrenchMode == 1 then
 			train.KR:TriggerInput("Set", train.KR.Position + 1)
 		end
-		if train.Pneumatic.DriverValvePosition != 2 then
+		if train.Pneumatic.DriverValvePosition ~= 2 then
 			train.Pneumatic:TriggerInput("BrakeSet", 2)
 		end
-		Set("SA15", 0, ply, train)
-		Set("SA13", 0, ply, train)
-		Set("EPK", 0, ply, train)	
-		Set("SA16", 1, ply, train)
-		Set("SAP39", 1, ply, train)		
-		timer.Create("TogglesOnTimer718", 0.5, 1, function() -- таймер на тумблера
-			Set("SA2/1", 1, ply, train)
-			Set("SA4/1", 1, ply, train)				
-			Set("SA5", 1, ply, train)
+		Set("SA15", 0, train)
+		Set("SA13", 0, train)
+		Set("EPK", 0, train)	
+		Set("SA16", 1, train)
+		Set("SAP39", 1, train)		
+		timer.Simple(0.5, function() -- таймер на тумблера
+			Set("SA2/1", 1, train)
+			Set("SA4/1", 1, train)				
+			Set("SA5", 1, train)
 		end)
-		timer.Create("ARSTimer718", 1, 1, function() -- таймер на AРC
-			Set("SA15", 1, ply, train)
-			Set("SA13", 1, ply, train)
-			Set("EPK", 1, ply, train)
+		timer.Simple(1, function() -- таймер на AРC
+			Set("SA15", 1, train)
+			Set("SA13", 1, train)
+			Set("EPK", 1, train)
 		end)
-		timer.Create("DriverValveTimer013", 1.5, 1, function() -- таймер на разобщительный кран (013)
-			Set("DriverValveDisconnect", 1, ply, train)
+		timer.Simple(1.5, function() -- таймер на разобщительный кран (013)
+			Set("DriverValveDisconnect", 1, train)
 		end)
-		timer.Create("SB9Pressed", 2, 1, function() -- таймер на отмену КВТ
-			Set("SB9", 1, ply, train)		
+		timer.Simple(2, function() -- таймер на отмену КВТ
+			Set("SB9", 1, train)		
 		end)	
-		timer.Create("SB9Released", 3, 1, function() -- таймер на отмену КВТ
-			Set("SB9", 0, ply, train)		
+		timer.Simple(3, function() -- таймер на отмену КВТ
+			Set("SB9", 0, train)		
 		end)
 	-- Яуза	
 	elseif train:GetClass():sub(13,18) == "81-720" then 	-- не проверено!
-		if train.WrenchMode != 1 or train.WrenchMode == 1 then
+		if train.WrenchMode ~= 1 or train.WrenchMode == 1 then
 			train:PlayOnce("kro_in", "cabin",1)
 			train.WrenchMode = 1
-			timer.Create("ReverserSet", 0.25, 1, function() -- таймер на переключение реверса
+			timer.Simple(0.25, function() -- таймер на переключение реверса
 				train.RV:TriggerInput("KROSet", train.RV.KROPosition + 1)
 			end)
 		end	
-		timer.Create("RearToggles", 0.5, 1, function() -- таймер на тумблера сзади
-			Set("Headlights1", 1, ply, train) -- Фары для Яузы
-			Set("Headlights2", 1, ply, train) -- Фары для Яузы
-			Set("CabLightStrength", 1, ply, train) -- Фары для Яузы				
+		timer.Simple(0.5, function() -- таймер на тумблера сзади
+			Set("Headlights1", 1, train) -- Фары для Яузы
+			Set("Headlights2", 1, train) -- Фары для Яузы
+			Set("CabLightStrength", 1, train) -- Фары для Яузы				
 		end)
-		timer.Create("VityazActivate", 1, 1, function() -- таймер на переход в штатный режим
-			if train["BUKP"].State != 5 then
+		timer.Simple(1, function() -- таймер на переход в штатный режим
+			if train["BUKP"].State ~= 5 then
 				train["BUKP"].State = 5
 			end
 		end)
-		timer.Create("FrontToggles", 1.5, 1, function() -- таймер на кнопки спереди
-			Set("DoorClose", 1, ply, train) 
-			Set("DoorSelectL", 1, ply, train) 
-			Set("DoorSelectR", 0, ply, train) 
+		timer.Simple(1.5, function() -- таймер на кнопки спереди
+			Set("DoorClose", 1, train) 
+			Set("DoorSelectL", 1, train) 
+			Set("DoorSelectR", 0, train) 
 		end)
 		timer.Create("AttentionPressed1", 3, 2, function() -- таймер на отмену (Яуза)
-			Set("AttentionMessage", 1, ply, train)
-			Set("AttentionBrake", 1, ply, train)
+			Set("AttentionMessage", 1, train)
+			Set("AttentionBrake", 1, train)
 		end)
 		timer.Create("AttentionReleased1", 3.25, 2, function() -- таймер на отмену (Яуза)
-			Set("AttentionMessage", 0, ply, train)
-			Set("AttentionBrake", 0, ply, train)
+			Set("AttentionMessage", 0, train)
+			Set("AttentionBrake", 0, train)
 		end)
 	else
 	-- Юбилейный (без комментариев)
 		if train:GetClass():sub(13,18) == "81-722" then 	
-			Set("ALS", 0, ply, train)
-			Set("ARS", 0, ply, train)
-			if train.MFDU.State != 1 then train.MFDU.State = 1 end
-			timer.Create("CabActive", 0.5, 1, function() 
+			Set("ALS", 0, train)
+			Set("ARS", 0, train)
+			if train.MFDU.State ~= 1 then train.MFDU.State = 1 end
+			timer.Simple(0.5, function() 
 				train.BUKP.Active = 1
 				train:SetPackedBool("MFDUActive", true)	
-				Set("PassVent", 2, ply, train)					
+				Set("PassVent", 2, train)					
 			end)
-			timer.Create("ARSTimer722", 1, 1, function() 
-				Set("ALS", 1, ply, train)
-				Set("ARS", 1, ply, train)			
+			timer.Simple(1, function() 
+				Set("ALS", 1, train)
+				Set("ARS", 1, train)			
 			end)
-			timer.Create("VigilancePressed", 1.5, 1, function() 
-				Set("Vigilance", 1, ply, train)		
+			timer.Simple(1.5, function() 
+				Set("Vigilance", 1, train)		
 			end)	
-			timer.Create("VigilanceReleased", 2, 1, function() 
-				Set("Vigilance", 0, ply, train)		
-				Set("Headlights", 2, ply, train)
-				Set("DoorClose", 2, ply, train)
+			timer.Simple(2, function() 
+				Set("Vigilance", 0, train)		
+				Set("Headlights", 2, train)
+				Set("DoorClose", 2, train)
 			end)
-			timer.Create("KROForward", 2.5, 1, function() 
+			timer.Simple(2.5, function() 
 				train.KRO:TriggerInput("Set", 2) 
 			end)
 		end
@@ -243,43 +244,43 @@ end
 
 local function TrainStop(train)
 	-- Проход по составам - самая большая группа - Номерной и древнее
-	if train:GetClass() and (train:GetClass():sub(13,18) != "81-718" and train:GetClass():sub(13,18) != "81-720" and train:GetClass():sub(13,18) != "81-722") then
-		if train.Pneumatic.DriverValvePosition != 5 then
+	if train:GetClass() and (train:GetClass():sub(13,18) ~= "81-718" and train:GetClass():sub(13,18) ~= "81-720" and train:GetClass():sub(13,18) ~= "81-722") then
+		if train.Pneumatic.DriverValvePosition ~= 5 then
 			train.Pneumatic:TriggerInput("BrakeSet", 5)
 		end
-		timer.Create("TogglesOffTimer", 0.5, 1, function ()
-			Set("R_UNch", 0, ply, train)
-			Set("R_ZS", 0, ply, train)
-			Set("R_G", 0, ply, train)
-			Set("V1", 0, ply, train)
+		timer.Simple(0.5, function ()
+			Set("R_UNch", 0, train)
+			Set("R_ZS", 0, train)
+			Set("R_G", 0, train)
+			Set("V1", 0, train)
 		end)
-		timer.Create("TogglesOffTimer", 1, 1, function ()
-			Set("KU1", 0, ply, train)	-- МК для Еж
-			Set("KU2", 0, ply, train)
-			Set("PLights", 0, ply, train) -- свет в кабине для Еж3
-			Set("VMK", 0, ply, train)
+		timer.Simple(1, function ()
+			Set("KU1", 0, train)	-- МК для Еж
+			Set("KU2", 0, train)
+			Set("PLights", 0, train) -- свет в кабине для Еж3
+			Set("VMK", 0, train)
 		end)		
-		timer.Create("ValvesOffTimer", 1.5, 1, function ()
-			Set("DriverValveDisconnect", 0, ply, train)
-			Set("DriverValveBLDisconnect", 0, ply, train)
-			Set("DriverValveTLDisconnect", 0, ply, train)
+		timer.Simple(1.5, function ()
+			Set("DriverValveDisconnect", 0, train)
+			Set("DriverValveBLDisconnect", 0, train)
+			Set("DriverValveTLDisconnect", 0, train)
 		end)		
-		timer.Create("FullServiceBreakTimer", 2, 1, function() -- таймер на полное служебное торможение	
-			Set("ALS", 0, ply, train)
-			Set("ARS", 0, ply, train)	
-			timer.Create("MiscTimer", 1, 1, function()			
-				Set("VUD1", 0, ply, train)	
-				Set("V2", 0, ply, train)			
+		timer.Simple(2, function() -- таймер на полное служебное торможение	
+			Set("ALS", 0, train)
+			Set("ARS", 0, train)	
+			timer.Simple(1, function()			
+				Set("VUD1", 0, train)	
+				Set("V2", 0, train)			
 				train.Pneumatic:TriggerInput("BrakeSet", 2)	
 				end)
 		end)
 		if train.KVWrenchMode == 1  then
 			train.KV:TriggerInput("ControllerSet", 0)				
 		end 
-		if train.KVWrenchMode != 0  then	
-			timer.Create("KVOff", 2.5, 1, function() -- таймер на откл реверса
+		if train.KVWrenchMode ~= 0  then
+			timer.Simple(2.5, function() -- таймер на откл реверса
 				train.KV:TriggerInput("ReverserSet", 0)
-				timer.Create("KVOut", 0.5, 1, function()
+				timer.Simple(0.5, function()
 					train.KV:TriggerInput("Enabled", 0)
 					train.KVWrenchMode = 0
 				end)
@@ -287,23 +288,23 @@ local function TrainStop(train)
 		end	
 	-- ТИСУ
 	elseif train:GetClass() and train:GetClass():sub(13,18) == "81-718" then
-		if train.Pneumatic.DriverValvePosition != 6 then
+		if train.Pneumatic.DriverValvePosition ~= 6 then
 			train.Pneumatic:TriggerInput("BrakeSet", 5)
 		end
-		timer.Create("FullServiceBreakTimer718", 3, 1, function() -- таймер на полное служебное торможение ТИСУ
-			Set("DriverValveDisconnect", 0, ply, train)
+		timer.Simple(3, function() -- таймер на полное служебное торможение ТИСУ
+			Set("DriverValveDisconnect", 0, train)
 		end)
-		timer.Create("TogglesOffTimer718", 4, 1, function()
-			Set("SAP39", 0, ply, train)
-			Set("SA5", 0, ply, train)
-			Set("SA16", 0, ply, train)
+		timer.Simple(4, function()
+			Set("SAP39", 0, train)
+			Set("SA5", 0, train)
+			Set("SA16", 0, train)
 		end)						
-		if train.WrenchMode != 0 then
-			timer.Create("KROff", 5, 1, function() -- таймер на откл реверса. ТИСУ
+		if train.WrenchMode ~= 0 then
+			timer.Simple(5, function() -- таймер на откл реверса. ТИСУ
 				train.KR:TriggerInput("Set", train.KR.Position - 1)
-				Set("SA15", 0, ply, train)
-				Set("SA13", 0, ply, train)
-				timer.Create("KROff1", 1, 1, function() -- таймер на откл реверса. ТИСУ
+				Set("SA15", 0, train)
+				Set("SA13", 0, train)
+				timer.Simple(1, function() -- таймер на откл реверса. ТИСУ
 					train.WrenchMode = 0
 					train.Pneumatic:TriggerInput("BrakeSet", 2)
 				end)
@@ -311,36 +312,36 @@ local function TrainStop(train)
 		end		
 	-- Яуза
 	elseif train:GetClass() and train:GetClass():sub(13,18) == "81-720" then
-		if train.WrenchMode != 0 then
+		if train.WrenchMode ~= 0 then
 			train.RV:TriggerInput("KROSet", train.RV.KROPosition - 1)
-			timer.Create("RVOff", 0.5, 1, function() -- таймер на откл реверса. Яуза
-				Set("DoorClose", 0, ply, train) 
-				Set("DoorSelectL", 0, ply, train) 
-				Set("DoorSelectR", 0, ply, train) 
+			timer.Simple(0.5, function() -- таймер на откл реверса. Яуза
+				Set("DoorClose", 0, train) 
+				Set("DoorSelectL", 0, train) 
+				Set("DoorSelectR", 0, train) 
 			end)			
-			timer.Create("RVOut", 1, 1, function() -- таймер на откл реверса. Яуза
+			timer.Simple(1, function() -- таймер на откл реверса. Яуза
 				train.WrenchMode = 0
 			end)
-			timer.Create("TogglesOffTimer720", 1.5, 1, function() -- таймер на откл кнопок
-				Set("DoorClose", 0, ply, train) 
-				Set("DoorSelectL", 0, ply, train) 
-				Set("DoorSelectR", 0, ply, train) 
+			timer.Simple(1.5, function() -- таймер на откл кнопок
+				Set("DoorClose", 0, train) 
+				Set("DoorSelectL", 0, train) 
+				Set("DoorSelectR", 0, train) 
 			end)
 		end	
 	else 
 	-- Юбилейный (без комментариев)
 		if train:GetClass():sub(13,18) == "81-722" then 	
-			timer.Create("KRONeutral", 0.5, 1, function() 
+			timer.Simple(0.5, function() 
 				train.KRO:TriggerInput("Set", 1) 
 			end)
-			timer.Create("ARSOffTimer722", 1, 1, function() 
-				Set("ALS", 0, ply, train)
-				Set("ARS", 0, ply, train)			
+			timer.Simple(1, function() 
+				Set("ALS", 0, train)
+				Set("ARS", 0, train)			
 			end)
-			timer.Create("CabDeactive", 1.5, 1, function() 
+			timer.Simple(1.5, function() 
 				train.BUKP.Active = 0
 				train:SetPackedBool("MFDUActive", false)	
-				Set("DoorClose", 1, ply, train)				
+				Set("DoorClose", 1, train)				
 			end)
 		end
 	end
@@ -358,33 +359,26 @@ local function ChangeCab (ply,train1,train2)
 	if ply:GetNW2String("MATrainClass","") == "gmod_subway_81-720" then tim = 1  tim2 = tim + 1 tim3 = tim2 + 1 end
 	if ply:GetNW2String("MATrainClass","") == "gmod_subway_81-722" then tim = 1  tim2 = tim + 1 tim3 = tim2 + 1 end
 	TrainStop(train1)	
-	timer.Create("Cab1OutDriverSeat", tim, 1, function()
+	timer.Simple(tim, function()
 		ply:ExitVehicle()
 		ply:SetMoveType(8)
 	end)
-	timer.Create("Cab2IntoDriverSeat", tim2, 1, function()
+	timer.Simple(tim2, function()
 		train2.DriverSeat:UseClientSideAnimation() -- пусть ебучую анимацию отрабатывает клиент	
 		train2.DriverSeat:Use(ply,ply,3,1)
 	end)
-	timer.Create("Cab2TrainStart", tim3, 1, function()
+	timer.Simple(tim3, function()
 		TrainStart(train2)
 	end)	
 end
 
 -- Вывод станций в чат
-local stswaittime = 10
-local stslasttime = -stswaittime
 function ulx.sts( calling_ply )
-    if stslasttime + stswaittime > CurTime() then
-        ULib.tsayError( calling_ply, lang("PleaseWait").." "..math.Round(stslasttime + stswaittime - CurTime()).." "..lang("Seconds").." "..lang("CommandDelay"), true )
-        return
-    end
-    stslasttime = CurTime()
 	local name_num = 1
-    local lng = GetConVarString("metrostroi_advanced_lang")
+    local lng = GetConVar("metrostroi_advanced_lang"):GetString()
 	if lng ~= "ru" then name_num = 2 end
 	--Проверка на наличие таблицы
-	if not Metrostroi.StationConfigurations then ULib.tsayError(calling_ply, "This map is not configured", true) return end	
+	if not Metrostroi.StationConfigurations then ULib.tsayError(calling_ply, lang("MapNotCongigured"), true) return end	
 	local stationstable = {}
     for k,v in pairs(Metrostroi.StationConfigurations) do
 		if v.names[name_num] then
@@ -396,8 +390,7 @@ function ulx.sts( calling_ply )
 	table.SortByMember(stationstable, "id",true)
 	timer.Simple(0.1, function() 
 		for k,v in pairs(stationstable) do
-			--ULib.tsayColor(nil,false,Color(219, 116, 32),v[1].." - "..v[2])
-			calling_ply:ChatPrint(v.id.." - "..v.name)	-- избавился от принта в общий чат
+			calling_ply:ChatPrint(v.id.." - "..v.name)
 		end
 	end)
 end
@@ -497,9 +490,7 @@ function ulx.wagons( calling_ply )
         ULib.tsayError( calling_ply, lang("PleaseWait").." "..math.Round(wagonslasttime + wagonswaittime - CurTime()).." "..lang("Seconds")..lang("CommandDelay"), true )
         return
     end
-
     wagonslasttime = CurTime()
-
     ulx.fancyLog(lang("ServerWagons").." #s", Metrostroi.TrainCount())
 	local Wags = {}
 	local Trains = {}
@@ -507,32 +498,33 @@ function ulx.wagons( calling_ply )
 	local Locs = {}
 	local wag_num = 0
 	local wag_str = lang("wagon1")
-
-	for k,v in pairs(MetrostroiAdvanced.TrainList) do
-		if string.find(k,"custom") then continue end
-		for _,train in pairs(ents.FindByClass(k)) do
-			local ply = train.Owner
-			if not IsValid(ply) then continue end
-			if (not Trains[ply:Nick()]) then
-				Trains[ply:Nick()] = MetrostroiAdvanced.TrainList[k]
-				Wags[ply:Nick()] = #train.WagonList
-				local rnum = 0
-				if k == "gmod_subway_81-722" or k == "gmod_subway_81-722_3" or k == "gmod_subway_81-7175p" then
-					rnum = tonumber(train.RouteNumberSys.RouteNumber)
-				elseif k == "gmod_subway_81-717_6" then
-					rnum = train.ASNP.RouteNumber
-				else
-					if train.RouteNumber then
-						rnum = tonumber(train.RouteNumber.RouteNumber)
-					end
-				end
-				if table.HasValue({"gmod_subway_81-702","gmod_subway_81-703","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_81-717_mvm","gmod_subway_81-718","gmod_subway_81-720","gmod_subway_81-720_1"},k) then
-					rnum = rnum / 10
-				end
-				Routes[ply:Nick()] = tostring(rnum)
-				Locs[ply:Nick()] = MetrostroiAdvanced.GetLocation(train)
+	
+	for train in pairs(Metrostroi.SpawnedTrains) do
+		if not IsValid(train) then continue end
+		if not MetrostroiAdvanced.TrainList[train:GetClass()] then continue end
+		local cl = train:GetClass()
+		local ply = train.Owner
+		if not IsValid(ply) then continue end
+		if Trains[ply:Nick()] then continue end
+		Trains[ply:Nick()] = MetrostroiAdvanced.TrainList[cl]
+		Wags[ply:Nick()] = #train.WagonList
+		local rnum = 0
+		if cl == "gmod_subway_81-540_2" then
+			rnum = tonumber(train.RouteNumbera.RouteNumbera)
+		elseif cl == "gmod_subway_81-722" or cl == "gmod_subway_81-722_3" or cl == "gmod_subway_81-722_new" or cl == "gmod_subway_81-7175p" then
+			rnum = tonumber(train.RouteNumberSys.RouteNumber)
+		elseif cl == "gmod_subway_81-717_6" then
+			rnum = train.ASNP.RouteNumber
+		else
+			if train.RouteNumber then
+				rnum = tonumber(train.RouteNumber.RouteNumber)
 			end
 		end
+		if table.HasValue({"gmod_subway_81-702","gmod_subway_81-703","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_ezh3ru1","gmod_subway_81-717_mvm","gmod_subway_81-718","gmod_subway_81-720","gmod_subway_81-720_1","gmod_subway_81-720a","gmod_subway_81-717_freight"},cl) then
+			rnum = rnum / 10
+		end
+		Routes[ply:Nick()] = tostring(rnum)
+		Locs[ply:Nick()] = MetrostroiAdvanced.GetLocation(train)
 	end
 	
 	for k,v in pairs(Trains) do
@@ -541,7 +533,7 @@ function ulx.wagons( calling_ply )
 		if wag_num >= 5 then wag_str = lang("wagon3") end
 		ulx.fancyLog("#s: #s #s #s. "..lang("Route")..": #s\n"..lang("Location")..": #s",k,wag_num,wag_str,Trains[k],Routes[k],Locs[k])
 	end
-	local wag_awail = (GetConVarNumber("metrostroi_maxtrains")*GetConVarNumber("metrostroi_advanced_maxwagons"))-GetGlobalInt("metrostroi_train_count")
+	local wag_awail = (GetConVar("metrostroi_maxtrains"):GetInt()*GetConVar("metrostroi_advanced_maxwagons"):GetInt())-GetGlobalInt("metrostroi_train_count")
     ulx.fancyLog(lang("WagonsAwail").." #s",wag_awail)
 end
 local wagons = ulx.command(CATEGORY_NAME, "ulx trains", ulx.wagons, "!trains" )
@@ -568,51 +560,50 @@ kbinds:help("Show key bindings for train.")
 -- телепорт в состав игрока
 function ulx.traintp( calling_ply, target_ply )
 	local class = target_ply:GetNW2String("MATrainClass","")
-	if class !="" then
-		local teleported = false
-		local ents = ents.FindByClass(class)
-		for k,v in pairs(ents) do
-			if v.Owner:Nick() == target_ply:Nick() then
-				if class:sub(13,18) == "81-760" or class:sub(13,19) == "81-760a" then
-					if v.RV.KROPosition != 0 then
+	if class == "" then return end
+	local teleported = false
+	local ents = ents.FindByClass(class)
+	for k,v in pairs(ents) do
+		if v.Owner:Nick() == target_ply:Nick() then
+			if class:sub(13,18) == "81-760" or class:sub(13,19) == "81-760a" then
+				if v.RV.KROPosition ~= 0 then
+					GotoTrain(calling_ply,target_ply,v,true)
+					teleported = true
+				end
+			elseif class:sub(13,18) == "81-722" then
+				if v.Electric.CabActive ~= 0 then
+					GotoTrain(calling_ply,target_ply,v,true) 
+					teleported = true
+				end
+			elseif class:sub(13,18) == "81-720" then
+				if v.WrenchMode ~= 0 then
+					if v.RV.KROPosition ~= 0 then
 						GotoTrain(calling_ply,target_ply,v,true)
 						teleported = true
 					end
-				elseif class:sub(13,18) == "81-722" then
-					if v.Electric.CabActive != 0 then
-						GotoTrain(calling_ply,target_ply,v,true) 
+				end
+			elseif class:sub(13,18) == "81-718" then
+				if v.WrenchMode ~= 0 then
+					if v.KR.Position ~= 0 then
+						GotoTrain(calling_ply,target_ply,v,true)
 						teleported = true
 					end
-				elseif class:sub(13,18) == "81-720" then
-					if v.WrenchMode != 0 then
-						if v.RV.KROPosition != 0 then
-							GotoTrain(calling_ply,target_ply,v,true)
-							teleported = true
-						end
-					end
-				elseif class:sub(13,18) == "81-718" then
-					if v.WrenchMode != 0 then
-						if v.KR.Position != 0 then
-							GotoTrain(calling_ply,target_ply,v,true)
-							teleported = true
-						end
-					end
-				else
-					if v.KVWrenchMode != 0 then
-						if v.KV.ReverserSet != 0 then
-							GotoTrain(calling_ply,target_ply,v,true)
-							teleported = true
-						end
+				end
+			else
+				if v.KVWrenchMode ~= 0 then
+					if v.KV.ReverserSet ~= 0 then
+						GotoTrain(calling_ply,target_ply,v,true)
+						teleported = true
 					end
 				end
 			end
 		end
-		if not teleported then
-			for k,v in pairs(ents) do
-				if v.Owner:Nick() == target_ply:Nick() then
-					GotoTrain(calling_ply,target_ply,v,false)
-					break
-				end
+	end
+	if not teleported then
+		for k,v in pairs(ents) do
+			if v.Owner:Nick() == target_ply:Nick() then
+				GotoTrain(calling_ply,target_ply,v,false)
+				break
 			end
 		end
 	end
@@ -625,7 +616,7 @@ ttp:help( "Teleport to a player's train." )
 -- телепорт к светофору по названию
 function ulx.signaltp(calling_ply,signal)
 	for _,sig in pairs(ents.FindByClass("gmod_track_signal")) do
-		if sig.Name == signal or sig.Name == string.upper(signal) or string.upper(sig.Name) == signal then
+		if sig.Name and sig.Name:upper() == signal:upper() then
 			if calling_ply:InVehicle() then calling_ply:ExitVehicle() end
 			calling_ply:SetPos(sig:GetPos())
 			calling_ply:SetEyeAngles(sig:GetAngles()+Angle(0,-90,0))	
@@ -660,28 +651,27 @@ entitytp:help("Teleport to any entity by its ID (eg. signalling debug")
 
 -- установить собственный бортовой номер вагона (с проверкой на дубликаты!)
 function ulx.setwagnumber(ply, WagNumber)
-	if IsValid(ply) then
-		local train = ply:GetEyeTrace().Entity
-		if ((not IsValid(train)) or (not train.WagonNumber)) then
-			ULib.tsayError(ply, lang("SetWagNum1"))
-			return
+	if not IsValid(ply) then return end
+	local train = ply:GetEyeTrace().Entity
+	if ((not IsValid(train)) or (not train.WagonNumber)) then
+		ULib.tsayError(ply, lang("SetWagNum1"))
+		return
+	end
+	if (train.Owner ~= ply) then
+		ULib.tsayError(ply, lang("SetWagNum2"))
+		return
+	end
+	local double = false
+	for k, v in pairs(Metrostroi.SpawnedTrains) do
+		if k.WagonNumber == WagNumber then
+			double = true
 		end
-		if (train.Owner ~= ply) then
-			ULib.tsayError(ply, lang("SetWagNum2"))
-			return
-		end
-		local double = false
-		for k, v in pairs(Metrostroi.SpawnedTrains) do
-			if k.WagonNumber == WagNumber then
-				double = true
-			end
-		end 
-		if not double then
-			train.WagonNumber = WagNumber
-			train:SetNW2Int("WagonNumber",train.WagonNumber)
-		else
-			ULib.tsayError(ply, lang("SetWagNum3"))
-		end
+	end 
+	if not double then
+		train.WagonNumber = WagNumber
+		train:SetNW2Int("WagonNumber",train.WagonNumber)
+	else
+		ULib.tsayError(ply, lang("SetWagNum3"))
 	end
 end
 local setwagnumber = ulx.command( CATEGORY_NAME, "ulx setwagnumber", ulx.setwagnumber, "!swn")
@@ -691,9 +681,8 @@ setwagnumber:help("Set wagon number (aim at any wagon)")
 
 -- восстановление исходного положения удочек
 function ulx.udochka( calling_ply )
-	local cur_map = game.GetMap()
 	local boxes = {}
-	if (cur_map:find("gm_mus_loopline")) then
+	if (game.GetMap():find("gm_mus_loopline")) then
 		boxes = ents.FindByClass("func_tracktrain")
 	else
 		boxes = ents.FindByClass("func_physbox")
@@ -702,8 +691,8 @@ function ulx.udochka( calling_ply )
 		v:SetAngles(MetrostroiAdvanced.Box_Angles[k])
 		v:SetPos(MetrostroiAdvanced.Box_Positions[k])
 	end
-	local udcs = ents.FindByClass("gmod_track_udochka")
-	for k,v in pairs(udcs) do
+	boxes = nil
+	for k,v in pairs(ents.FindByClass("gmod_track_udochka")) do
 		v:SetPos(MetrostroiAdvanced.Udc_Positions[k])
 	end
 	ulx.fancyLog("#s "..lang("UDCMessage"),calling_ply:Nick())
@@ -714,31 +703,27 @@ udc:help( "Reset the positions of power connectors." )
 
 -- посадить игрока в кресло машиниста
 function ulx.enter( calling_ply, target_ply )
-	if IsValid(target_ply) then
-		local train = calling_ply:GetEyeTrace().Entity
-		if not train.DriverSeat then
-			ULib.tsayError( calling_ply, lang("WagonIncorrect") )
-			return
-		end
-		if IsValid(target_ply:GetVehicle()) then
-			target_ply:ExitVehicle()
-		end
-		local pos = train:GetPos()
-		target_ply:SetMoveType(8)
-		target_ply:Freeze(true)
-		target_ply:SetPos(pos-Vector(0,0,40))
-		timer.Create("TimerPlyEnterDriverSeat", 0.2, 1, function()
-			train.DriverSeat:UseClientSideAnimation()
-			train.DriverSeat:Use(target_ply,target_ply,3,1)
-			target_ply:Freeze(false)
-			if train.DriverSeat == target_ply:GetVehicle() then
-				ulx.fancyLogAdmin( calling_ply, "#A "..lang("EnterPlayer").." #T "..lang("IntoTrain"), target_ply )
-			else
-				ULib.tsayError( calling_ply, lang("EnterFail") )
-			end
-		end)
-
+	if not IsValid(target_ply) then return end
+	local train = calling_ply:GetEyeTrace().Entity
+	if not IsValid(train) then ULib.tsayError( calling_ply, lang("WagonIncorrect") ) return end
+	if not train.DriverSeat then ULib.tsayError( calling_ply, lang("WagonIncorrect") ) return end
+	if IsValid(target_ply:GetVehicle()) then
+		target_ply:ExitVehicle()
 	end
+	local pos = train:GetPos()
+	target_ply:SetMoveType(8)
+	target_ply:Freeze(true)
+	target_ply:SetPos(pos-Vector(0,0,40))
+	timer.Simple(0.2, function()
+		train.DriverSeat:UseClientSideAnimation()
+		train.DriverSeat:Use(target_ply,target_ply,3,1)
+		target_ply:Freeze(false)
+		if train.DriverSeat == target_ply:GetVehicle() then
+			ulx.fancyLogAdmin( calling_ply, "#A "..lang("EnterPlayer").." #T "..lang("IntoTrain"), target_ply )
+		else
+			ULib.tsayError( calling_ply, lang("EnterFail") )
+		end
+	end)
 end
 local enter = ulx.command( CATEGORY_NAME, "ulx enter", ulx.enter, "!enter")
 enter:addParam{ type = ULib.cmds.PlayerArg }
@@ -747,15 +732,14 @@ enter:help( "Place a player into the driver's seat (aim at any wagon)" )
 
 -- высадить игрока с любого места в составе
 function ulx.expel( calling_ply, target_ply )
-	if IsValid(target_ply) then
-		if not IsValid(target_ply:GetVehicle()) then
-			ULib.tsayError( calling_ply, target_ply:Nick() .. " "..lang("NotInVehicle") )
-			return
-		else
-			target_ply:ExitVehicle()
-		end
-		ulx.fancyLogAdmin( calling_ply, "#A "..lang("ExpelPlayer").." #T "..lang("OutTrain"), target_ply )
+	if not IsValid(target_ply) then return end
+	if not IsValid(target_ply:GetVehicle()) then
+		ULib.tsayError( calling_ply, target_ply:Nick() .. " "..lang("NotInVehicle") )
+		return
+	else
+		target_ply:ExitVehicle()
 	end
+	ulx.fancyLogAdmin( calling_ply, "#A "..lang("ExpelPlayer").." #T "..lang("OutTrain"), target_ply )
 end
 local expl = ulx.command( CATEGORY_NAME, "ulx expel", ulx.expel, "!expel")
 expl:addParam{ type = ULib.cmds.PlayerArg }
@@ -777,20 +761,19 @@ function ulx.ch( calling_ply )
 			calling_ply:SetMoveType(8)
 			if seattype == "driver" then
 				wag.DriverSeat:UseClientSideAnimation()
-				timer.Create("TeleportIntoCab2DriverSeat", 1, 1, function()
+				timer.Simple(1, function()
 					wag.DriverSeat:Use(calling_ply,calling_ply,3,1)
 				end)
 				break
 			else
 				local seats = ents.FindInSphere(wag:LocalToWorld(seatpos),2)
 				for w,s in pairs(seats) do
-					if s:GetNW2String("SeatType") == "instructor" then
-						s:UseClientSideAnimation()
-						timer.Create("TeleportIntoCab2InstructorSeat", 1, 1, function()
-							s:Use(calling_ply,calling_ply,3,1)
-						end)
-						break
-					end
+					if s:GetNW2String("SeatType") ~= "instructor" then return end
+					s:UseClientSideAnimation()
+					timer.Simple(1, function()
+						s:Use(calling_ply,calling_ply,3,1)
+					end)
+					break
 				end
 			end
 		end
@@ -804,21 +787,20 @@ function ulx.smartch( calling_ply )
 	local seat = calling_ply:GetVehicle()
 	if not IsValid(seat) then return end
 	local seattype = seat:GetNW2String("SeatType")
-	if seattype == "driver" then
-		local train1 = seat:GetNW2Entity("TrainEntity")
-		if train1:GetClass() == "gmod_subway_81-760" or train1:GetClass() == "gmod_subway_81-760a" then
-			calling_ply:ChatPrint("Oka is not supported yet.")
-			return
-		end
-		local train2
-		if not IsValid(train1) then return end
-		for t,wag in pairs(train1.WagonList) do
-			if (wag:GetClass() == train1:GetClass() and wag ~= train1) then
-				train2 = wag
-			end
-		end
-		ChangeCab(calling_ply,train1,train2)
+	if seattype ~= "driver" then return end
+	local train1 = seat:GetNW2Entity("TrainEntity")
+	if not IsValid(train1) then return end
+	if train1:GetClass() == "gmod_subway_81-760" or train1:GetClass() == "gmod_subway_81-760a" then
+		calling_ply:ChatPrint(lang("TS760"))
+		return
 	end
+	local train2
+	for t,wag in pairs(train1.WagonList) do
+		if (wag:GetClass() == train1:GetClass() and wag ~= train1) then
+			train2 = wag
+		end
+	end
+	ChangeCab(calling_ply,train1,train2)
 end
 local sch = ulx.command( CATEGORY_NAME, "ulx sch", ulx.smartch, "!sch" )
 sch:defaultAccess( ULib.ACCESS_ALL )
@@ -827,14 +809,13 @@ sch:help( "Smart cabin change" )
 function ulx.trainstart( calling_ply )
 	if not IsValid(calling_ply) then return end
     local train = calling_ply:GetTrain()
-	if train != nil then
-		if train:GetClass() == "gmod_subway_81-760" or train:GetClass() == "gmod_subway_81-760a" then
-			calling_ply:ChatPrint(lang("TS760"))
-			return
-		end
-		TrainStart(train)
-		ulx.fancyLog("#s "..lang("UseTrainStart"),calling_ply:Nick())
+	if not IsValid(train) then return end
+	if train:GetClass() == "gmod_subway_81-760" or train:GetClass() == "gmod_subway_81-760a" then
+		calling_ply:ChatPrint(lang("TS760"))
+		return
 	end
+	TrainStart(train)
+	ulx.fancyLog("#s "..lang("UseTrainStart"),calling_ply:Nick())
 end
 local trainstart = ulx.command( CATEGORY_NAME, "ulx trainstart", ulx.trainstart, "!trainstart" )
 trainstart:defaultAccess( ULib.ACCESS_ALL )
@@ -843,13 +824,12 @@ trainstart:help( "Cabin autostart" )
 function ulx.trainstop( calling_ply )
 	if not IsValid(calling_ply) then return end
     local train = calling_ply:GetTrain()
-	if train != nil then
-		if train:GetClass() == "gmod_subway_81-760" or train:GetClass() == "gmod_subway_81-760a" then
-			calling_ply:ChatPrint("Oka is not supported yet.")
-			return
-		end
-		TrainStop(train)
+	if not IsValid(train) then return end
+	if train:GetClass() == "gmod_subway_81-760" or train:GetClass() == "gmod_subway_81-760a" then
+		calling_ply:ChatPrint("Oka is not supported yet.")
+		return
 	end
+	TrainStop(train)
 end
 local trainstop = ulx.command( CATEGORY_NAME, "ulx trainstop", ulx.trainstop, "!trainstop" )
 trainstop:defaultAccess( ULib.ACCESS_ALL )
@@ -861,11 +841,6 @@ if SERVER then
 	-- Составы загружаем из файла, потому что Metrostroi.TrainClasses появляется позже, чем можно добавить права ULX
 	if file.Exists("metrostroi_advanced/trains.txt","DATA") then
 		local trains = string.Explode("\n", file.Read("metrostroi_advanced/trains.txt","DATA"))
-		for k, v in pairs (trains) do
-			if v ~= "" then ULib.ucl.registerAccess(v, ULib.ACCESS_ALL, "Spawn train "..v, CATEGORY_NAME) end
-		end
-	elseif file.Exists("metrostroi_advanced_trains.txt","DATA") then -- Временный код для автоматического перехода
-		local trains = string.Explode("\n", file.Read("metrostroi_advanced_trains.txt","DATA"))
 		for k, v in pairs (trains) do
 			if v ~= "" then ULib.ucl.registerAccess(v, ULib.ACCESS_ALL, "Spawn train "..v, CATEGORY_NAME) end
 		end

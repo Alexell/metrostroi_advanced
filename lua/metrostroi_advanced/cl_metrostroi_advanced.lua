@@ -2,35 +2,41 @@
 -- Developers:
 -- Alexell | https://steamcommunity.com/profiles/76561198210303223
 -- Agent Smith | https://steamcommunity.com/profiles/76561197990364979
--- Version: 2.3
+-- Version: 2.4
 -- License: MIT
 -- Source code: https://github.com/Alexell/metrostroi_advanced
 ----------------------------------------------------------------------
 
 if SERVER then return end
 
-CreateClientConVar("ma_autoinformator","1",true,true)
-CreateClientConVar("ma_routenums","1",true,true)
+CreateClientConVar("ma_autoinformator","1",true,true,"Enable autoannouncer (def = 1 - enabled)")
+CreateClientConVar("ma_routenums","1",true,true,"Auto-generate route number on train spawn (def = 1 - enabled)")
 CreateClientConVar("ma_clientoptimize","1",true,false)
-CreateClientConVar("ma_voltage","0",false,false)
-CreateClientConVar("ma_curlim","0",false,false)
-CreateClientConVar("ma_requirethirdrail","0",false,false)
+CreateClientConVar("ma_voltage","0",false,false,"Third rail voltage")
+CreateClientConVar("ma_curlim","0",false,false,"Third rail current limit")
+CreateClientConVar("ma_requirethirdrail","0",false,false,"Require third rail")
 CreateClientConVar("ma_button_sourcename", "", false, false)
 CreateClientConVar("ma_button_output", "", false, false)
 
 -- Дублирующие серверные квары для админов
-CreateClientConVar("metrostroi_advanced_spawninterval","0",false,false)
-CreateClientConVar("metrostroi_advanced_trainsrestrict","0",false,false)
-CreateClientConVar("metrostroi_advanced_spawnmessage","0",false,false)
-CreateClientConVar("metrostroi_advanced_minwagons","0",false,false)
-CreateClientConVar("metrostroi_advanced_maxwagons","0",false,false)
-CreateClientConVar("metrostroi_advanced_autowags","0",false,false)
-CreateClientConVar("metrostroi_advanced_afktime","0",false,false)
-CreateClientConVar("metrostroi_advanced_timezone","0",false,false)
-CreateClientConVar("metrostroi_advanced_buttonmessage","0",false,false)
+local AdminCVarList = {
+	{"metrostroi_advanced_spawninterval","Global delay between spawns in seconds (def = 0 - disabled)"},
+	{"metrostroi_advanced_trainsrestrict","Global train restrictions convar for ulx groups (def = 0 - disabled)"},
+	{"metrostroi_advanced_spawnmessage","Global chat outputs for every spawned train (def = 1 - enabled)"},
+	{"metrostroi_advanced_minwagons","Minimum wagon count for a player to spawn (def = 2)"},
+	{"metrostroi_advanced_maxwagons","Maximum wagon count for a player to spawn (def = 4)"},
+	{"metrostroi_advanced_autowags","Automatic permission to spawn 4 wagons instead of 3 wagons for the first 3 players to spawn a train, in case metrostroi_advanced_maxwagons convar is set to less than 4 (def = 0 - disabled)"},
+	{"metrostroi_advanced_afktime","Time in minutes before a player is kicked for being AFK (def = 0 - disabled)"},
+	{"metrostroi_advanced_timezone","Server time zone, def = 3 (Moscow local time)"},
+	{"metrostroi_advanced_buttonmessage","Enable chat notifications for station control panel's buttons (def = 1 - enabled)"},
+	{"metrostroi_advanced_noentryann","Enable automatic station announcements when there is no entry on an arriving train (def = 1 - enabled)"}
+}
+for _,cvr in pairs(AdminCVarList) do
+	CreateClientConVar(cvr[1],"0",false,false,cvr[2])
+end
 
 -- Локализация
-MetrostroiAdvanced.LoadLanguage(GetConVarString("metrostroi_language"))
+MetrostroiAdvanced.LoadLanguage(GetConVar("metrostroi_language"):GetString())
 cvars.AddChangeCallback("metrostroi_language", function(cvar,old,new)
     MetrostroiAdvanced.LoadLanguage(new)
 end)
@@ -60,43 +66,12 @@ end)
 hook.Add("InitPostEntity","MA_PlayerInit",function()
 	if not LocalPlayer():IsAdmin() then return end
 	timer.Simple(1,function()
-		cvars.AddChangeCallback("metrostroi_advanced_spawninterval",function(cvar,old,new)
-			if (old == new) then return end
-			SendCommand(cvar,new)
-		end)
-		cvars.AddChangeCallback("metrostroi_advanced_trainsrestrict",function(cvar,old,new)
-			if (old == new) then return end
-			SendCommand(cvar,new)
-		end)
-		cvars.AddChangeCallback("metrostroi_advanced_spawnmessage",function(cvar,old,new)
-			if (old == new) then return end
-			SendCommand(cvar,new)
-		end)
-		cvars.AddChangeCallback("metrostroi_advanced_minwagons",function(cvar,old,new)
-			if (old == new) then return end
-			SendCommand(cvar,new)
-		end)
-		cvars.AddChangeCallback("metrostroi_advanced_maxwagons",function(cvar,old,new)
-			if (old == new) then return end
-			SendCommand(cvar,new)
-		end)
-		cvars.AddChangeCallback("metrostroi_advanced_autowags",function(cvar,old,new)
-			if (old == new) then return end
-			SendCommand(cvar,new)
-		end)
-		cvars.AddChangeCallback("metrostroi_advanced_afktime",function(cvar,old,new)
-			if (old == new) then return end
-			SendCommand(cvar,new)
-		end)
-		cvars.AddChangeCallback("metrostroi_advanced_timezone",function(cvar,old,new)
-			if (old == new) then return end
-			SendCommand(cvar,new)
-		end)
-		cvars.AddChangeCallback("metrostroi_advanced_buttonmessage",function(cvar,old,new)
-			if (old == new) then return end
-			SendCommand(cvar,new)
-		end)
-		--
+		for _,cvr in pairs(AdminCVarList) do
+			cvars.AddChangeCallback(cvr[1],function(cvar,old,new)
+				if (old == new) then return end
+				SendCommand(cvar,new)
+			end)
+		end
 		cvars.AddChangeCallback("ma_voltage",function(cvar,old,new)
 			if (old == new) then return end
 			SendCommand(cvar,new)
@@ -182,6 +157,7 @@ local function AdminPanel(panel)
 	panel:Help(lang("APAFKTime"))
 	panel:NumSlider("","metrostroi_advanced_afktime",0,120,0)
 	panel:NumSlider(lang("APServerTimezone"),"metrostroi_advanced_timezone",-12,12,0)
+	panel:CheckBox(lang("APNoEntryAnn"),"metrostroi_advanced_noentryann")
 	panel:Help("") -- отступ
 	panel:Help("") -- отступ
 	panel:ControlHelp(lang("APServerOptions").." Metrostroi:")

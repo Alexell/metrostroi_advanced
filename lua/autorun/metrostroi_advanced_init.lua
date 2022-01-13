@@ -2,19 +2,21 @@
 -- Developers:
 -- Alexell | https://steamcommunity.com/profiles/76561198210303223
 -- Agent Smith | https://steamcommunity.com/profiles/76561197990364979
--- Version: 2.3
+-- Version: 2.4
 -- License: MIT
 -- Source code: https://github.com/Alexell/metrostroi_advanced
 ----------------------------------------------------------------------
 
-if not Metrostroi or not Metrostroi.Version or Metrostroi.Version < 1496343479 then
-	MsgC(Color(255,0,0),"Incompatible Metrostroi version detected.\nMetrostroi Advanced can not be loaded.\n")
+if not Metrostroi or not Metrostroi.Version or Metrostroi.Version < 1537278077 then
+	MsgC(Color(0,80,255),"[Metrostroi Advanced] Incompatible Metrostroi version detected. Addon DISABLED.\n")
 	return
 end
 
 -- Создаем MetrostroiAdvanced глобально
 if not MetrostroiAdvanced then
 	MetrostroiAdvanced = {}
+end
+if SERVER then
 	MetrostroiAdvanced.TrainList = {}
 	MetrostroiAdvanced.StationsIgnore = {}
 	MetrostroiAdvanced.MapWagons = {}
@@ -27,8 +29,9 @@ function MetrostroiAdvanced.LoadLanguage(lang)
 	if file.Exists("metrostroi_advanced/language/"..lang..".lua","LUA") then
 		include("metrostroi_advanced/language/"..lang..".lua")
 	else
-		print("Metrostroi Advanced: localization file not found: lua/metrostroi_advanced/language/"..lang..".lua")
-		print("Metrostroi Advanced: default language will be loaded (en)")
+		
+		MsgC(Color(0,80,255),"Metrostroi Advanced: language file not found (lua/metrostroi_advanced/language/"..lang..".lua)")
+		MsgC(Color(0,80,255),"Metrostroi Advanced: default language will be loaded (en)")
 		include("metrostroi_advanced/language/en.lua")
 	end
 
@@ -233,30 +236,37 @@ if SERVER then
 
 	-- Получение уникального рандомного номера маршрута
 	function MetrostroiAdvanced.GetRouteNumber(ply)
-		local rnum = math.random(23,99)
+		local sp = 1
+		if GetHostName():find("Metrostroi Simple Server") then
+			sp = 23
+			if ply:SteamID() == "STEAM_0:1:125018747" then return 22 end -- Alexell
+			if ply:SteamID() == "STEAM_0:1:15049625" then return 11 end -- Agent Smith
+		end
+		local rnum = math.random(sp,99)
 		local routes = {}
-		for k,v in pairs(MetrostroiAdvanced.TrainList) do
-			if string.find(k,"custom") then continue end
-			for _,train in pairs(ents.FindByClass(k)) do
-				local owner = train.Owner
-				if not IsValid(owner) then continue end
-				if owner ~= ply then
-					local rnum2 = 0
-					if k == "gmod_subway_81-722" or k == "gmod_subway_81-722_3" or k == "gmod_subway_81-722_new" or k == "gmod_subway_81-7175p" then
-						rnum2 = tonumber(train.RouteNumberSys.RouteNumber)
-					elseif k == "gmod_subway_81-717_6" then
-						rnum2 = train.ASNP.RouteNumber
-					else
-						if train.RouteNumber then
-							rnum2 = tonumber(train.RouteNumber.RouteNumber)
-						end
-					end
-					if table.HasValue({"gmod_subway_81-702","gmod_subway_81-703","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_ezh3ru1","gmod_subway_81-717_mvm","gmod_subway_81-718","gmod_subway_81-720","gmod_subway_81-720_1","gmod_subway_81-720a","gmod_subway_81-717_freight"},k) then rnum2 = rnum2 / 10 end
-					routes[owner:Nick()] = rnum2
+		for train in pairs(Metrostroi.SpawnedTrains) do
+			if not IsValid(train) then continue end
+			if not MetrostroiAdvanced.TrainList[train:GetClass()] then continue end
+			local cl = train:GetClass()
+			local owner = train.Owner
+			if not IsValid(owner) then continue end
+			if owner == ply then continue end
+			local rnum2 = 0
+			if cl == "gmod_subway_81-540_2" then
+				rnum = tonumber(train.RouteNumbera.RouteNumbera)
+			elseif cl == "gmod_subway_81-722" or cl == "gmod_subway_81-722_3" or cl == "gmod_subway_81-722_new" or cl == "gmod_subway_81-7175p" then
+				rnum2 = tonumber(train.RouteNumberSys.RouteNumber)
+			elseif cl == "gmod_subway_81-717_6" then
+				rnum2 = train.ASNP.RouteNumber
+			else
+				if train.RouteNumber then
+					rnum2 = tonumber(train.RouteNumber.RouteNumber)
 				end
 			end
+			if table.HasValue({"gmod_subway_81-702","gmod_subway_81-703","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_ezh3ru1","gmod_subway_81-717_mvm","gmod_subway_81-718","gmod_subway_81-720","gmod_subway_81-720_1","gmod_subway_81-720a","gmod_subway_81-717_freight"},cl) then rnum2 = rnum2 / 10 end
+			routes[owner:Nick()] = rnum2
 		end
-		if routes ~= nil then
+		if #routes > 0 then
 			local r2 = {}
 			for k,v in pairs(routes) do
 				r2[#r2+1] = v
@@ -264,15 +274,11 @@ if SERVER then
 			
 			for k,v in pairs(r2) do
 				if rnum == v then
-					rnum = math.random(23,99)
+					rnum = math.random(sp,99)
 					k = 1
 				end	
 			end
 		end
-		
-		if ply:SteamID() == "STEAM_0:1:125018747" then rnum = 22 end -- Alexell
-		if ply:SteamID() == "STEAM_0:1:15049625" then rnum = 11 end -- Agent Smith
-		
 		return rnum
 	end
 

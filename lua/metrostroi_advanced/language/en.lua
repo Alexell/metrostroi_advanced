@@ -92,7 +92,7 @@ MetrostroiAdvanced.Lang["UserFoundInBL"]		= "User found in blacklist"
 MetrostroiAdvanced.Lang["SetWagNum1"]			= "Please aim at wagon to change its number."
 MetrostroiAdvanced.Lang["SetWagNum2"]			= "This is not your wagon!"
 MetrostroiAdvanced.Lang["SetWagNum3"]			= "Oops, this number already exists! \nTry another one."
-MetrostroiAdvanced.Lang["TS760"]				= "Set the reverser to 'forward'."
+MetrostroiAdvanced.Lang["TS760"]				= "Please set the reverser to forward and go."
 
 -- CL
 MetrostroiAdvanced.Lang["CPGameStart"]			= "On game load:"
@@ -132,3 +132,4 @@ MetrostroiAdvanced.Lang["ACPBtnSave"]			= "Save all buttons"
 MetrostroiAdvanced.Lang["ACPBtnHeader"]			= "Station control buttons notifications"
 MetrostroiAdvanced.Lang["ACPBtnCheckBox"]		= "Enable/Disable notifications"
 MetrostroiAdvanced.Lang["ACPBtnNLabel"]			= "Add button definition"
+MetrostroiAdvanced.Lang["APNoEntryAnn"]			= "Announcements when there is no entry on train"

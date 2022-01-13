@@ -93,7 +93,7 @@ MetrostroiAdvanced.Lang["UserFoundInBL"]		= "Пользователь в чер�
 MetrostroiAdvanced.Lang["SetWagNum1"]			= "Пожалуйста наведите указатель на вагон для изменения его номера."
 MetrostroiAdvanced.Lang["SetWagNum2"]			= "Это не ваш вагон!"
 MetrostroiAdvanced.Lang["SetWagNum3"]			= "Упс, такой номер вагона уже существует! \nПопробуйте другой."
-MetrostroiAdvanced.Lang["TS760"]				= "Установите реверс по ходу 'вперед'."
+MetrostroiAdvanced.Lang["TS760"]				= "Установите реверс по ходу 'вперед' и отправляйтесь."
 
 -- CL
 MetrostroiAdvanced.Lang["CPGameStart"]			= "При запуске игры:"
@@ -132,3 +132,4 @@ MetrostroiAdvanced.Lang["ACPBtnSave"]			= "Сохранить все кнопк�
 MetrostroiAdvanced.Lang["ACPBtnHeader"]			= "Уведомления о нажатии кнопок на пультах"
 MetrostroiAdvanced.Lang["ACPBtnCheckBox"]		= "Включить/отключить уведомления"
 MetrostroiAdvanced.Lang["ACPBtnNLabel"]			= "Добавить расшифровку кнопки"
+MetrostroiAdvanced.Lang["APNoEntryAnn"]			= "Объявления, когда на поезд посадки нет"
