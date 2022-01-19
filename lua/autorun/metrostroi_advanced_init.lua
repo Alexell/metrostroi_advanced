@@ -21,6 +21,7 @@ if SERVER then
 	MetrostroiAdvanced.StationsIgnore = {}
 	MetrostroiAdvanced.MapWagons = {}
 	MetrostroiAdvanced.MapButtonNames = {}
+	MetrostroiAdvanced.TwoToSixMap = false
 end
 
 -- Загрузка локализации
@@ -29,9 +30,8 @@ function MetrostroiAdvanced.LoadLanguage(lang)
 	if file.Exists("metrostroi_advanced/language/"..lang..".lua","LUA") then
 		include("metrostroi_advanced/language/"..lang..".lua")
 	else
-		
-		MsgC(Color(0,80,255),"Metrostroi Advanced: language file not found (lua/metrostroi_advanced/language/"..lang..".lua)")
-		MsgC(Color(0,80,255),"Metrostroi Advanced: default language will be loaded (en)")
+		MsgC(Color(0,80,255),"[Metrostroi Advanced] Language file not found (lua/metrostroi_advanced/language/"..lang..".lua)\n")
+		MsgC(Color(0,80,255),"[Metrostroi Advanced] Default language will be loaded (en)\n")
 		include("metrostroi_advanced/language/en.lua")
 	end
 
@@ -65,6 +65,17 @@ if SERVER then
 			local tbl = string.Explode(" ",str)
 			if tbl[1] ~= "" and tonumber(tbl[2]) then
 				MetrostroiAdvanced.MapWagons[tbl[1]] = tonumber(tbl[2]) or nil
+			end
+		end
+	end
+	
+	-- Определяем тип сигнализации на карте
+	function MetrostroiAdvanced.GetSignallingType()
+		if game.GetMap():find("gm_jar_pll_remastered_v") then return end -- на одной линии 1/5, на другой 2/6
+		for _,sig in pairs(ents.FindByClass("gmod_track_signal")) do
+			if (sig.TwoToSix ~= nil and sig.TwoToSix == true) then
+				MetrostroiAdvanced.TwoToSixMap = true
+				break
 			end
 		end
 	end
@@ -236,13 +247,7 @@ if SERVER then
 
 	-- Получение уникального рандомного номера маршрута
 	function MetrostroiAdvanced.GetRouteNumber(ply)
-		local sp = 1
-		if GetHostName():find("Metrostroi Simple Server") then
-			sp = 23
-			if ply:SteamID() == "STEAM_0:1:125018747" then return 22 end -- Alexell
-			if ply:SteamID() == "STEAM_0:1:15049625" then return 11 end -- Agent Smith
-		end
-		local rnum = math.random(sp,99)
+		local rnum = math.random(1,99)
 		local routes = {}
 		for train in pairs(Metrostroi.SpawnedTrains) do
 			if not IsValid(train) then continue end
@@ -274,7 +279,7 @@ if SERVER then
 			
 			for k,v in pairs(r2) do
 				if rnum == v then
-					rnum = math.random(sp,99)
+					rnum = math.random(1,99)
 					k = 1
 				end	
 			end

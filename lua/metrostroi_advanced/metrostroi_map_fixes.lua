@@ -7,7 +7,7 @@ local function snake()
 	end
 end
 if (game.GetMap():find("gm_metro_jar_imagine_line")) then
-	timer.Simple(1, snake())
+	timer.Simple(1, function() snake() end)
 end
 
 -- сохраняем изначальные положения удочек
@@ -30,4 +30,4 @@ local function get_udc_pos()
 		MetrostroiAdvanced.Udc_Positions[k] = v:GetPos()
 	end
 end
-timer.Simple(3, get_udc_pos())
+timer.Simple(3, function() get_udc_pos() end)

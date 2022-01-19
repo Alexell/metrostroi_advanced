@@ -17,6 +17,7 @@ CreateClientConVar("ma_curlim","0",false,false,"Third rail current limit")
 CreateClientConVar("ma_requirethirdrail","0",false,false,"Require third rail")
 CreateClientConVar("ma_button_sourcename", "", false, false)
 CreateClientConVar("ma_button_output", "", false, false)
+CreateClientConVar("ma_auto_alsdecoder", "1", true, true,"Enable auto ALS decoder switching (def = 1 - enabled)")
 
 -- Дублирующие серверные квары для админов
 local AdminCVarList = {
@@ -38,6 +39,7 @@ end
 -- Локализация
 MetrostroiAdvanced.LoadLanguage(GetConVar("metrostroi_language"):GetString())
 cvars.AddChangeCallback("metrostroi_language", function(cvar,old,new)
+	if (old == new) then return end
     MetrostroiAdvanced.LoadLanguage(new)
 end)
 local function lang(str)
@@ -136,6 +138,7 @@ local function ClientPanel(panel)
 	panel:CheckBox(lang("CPRouteNum"),"ma_routenums")
 	panel:Help("      "..lang("CPNeedReconnect"))
 	panel:CheckBox(lang("CPUseAutoinform"),"ma_autoinformator")
+	panel:CheckBox(lang("CPUseAutoALSDecoder"),"ma_auto_alsdecoder")
 end
 
 local function AdminPanel(panel)

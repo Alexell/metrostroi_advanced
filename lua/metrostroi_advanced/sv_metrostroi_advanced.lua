@@ -21,6 +21,7 @@ local afktime = CreateConVar("metrostroi_advanced_afktime", 0, FCVAR_ARCHIVE, "T
 local timezone = CreateConVar("metrostroi_advanced_timezone", 3, FCVAR_ARCHIVE, "Server time zone, def = 3 (Moscow local time)")
 local buttonmessage = CreateConVar("metrostroi_advanced_buttonmessage", 1, FCVAR_ARCHIVE, "Enable chat notifications for station control panel's buttons (def = 1 - enabled)")
 local noentry_ann = CreateConVar("metrostroi_advanced_noentryann", 1, FCVAR_ARCHIVE, "Enable automatic station announcements when there is no entry on an arriving train (def = 1 - enabled)")
+local twotosix_rest = CreateConVar("metrostroi_advanced_trainsrestrict26", 0, FCVAR_ARCHIVE, "Train restrictions for maps with 2/6 signalling (def = 0 - disabled)")
 
 util.AddNetworkString("MA.ServerCommands")
 util.AddNetworkString("MA.AddNewButtons")
@@ -30,7 +31,7 @@ local AFK_WARN1 = 0
 local AFK_WARN2 = 0
 local AFK_WARN3 = 60
 
-timer.Simple(1,function()
+timer.Create("MetrostroiAdvanced.Init",3,1,function()
 	if (not file.Exists("metrostroi_advanced","DATA")) then
 		file.CreateDir("metrostroi_advanced")
 	end
@@ -38,12 +39,14 @@ timer.Simple(1,function()
 	MetrostroiAdvanced.LoadStationsIgnore()
 	MetrostroiAdvanced.LoadMapWagonsLimit()
 	MetrostroiAdvanced.LoadMapButtons()
+	MetrostroiAdvanced.GetSignallingType()
 	MetrostroiAdvanced.LastSpawned = os.time()
 	if not file.Exists("sound/metrostroi_advanced/no_entry_ann/"..madv_lang:GetString(),"GAME") then
 		RunConsoleCommand("metrostroi_advanced_noentryann",0)
 		MsgC(Color(0,80,255),"[Metrostroi Advanced] Sounds for '"..madv_lang:GetString().."' language not found!\n")
 		MsgC(Color(0,80,255),"[Metrostroi Advanced] No Entry Announces DISABLED.\n")
 	end
+	timer.Remove("MetrostroiAdvanced.Init")
 end)
 
 concommand.Add("ma_save_buttonoutput", function( ply, cmd, args )
@@ -53,19 +56,23 @@ concommand.Add("ma_save_buttonoutput", function( ply, cmd, args )
 	tab[game.GetMap()] = MetrostroiAdvanced.MapButtonNames
 	file.Write("metrostroi_advanced/map_buttons.txt",util.TableToJSON(tab,true))
 end)
-	
-cvars.AddChangeCallback("metrostroi_advanced_lang", function(cvar, old, new)
-    MetrostroiAdvanced.LoadLanguage(new)
-end)
+
 local function lang(str)
 	return MetrostroiAdvanced.Lang[str]
 end
-
 AFK_TIME = afktime:GetInt() * 60
-cvars.AddChangeCallback("metrostroi_advanced_afktime", function(cvar, old, new)
-    AFK_TIME = new * 60
-	AFK_WARN1 = AFK_TIME * 0.6
-	AFK_WARN2 = AFK_TIME * 0.4
+
+timer.Simple(1.5,function()
+	cvars.AddChangeCallback("metrostroi_advanced_lang", function(cvar, old, new)
+		if (old == new) then return end
+		MetrostroiAdvanced.LoadLanguage(new)
+	end)
+	cvars.AddChangeCallback("metrostroi_advanced_afktime", function(cvar, old, new)
+		if (old == new) then return end
+		AFK_TIME = new * 60
+		AFK_WARN1 = AFK_TIME * 0.6
+		AFK_WARN2 = AFK_TIME * 0.4
+	end)
 end)
 
 net.Receive("MA.ServerCommands",function(ln,ply)
@@ -96,10 +103,9 @@ end
 hook.Add("MetrostroiSpawnerRestrict","MA.TrainSpawnerLimits",function(ply,settings)
 	if not IsValid(ply) then return end
 	-- ограничение составов по правам ULX
-	local train_restrict = train_rest:GetInt()
 	local train = settings.Train
 	
-	if (train_restrict == 1) then
+	if (train_rest:GetInt() == 1) then
 		if (not PlayerPermission(ply,train)) then
 			ply:ChatPrint(lang("SpawnerRestrict1"))
 			ply:ChatPrint(lang("SpawnerRestrict2"))
@@ -110,6 +116,17 @@ hook.Add("MetrostroiSpawnerRestrict","MA.TrainSpawnerLimits",function(ply,settin
 				end
 			end
 			return true
+		end
+	end
+	
+	-- ограничение составов на картах с сигналкой 2/6
+	if (twotosix_rest:GetInt() == 1) then
+		if MetrostroiAdvanced.TwoToSixMap then
+			if ((tonumber(train:sub(16,18)) and tonumber(train:sub(16,18)) < 717) or train:find("ezh3")
+			or train:find("lvz") or train:find("freight") or train:find("7175p") or train:find("722")) then
+				ply:ChatPrint(lang("Restrict26"))
+				return true
+			end
 		end
 	end
 	
@@ -304,93 +321,80 @@ hook.Add("Think","MA.ControlAFKPlayers", function()
 	end
 end)
 
-hook.Add("MetrostroiCoupled","MA.SetTrainParams",function(ent,ent2)
-	if IsValid(ent) and IsValid(ent2) then
-		-- устанавливаем номер маршрута на состав
-		local ply = ent.Owner
-		if (ply:GetInfoNum("ma_routenums",1) == 0) then return end
-		local rnum = ply:GetNW2Int("MARouteNumber")
-		if MetrostroiAdvanced.TrainList[ent:GetClass()] then
-			if table.HasValue({"gmod_subway_81-702","gmod_subway_81-703","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_ezh3ru1","gmod_subway_81-717_mvm","gmod_subway_81-718","gmod_subway_81-720","gmod_subway_81-720_1","gmod_subway_81-720a","gmod_subway_81-717_freight"},ent:GetClass()) then rnum = rnum * 10 end
-
-			if ent:GetClass() == "gmod_subway_81-540_2" then
-				local rtype = ent:GetNW2Int("Route",1)
-				if rtype == 1 then
-					ent.RouteNumbera.RouteNumbera = tostring(rnum).."0"
-					ent:SetNW2String("RouteNumbera",tostring(rnum).."0")
+hook.Add("MetrostroiCoupled","MA.SetTrainParams",function(train,train2)
+	if not IsValid(train) then return end
+	if not MetrostroiAdvanced.TrainList[train:GetClass()] then return end
+	local ply = train.Owner
+	if not IsValid(ply) then return end
+	
+	-- переключаем дешифратор АЛС
+	if (ply:GetInfoNum("ma_auto_alsdecoder",1) == 1 and MetrostroiAdvanced.TwoToSixMap) then
+		for _,sw in pairs({"ALSFreq","SAP14","SA14k","SA14"}) do
+			if train[sw] then train[sw]:TriggerInput("Toggle",1) end
+		end
+	end
+	
+	-- устанавливаем номер маршрута на состав
+	if (ply:GetInfoNum("ma_routenums",1) == 1) then
+		local rnum = 0
+		rnum = ply:GetNW2Int("MARouteNumber")
+		if train:GetClass() == "gmod_subway_81-540_2" then
+			local rtype = train:GetNW2Int("Route",1)
+			if rtype == 1 then
+				if rnum < 10 then
+					rnum = "0"..tostring(rnum).."0"
+				else
+					rnum = tostring(rnum).."00"
 				end
-				if rtype == 2 then
-					ent.RouteNumbera.RouteNumbera = "0"..tostring(rnum)
-					ent:SetNW2String("RouteNumbera","0"..tostring(rnum))
+				train.RouteNumbera.RouteNumbera = rnum
+				train:SetNW2String("RouteNumbera",rnum)
+			end
+			if rtype == 2 then
+				if rnum < 10 then
+					rnum = "00"..tostring(rnum)
+				else
+					rnum = "0"..tostring(rnum)
 				end
-				if rtype == 3 then
-					if ent.RouteNumberSys then
-						ent.RouteNumberSys.CurrentRouteNumber = rnum
-					end
-				end
-			elseif ent:GetClass() == "gmod_subway_81-540_2k" then
-				ent.RouteNumber.RouteNumber = rnum
-				ent.RouteNumber.CurrentRouteNumber = rnum
-			elseif ent:GetClass() == "gmod_subway_81-722" or ent:GetClass() == "gmod_subway_81-722_3" or ent:GetClass() == "gmod_subway_81-722_new" or ent:GetClass() == "gmod_subway_81-7175p" then
-				ent.RouteNumberSys.CurrentRouteNumber = rnum
-			elseif ent:GetClass() == "gmod_subway_81-717_6" then
-				ent.ASNP.RouteNumber = rnum
-			elseif ent:GetClass() == "gmod_subway_81-502" or ent:GetClass() == "gmod_subway_81-540" or ent:GetClass() == "gmod_subway_81-540_1" or ent:GetClass() == "gmod_subway_81-540_8" or ent:GetClass() == "gmod_subway_81-717_lvz" then
-				ent.RouteNumber.RouteNumber = "0"..tostring(rnum)
-				ent:SetNW2String("RouteNumber","0"..tostring(rnum))
-			elseif ent:GetClass() == "gmod_subway_81-760" or ent:GetClass() == "gmod_subway_81-760a" then
-				ent.BMCIS.RouteNumber = rnum
-				ent:SetNW2Int("RouteNumber:RouteNumber",rnum)
-				ent.RouteNumber.RouteNumber = rnum
-			else
-				if ent.RouteNumber then
-					ent.RouteNumber.RouteNumber = tostring(rnum)
-					ent:SetNW2String("RouteNumber",tostring(rnum))
+				train.RouteNumbera.RouteNumbera = rnum
+				train:SetNW2String("RouteNumbera",rnum)
+			end
+			if rtype == 3 then
+				if train.RouteNumberSys then
+					train.RouteNumberSys.CurrentRouteNumber = rnum
 				end
 			end
-		end
-		if MetrostroiAdvanced.TrainList[ent2:GetClass()] then
-			if table.HasValue({"gmod_subway_81-702","gmod_subway_81-703","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_ezh3ru1","gmod_subway_81-717_mvm","gmod_subway_81-718","gmod_subway_81-720","gmod_subway_81-720_1","gmod_subway_81-720a","gmod_subway_81-717_freight"},ent2:GetClass()) then rnum = rnum * 10 end
-			
-			if ent2:GetClass() == "gmod_subway_81-540_2" then
-				local rtype = ent2:GetNW2Int("Route",1)
-				if rtype == 1 then
-					ent2.RouteNumbera.RouteNumbera = tostring(rnum).."0"
-					ent2:SetNW2String("RouteNumbera",tostring(rnum).."0")
-				end
-				if rtype == 2 then
-					ent2.RouteNumbera.RouteNumbera = "0"..tostring(rnum)
-					ent2:SetNW2String("RouteNumbera","0"..tostring(rnum))
-				end
-				if rtype == 3 then
-					if ent2.RouteNumberSys then
-						ent2.RouteNumberSys.CurrentRouteNumber = rnum
-					end
-				end
-			elseif ent2:GetClass() == "gmod_subway_81-540_2k" then
-				ent2.RouteNumber.RouteNumber = rnum
-				ent2.RouteNumber.CurrentRouteNumber = rnum
-			elseif ent2:GetClass() == "gmod_subway_81-722" or ent2:GetClass() == "gmod_subway_81-722_3" or ent2:GetClass() == "gmod_subway_81-722_new" or ent2:GetClass() == "gmod_subway_81-7175p" then
-				ent2.RouteNumberSys.CurrentRouteNumber = rnum
-			elseif ent2:GetClass() == "gmod_subway_81-717_6" then
-				ent2.ASNP.RouteNumber = rnum
-			elseif ent2:GetClass() == "gmod_subway_81-502" or ent2:GetClass() == "gmod_subway_81-540" or ent2:GetClass() == "gmod_subway_81-540_1" or ent2:GetClass() == "gmod_subway_81-540_8" or ent2:GetClass() == "gmod_subway_81-717_lvz" then
-				ent2.RouteNumber.RouteNumber = "0"..tostring(rnum)
-				ent2:SetNW2String("RouteNumber","0"..tostring(rnum))
-			elseif ent2:GetClass() == "gmod_subway_81-760" or ent2:GetClass() == "gmod_subway_81-760a" then
-				ent2.BMCIS.RouteNumber = rnum
-				ent2:SetNW2Int("RouteNumber:RouteNumber",rnum)
-				ent2.RouteNumber.RouteNumber = rnum
+		elseif train:GetClass() == "gmod_subway_81-540_2k" then
+			train.RouteNumber.RouteNumber = rnum
+			train.RouteNumber.CurrentRouteNumber = rnum
+		elseif train:GetClass() == "gmod_subway_81-722" or train:GetClass() == "gmod_subway_81-722_3" or train:GetClass() == "gmod_subway_81-722_new" or train:GetClass() == "gmod_subway_81-7175p" then
+			train.RouteNumberSys.CurrentRouteNumber = rnum
+		elseif train:GetClass() == "gmod_subway_81-717_6" then
+			train.ASNP.RouteNumber = rnum
+		elseif train:GetClass() == "gmod_subway_81-502" or train:GetClass() == "gmod_subway_81-540" or train:GetClass() == "gmod_subway_81-540_1" or train:GetClass() == "gmod_subway_81-540_8" or train:GetClass() == "gmod_subway_81-717_lvz" then
+			if rnum < 10 then
+				rnum = "00"..tostring(rnum)
 			else
-				if ent2.RouteNumber then
-					ent2.RouteNumber.RouteNumber = tostring(rnum)
-					ent2:SetNW2String("RouteNumber",tostring(rnum))
+				rnum = "0"..tostring(rnum)
+			end
+			train.RouteNumber.RouteNumber = rnum
+			train:SetNW2String("RouteNumber",rnum)
+		elseif train:GetClass() == "gmod_subway_81-760" or train:GetClass() == "gmod_subway_81-760a" then
+			train.BMCIS.RouteNumber = rnum
+			train:SetNW2Int("RouteNumber:RouteNumber",rnum)
+			train.RouteNumber.RouteNumber = rnum
+		else
+			if train.RouteNumber then
+				if rnum < 10 then
+					rnum = "0"..tostring(rnum).."0"
+				else
+					rnum = tostring(rnum).."0"
 				end
+				train.RouteNumber.RouteNumber = rnum
+				train:SetNW2String("RouteNumber",rnum)
 			end
 		end
 	end
 end)
-
 
 hook.Add("EntityRemoved","MA.DeleteTrainParams",function (ent)
 	if MetrostroiAdvanced.TrainList[ent:GetClass()] then
@@ -423,8 +427,9 @@ timer.Simple(1,function()
 			
 			-- Объявление на станции, если на прибывающий поезд посадки нет
 			if noentry_ann:GetInt() == 1 then
+				if ctrain.Speed < 1 and not v.LastCurrentTrain then v.LastCurrentTrain = ctrain end
 				if ctrain.Speed > 15 and (not v.LastCurrentTrain or ctrain ~= v.LastCurrentTrain) then
-					v.LastCurrentTrain = ctrain
+					if not v.LastCurrentTrain then v.LastCurrentTrain = ctrain end
 					local last_st = MetrostroiAdvanced.GetLastStationID(ctrain)
 					if last_st > -1 then
 						local play_snd
@@ -448,7 +453,8 @@ timer.Simple(1,function()
 									rtrain = wag
 								end
 							end
-							if not MetrostroiAdvanced.IsRealLastStation(v.StationIndex) or (MetrostroiAdvanced.IsRealLastStation(v.StationIndex) and IsValid(rtrain) and rtrain:ReadCell(49162) == 0) then -- на реальной конечной только при выезде из тупика
+							if not MetrostroiAdvanced.IsRealLastStation(v.StationIndex) or (MetrostroiAdvanced.IsRealLastStation(v.StationIndex)
+							and IsValid(rtrain) and rtrain:ReadCell(49162) == 0) then -- на реальной конечной только при выезде из тупика
 								--v:PlayAnnounce(2,play_snd) не хочет работать :(
 								sound.Play(play_snd,LerpVector(0.33,v.PlatformStart,v.PlatformEnd),120,100,0.5)
 								sound.Play(play_snd,LerpVector(0.33,v.PlatformEnd,v.PlatformStart),120,100,0.5)
