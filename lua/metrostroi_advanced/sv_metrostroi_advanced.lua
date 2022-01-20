@@ -21,7 +21,7 @@ local afktime = CreateConVar("metrostroi_advanced_afktime", 0, FCVAR_ARCHIVE, "T
 local timezone = CreateConVar("metrostroi_advanced_timezone", 3, FCVAR_ARCHIVE, "Server time zone, def = 3 (Moscow local time)")
 local buttonmessage = CreateConVar("metrostroi_advanced_buttonmessage", 1, FCVAR_ARCHIVE, "Enable chat notifications for station control panel's buttons (def = 1 - enabled)")
 local noentry_ann = CreateConVar("metrostroi_advanced_noentryann", 1, FCVAR_ARCHIVE, "Enable automatic station announcements when there is no entry on an arriving train (def = 1 - enabled)")
-local twotosix_rest = CreateConVar("metrostroi_advanced_trainsrestrict26", 0, FCVAR_ARCHIVE, "Train restrictions for maps with 2/6 signalling (def = 0 - disabled)")
+local twotosix_rest = CreateConVar("metrostroi_advanced_26restrict", 0, FCVAR_ARCHIVE, "Train restrictions for maps with 2/6 signalling (def = 0 - disabled)")
 
 util.AddNetworkString("MA.ServerCommands")
 util.AddNetworkString("MA.AddNewButtons")
@@ -120,13 +120,11 @@ hook.Add("MetrostroiSpawnerRestrict","MA.TrainSpawnerLimits",function(ply,settin
 	end
 	
 	-- ограничение составов на картах с сигналкой 2/6
-	if (twotosix_rest:GetInt() == 1) then
-		if MetrostroiAdvanced.TwoToSixMap then
-			if ((tonumber(train:sub(16,18)) and tonumber(train:sub(16,18)) < 717) or train:find("ezh3")
-			or train:find("lvz") or train:find("freight") or train:find("7175p") or train:find("722")) then
-				ply:ChatPrint(lang("Restrict26"))
-				return true
-			end
+	if (twotosix_rest:GetInt() == 1 and MetrostroiAdvanced.TwoToSixMap) then
+		if ((tonumber(train:sub(16,18)) and tonumber(train:sub(16,18)) < 717) or train:find("ezh3")
+		or train:find("lvz") or train:find("freight") or train:find("7175p") or train:find("722")) then
+			ply:ChatPrint(lang("Restrict26"))
+			return true
 		end
 	end
 	
@@ -428,7 +426,7 @@ timer.Simple(1,function()
 			-- Объявление на станции, если на прибывающий поезд посадки нет
 			if noentry_ann:GetInt() == 1 then
 				if ctrain.Speed < 1 and not v.LastCurrentTrain then v.LastCurrentTrain = ctrain end
-				if ctrain.Speed > 15 and (not v.LastCurrentTrain or ctrain ~= v.LastCurrentTrain) then
+				if ctrain.Speed > 10 and (not v.LastCurrentTrain or ctrain ~= v.LastCurrentTrain) then
 					if not v.LastCurrentTrain then v.LastCurrentTrain = ctrain end
 					local last_st = MetrostroiAdvanced.GetLastStationID(ctrain)
 					if last_st > -1 then

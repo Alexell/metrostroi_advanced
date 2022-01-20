@@ -531,7 +531,7 @@ function ulx.wagons( calling_ply )
 		wag_num = tonumber(Wags[k])
 		if wag_num >= 2 and wag_num <= 4 then wag_str = lang("wagon2") end
 		if wag_num >= 5 then wag_str = lang("wagon3") end
-		ulx.fancyLog("#s: #s #s #s. "..lang("Route")..": #s\n"..lang("Location")..": #s",k,wag_num,wag_str,Trains[k],Routes[k],Locs[k])
+		ulx.fancyLog("#s:\n\t#s "..wag_str.." #s \n\t"..lang("Route")..": #s\n\t"..lang("Location")..": #s",k,wag_num,Trains[k],Routes[k],Locs[k])
 	end
 	local wag_awail = (GetConVar("metrostroi_maxtrains"):GetInt()*GetConVar("metrostroi_advanced_maxwagons"):GetInt())-GetGlobalInt("metrostroi_train_count")
     ulx.fancyLog(lang("WagonsAwail").." #s",wag_awail)

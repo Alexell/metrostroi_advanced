@@ -9,7 +9,7 @@
 
 if SERVER then return end
 
-CreateClientConVar("ma_autoinformator","1",true,true,"Enable autoannouncer (def = 1 - enabled)")
+CreateClientConVar("ma_autoinformator","0",true,true,"Enable autoannouncer (def = 1 - enabled)")
 CreateClientConVar("ma_routenums","1",true,true,"Auto-generate route number on train spawn (def = 1 - enabled)")
 CreateClientConVar("ma_clientoptimize","1",true,false)
 CreateClientConVar("ma_voltage","0",false,false,"Third rail voltage")
