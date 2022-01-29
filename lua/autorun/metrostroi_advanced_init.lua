@@ -393,6 +393,268 @@ if SERVER then
 		table.SortDesc(station_ids)
 		if (id == station_ids[1] or id == station_ids[#station_ids]) then return true else return false end
 	end
+	
+	-- Обработка команд сигнализации с выводами в чат
+	function MetrostroiAdvanced.SignalSayHook(ply,comm,Name,fromULX)
+		if ulx and not fromULX then return end
+		if not IsValid(ply) then return end
+		if comm == "!sactiv" then
+			local route_found = false
+			local route_opened = false
+			for _, ent in pairs(ents.FindByClass("gmod_track_signal")) do
+				if ent.Routes then
+					for RouteID, RouteInfo in pairs(ent.Routes) do
+						if (RouteInfo.RouteName and RouteInfo.RouteName:upper() == Name:upper() or Name == "*") and RouteInfo.Emer then
+							route_found = true
+							if ent.LastOpenedRoute and k != ent.LastOpenedRoute then ent:CloseRoute(self.LastOpenedRoute) end
+							RouteInfo.IsOpened = true
+							route_opened = true
+						end
+					end
+				end	
+			end
+			if route_found and route_opened then
+				timer.Simple(0.2, function() 
+					ulx.fancyLog("#s opened emergency route #s.", ply:Nick(), Name:upper())
+				end)	 	
+			elseif route_found and not route_opened then
+				timer.Simple(0.2, function() 
+					ply:ChatPrint("Emergency route "..Name:upper().." is already opened.")
+				end)	 
+			end		
+			if not route_found then
+				timer.Simple(0.2, function() 
+					ply:ChatPrint("Emergency route "..Name:upper().." not found.")
+				end)
+			end
+		elseif comm == "!sdeactiv" then
+			local route_found = false
+			local route_closed = false
+			for _, ent in pairs(ents.FindByClass("gmod_track_signal")) do
+				if ent.Routes then
+					for RouteID, RouteInfo in pairs(ent.Routes) do
+						if (RouteInfo.RouteName and RouteInfo.RouteName:upper() == Name:upper() or Name == "*") and RouteInfo.Emer then
+							route_found = true
+							if ent.LastOpenedRoute and k != ent.LastOpenedRoute then ent:CloseRoute(self.LastOpenedRoute) end
+							RouteInfo.IsOpened = false
+							route_closed = true
+						end
+					end
+				end	
+			end
+			if route_found and route_closed then
+				timer.Simple(0.2, function() 
+					ulx.fancyLog("#s closed emergency route #s.", ply:Nick(), Name:upper())
+				end)	 	
+			elseif route_found and not route_closed then
+				timer.Simple(0.2, function() 
+					ply:ChatPrint("Emergency route "..Name:upper().." is already closed.") 
+				end) 
+			end		
+			if not route_found then
+				timer.Simple(0.2, function() 
+					ply:ChatPrint("Emergency route "..Name:upper().." not found.")
+				end)
+			end
+		elseif comm == "!sclose" then
+			local signal_found = false
+			local signal_closed = false
+			local route_found = false
+			local route_closed = false
+			for _, ent in pairs(ents.FindByClass("gmod_track_signal")) do
+				if ent.Name == Name:upper() then
+					signal_found = true
+					if #ent.Routes == 1 and ent.Routes[1].Manual then
+						ent:CloseRoute(1)
+						signal_closed = true
+					elseif not ent.Close then
+						ent.Close = true
+						signal_closed = true
+					end
+					
+					if ent.InvationSignal then
+						ent.InvationSignal = false
+						signal_closed = true
+					end
+					
+					if (ent.LastOpenedRoute and ent.LastOpenedRoute == 1) or ent.Routes[1].Repeater then
+						ent:CloseRoute(1)
+						signal_closed = true
+					else
+						ent:OpenRoute(1)
+					end
+					
+				elseif #ent.Routes >= 1 then
+					for RouteID, RouteInfo in pairs(ent.Routes) do
+						if RouteInfo.RouteName and RouteInfo.RouteName:upper() == Name:upper() then
+							route_found = true
+							if ent.Route == ent.LastOpenedRoute and RouteID == ent.LastOpenedRoute and ent.Routes[RouteID].Switches then
+								ent:CloseRoute(RouteID)
+								route_closed = true						
+							else
+								route_closed = false
+							end
+						end
+					end
+				end		
+			end
+			if signal_found and signal_closed then
+				timer.Simple(0.2, function() 
+					ulx.fancyLog("#s closed signal #s.", ply:Nick(), Name:upper())
+				end)	 	
+			elseif signal_found and not signal_closed then
+				timer.Simple(0.2, function() 
+					ply:ChatPrint("Signal "..Name:upper().." is already closed.")
+				end)	 
+			end
+			if route_found and route_closed then
+				timer.Simple(0.2, function() 
+					ulx.fancyLog("#s closed route #s.", ply:Nick(), Name:upper())
+				end)	 	
+			elseif route_found and not route_closed then
+				timer.Simple(0.2, function() 
+					ply:ChatPrint("Route "..Name:upper().." is already closed.")
+				end)	 
+			end		
+			if not route_found and not signal_found then
+				timer.Simple(0.2, function() 
+					ply:ChatPrint("Signal/Route "..Name:upper().." not found.")
+				end)	 	
+			end
+		elseif comm == "!sopen" then
+			local signal_found = false
+			local signal_opened = false
+			local route_found = false
+			local route_opened = false
+			for _, ent in pairs(ents.FindByClass("gmod_track_signal")) do
+				if ent.Name == Name:upper() then
+					signal_found = true
+					if #ent.Routes == 1 and ent.Routes[1].Manual then
+						ent:OpenRoute(1)
+						signal_opened = true
+					elseif ent.Close then
+						ent.Close = false
+						signal_opened = true
+					end
+				elseif #ent.Routes >= 1 then
+					for RouteID, RouteInfo in pairs(ent.Routes) do
+						if RouteInfo.RouteName and RouteInfo.RouteName:upper() == Name:upper() then
+							route_found = true
+							if ent.Route == ent.LastOpenedRoute and RouteID == ent.LastOpenedRoute and ent.Routes[RouteID].Switches then
+								route_opened = false
+							else
+								ent:OpenRoute(RouteID)
+								route_opened = true
+							end
+						end
+					end
+				end
+			end	
+			if signal_found and signal_opened then
+				timer.Simple(0.2, function() 
+					ulx.fancyLog("#s opened signal #s.", ply:Nick(), Name:upper())
+				end)	 	
+			elseif signal_found and not signal_opened then
+				timer.Simple(0.2, function() 
+					ply:ChatPrint("Signal "..Name:upper().." is already opened.")
+				end)	 
+			end
+			if route_found and route_opened then
+				timer.Simple(0.2, function() 
+					ulx.fancyLog("#s opened route #s.", ply:Nick(), Name:upper())
+				end)	 	
+			elseif route_found and not route_opened then
+				timer.Simple(0.2, function() 
+					ply:ChatPrint("Route "..Name:upper().." is already opened.")
+				end)	 
+			end	
+			if not route_found and not signal_found then
+				timer.Simple(0.2, function() 
+					ply:ChatPrint("Signal/Route "..Name:upper().." not found.")
+				end)	 	
+			end
+		elseif comm == "!sopps" then
+			local signal_found = false
+			local signal_opened = false
+			for _, ent in pairs(ents.FindByClass("gmod_track_signal")) do
+				if ent.Name == Name:upper() then
+					signal_found = true
+					if not ent.InvationSignal and ent.GoodInvationSignal > 1 then
+						ent.InvationSignal = true
+						signal_opened = true
+					end
+				end
+			end	
+			if signal_found and signal_opened then
+				timer.Simple(0.2, function() 
+					ulx.fancyLog("#s opened IS on signal #s.", ply:Nick(), Name:upper())
+				end)
+			elseif not signal_found then
+				timer.Simple(0.2, function() 
+					ply:ChatPrint("Signal "..Name:upper().." not found.")
+				end)
+			end
+		elseif comm == "!sclps" then
+			local signal_found = false
+			local signal_closed = false
+			for _, ent in pairs(ents.FindByClass("gmod_track_signal")) do
+				if ent.Name == Name:upper() then
+					signal_found = true
+					if ent.InvationSignal and ent.GoodInvationSignal > 1 then
+						ent.InvationSignal = false
+						signal_closed = true
+					end
+				end
+			end	
+			if signal_found and signal_closed then
+				timer.Simple(0.2, function() 
+					ulx.fancyLog("#s closed IS on signal #s.", ply:Nick(), Name:upper())
+				end)
+			elseif not signal_found then
+				timer.Simple(0.2, function() 
+					ply:ChatPrint("Signal "..Name:upper().." not found.")
+				end)
+			end
+		elseif Metrostroi.Version > 1537278077 then
+			if comm == "!senao" then
+				local signal_found = false
+				local ao_changed = false
+				for _, ent in pairs(ents.FindByClass("gmod_track_signal")) do
+					if ent.Name == Name:upper() then
+						signal_found = true
+						if ent.AODisabled then ent.AODisabled = false ao_changed = true end
+					end
+				end
+				if signal_found and ao_changed then
+					timer.Simple(0.2, function() 
+						ulx.fancyLog("#s enabled AO on signal #s.", ply:Nick(), Name:upper())
+					end)
+				elseif not signal_found then
+					timer.Simple(0.2, function() 
+						ply:ChatPrint("Signal "..Name:upper().." not found.")
+					end)
+				end
+			elseif comm == "!sdisao" then
+				local signal_found = false
+				local ao_changed = false
+				for _, ent in pairs(ents.FindByClass("gmod_track_signal")) do
+					if ent.Name == Name:upper() then
+						signal_found = true
+						if ent.ARSSpeedLimit == 2 then ent.AODisabled = true ao_changed = true end
+					end
+				end
+				if signal_found and ao_changed then
+					timer.Simple(0.2, function() 
+						ulx.fancyLog("#s disabled AO on signal #s.", ply:Nick(), Name:upper())
+					end)
+				elseif not signal_found then
+					timer.Simple(0.2, function() 
+						ply:ChatPrint("Signal "..Name:upper().." not found.")
+					end)
+				end
+			end
+		end
+	end
 end --SERVER
 
 -- Подключение файлов

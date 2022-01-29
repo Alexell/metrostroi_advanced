@@ -647,7 +647,7 @@ end
 local entitytp = ulx.command( CATEGORY_NAME, "ulx entitytp", ulx.entitytp, "!entitytp" )
 entitytp:addParam{ type=ULib.cmds.StringArg, hint="ID", ULib.cmds.takeRestOfLine }
 entitytp:defaultAccess( ULib.ACCESS_ADMIN )
-entitytp:help("Teleport to any entity by its ID (eg. signalling debug")
+entitytp:help("Teleport to any entity by its ID (eg. signalling debug)")
 
 -- установить собственный бортовой номер вагона (с проверкой на дубликаты!)
 function ulx.setwagnumber(ply, WagNumber)
@@ -834,6 +834,73 @@ end
 local trainstop = ulx.command( CATEGORY_NAME, "ulx trainstop", ulx.trainstop, "!trainstop" )
 trainstop:defaultAccess( ULib.ACCESS_ALL )
 trainstop:help( "Cabin stop." )
+
+-- Обработка команд сигнализации
+function ulx.sopen( calling_ply, arg )
+    MetrostroiAdvanced.SignalSayHook(calling_ply,"!sopen", arg, true)
+end
+local sopen = ulx.command( CATEGORY_NAME, "ulx sopen", ulx.sopen, "!sopen" )
+sopen:addParam{ type=ULib.cmds.StringArg, hint="Signal or route name", ULib.cmds.takeRestOfLine }
+sopen:defaultAccess( ULib.ACCESS_ALL )
+sopen:help( "Open signal or route" )
+
+function ulx.sclose( calling_ply, arg )
+    MetrostroiAdvanced.SignalSayHook(calling_ply,"!sclose", arg, true)
+end
+local sclose = ulx.command( CATEGORY_NAME, "ulx sclose", ulx.sclose, "!sclose" )
+sclose:addParam{ type=ULib.cmds.StringArg, hint="Signal or route name", ULib.cmds.takeRestOfLine }
+sclose:defaultAccess( ULib.ACCESS_ALL )
+sclose:help( "Close signal or route" )
+
+function ulx.sactiv( calling_ply, arg )
+    MetrostroiAdvanced.SignalSayHook(calling_ply,"!sactiv", arg, true)
+end
+local sactiv = ulx.command( CATEGORY_NAME, "ulx sactiv", ulx.sactiv, "!sactiv" )
+sactiv:addParam{ type=ULib.cmds.StringArg, hint="Signal or route name", ULib.cmds.takeRestOfLine }
+sactiv:defaultAccess( ULib.ACCESS_ALL )
+sactiv:help( "Enable auxulary signals" )
+
+function ulx.sdeactiv( calling_ply, arg )
+    MetrostroiAdvanced.SignalSayHook(calling_ply,"!sdeactiv", arg, true)
+end
+local sdeactiv = ulx.command( CATEGORY_NAME, "ulx sdeactiv", ulx.sdeactiv, "!sdeactiv" )
+sdeactiv:addParam{ type=ULib.cmds.StringArg, hint="Signal or route name", ULib.cmds.takeRestOfLine }
+sdeactiv:defaultAccess( ULib.ACCESS_ALL )
+sdeactiv:help( "Disable auxulary signals" )
+
+function ulx.sopps( calling_ply, arg )
+    MetrostroiAdvanced.SignalSayHook(calling_ply,"!sopps", arg, true)
+end
+local sopps = ulx.command( CATEGORY_NAME, "ulx sopps", ulx.sopps, "!sopps" )
+sopps:addParam{ type=ULib.cmds.StringArg, hint="Signal or route name", ULib.cmds.takeRestOfLine }
+sopps:defaultAccess( ULib.ACCESS_ALL )
+sopps:help( "Open invitation signal" )
+
+function ulx.sclps( calling_ply, arg )
+    MetrostroiAdvanced.SignalSayHook(calling_ply,"!sclps", arg, true)
+end
+local sclps = ulx.command( CATEGORY_NAME, "ulx sclps", ulx.sclps, "!sclps" )
+sclps:addParam{ type=ULib.cmds.StringArg, hint="Signal or route name", ULib.cmds.takeRestOfLine }
+sclps:defaultAccess( ULib.ACCESS_ALL )
+sclps:help( "Close invitation signal" )
+
+if Metrostroi.Version > 1537278077 then
+	function ulx.senao( calling_ply, arg )
+		MetrostroiAdvanced.SignalSayHook(calling_ply,"!senao", arg, true)
+	end
+	local senao = ulx.command( CATEGORY_NAME, "ulx senao", ulx.senao, "!senao" )
+	senao:addParam{ type=ULib.cmds.StringArg, hint="Signal", ULib.cmds.takeRestOfLine }
+	senao:defaultAccess( ULib.ACCESS_ALL )
+	senao:help( "Enable absolute stop signal" )
+
+	function ulx.sdisao( calling_ply, arg )
+		MetrostroiAdvanced.SignalSayHook(calling_ply,"!sdisao", arg, true)
+	end
+	local sdisao = ulx.command( CATEGORY_NAME, "ulx sdisao", ulx.sdisao, "!sdisao" )
+	sdisao:addParam{ type=ULib.cmds.StringArg, hint="Signal", ULib.cmds.takeRestOfLine }
+	sdisao:defaultAccess( ULib.ACCESS_ALL )
+	sdisao:help( "Disable absolute stop signal" )
+end
 
 if SERVER then
 	-- Регистрация прав ULX

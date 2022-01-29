@@ -46,8 +46,32 @@ timer.Create("MetrostroiAdvanced.Init",3,1,function()
 		MsgC(Color(0,80,255),"[Metrostroi Advanced] Sounds for '"..madv_lang:GetString().."' language not found!\n")
 		MsgC(Color(0,80,255),"[Metrostroi Advanced] No Entry Announces DISABLED.\n")
 	end
+	if Metrostroi.Version > 1537278077 then
+		if ulx then
+			hook.Remove("PlayerSay","metrostroi-signal-say")
+			MSignalSayHook = MetrostroiAdvanced.SignalSayHook
+		end
+	end
 	timer.Remove("MetrostroiAdvanced.Init")
 end)
+
+if Metrostroi.Version == 1537278077 then
+	timer.Simple(0.5, function()
+		local ENT = scripted_ents.GetStored("gmod_track_signal").t
+		function ENT:Initialize()
+			self:SetModel("models/metrostroi/signals/mus/ars_box.mdl")
+			self.Sprites = {}
+			self.Sig = ""
+			self.FreeBS = 1
+			self.OldBSState = 1
+			self.OutputARS = 1
+			self.EnableDelay = {}
+			self.PostInitalized = true
+
+			self.Controllers = nil
+		end
+	end)
+end
 
 concommand.Add("ma_save_buttonoutput", function( ply, cmd, args )
 	if not ply:IsAdmin() then return end
@@ -505,12 +529,16 @@ timer.Simple(5,function()	-- отсекаем лишний высер в лог 
 			if IsValid(activator) and activator:GetClass() == "player" then				
 				if IsValid(caller) and caller:GetClass() == "player" then 
 					Nick = caller:Nick()
-					ulx.fancyLog("#s "..lang("PressedButton").." #s",Nick,ButtonName)
+					if ulx then
+						ulx.fancyLog("#s "..lang("PressedButton").." #s",Nick,ButtonName)
+					end
 				end	
 			end
 		elseif input == "Press" then
 			Nick = "Someone"
-			ulx.fancyLog("#s "..lang("PressedButton").." #s",Nick,ButtonName)
+			if ulx then
+				ulx.fancyLog("#s "..lang("PressedButton").." #s",Nick,ButtonName)
+			end
 		end
 	end)
 end)
