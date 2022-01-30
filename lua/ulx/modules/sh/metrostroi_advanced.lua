@@ -374,25 +374,30 @@ end
 
 -- Вывод станций в чат
 function ulx.sts( calling_ply )
-	local name_num = 1
-    local lng = GetConVar("metrostroi_advanced_lang"):GetString()
-	if lng ~= "ru" then name_num = 2 end
-	--Проверка на наличие таблицы
-	if not Metrostroi.StationConfigurations then ULib.tsayError(calling_ply, lang("MapNotCongigured"), true) return end	
-	local stationstable = {}
-    for k,v in pairs(Metrostroi.StationConfigurations) do
-		if v.names[name_num] then
-			table.insert(stationstable,{id = tostring(k), name = tostring(v.names[name_num])})
-		else
-			table.insert(stationstable,{id = tostring(k), name = tostring(v.names[1])})
-		end
-    end 
-	table.SortByMember(stationstable, "id",true)
-	timer.Simple(0.1, function() 
-		for k,v in pairs(stationstable) do
-			calling_ply:ChatPrint(v.id.." - "..v.name)
-		end
-	end)
+	if Metrostroi.Version > 1537278077 then
+        net.Start("metrostroi_stations_gui")
+        net.Send(calling_ply)
+	else
+		local name_num = 1
+		local lng = GetConVar("metrostroi_advanced_lang"):GetString()
+		if lng ~= "ru" then name_num = 2 end
+		--Проверка на наличие таблицы
+		if not Metrostroi.StationConfigurations then ULib.tsayError(calling_ply, lang("MapNotCongigured"), true) return end	
+		local stationstable = {}
+		for k,v in pairs(Metrostroi.StationConfigurations) do
+			if v.names[name_num] then
+				table.insert(stationstable,{id = tostring(k), name = tostring(v.names[name_num])})
+			else
+				table.insert(stationstable,{id = tostring(k), name = tostring(v.names[1])})
+			end
+		end 
+		table.SortByMember(stationstable, "id",true)
+		timer.Simple(0.1, function() 
+			for k,v in pairs(stationstable) do
+				calling_ply:ChatPrint(v.id.." - "..v.name)
+			end
+		end)
+	end
 end
 local sts = ulx.command(CATEGORY_NAME, "ulx stations", ulx.sts, "!stations" )
 sts:defaultAccess( ULib.ACCESS_ALL )

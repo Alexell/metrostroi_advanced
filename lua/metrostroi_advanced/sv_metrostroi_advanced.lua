@@ -277,10 +277,16 @@ hook.Add("MetrostroiSpawnerRestrict","MA.TrainSpawnerLimits",function(ply,settin
 end)
 	
 hook.Add("PlayerInitialSpawn","MA.SetPlyParams",function(ply)
-	-- выдаем игроку уникальный номер маршрута на время сессии
-	if (ply:GetInfoNum("ma_routenums",1) == 1) then
-		local rnum = MetrostroiAdvanced.GetRouteNumber(ply)
-		ply:SetNW2Int("MARouteNumber",rnum)
+	-- выдаем игроку номер маршрута
+	local rnum = MetrostroiAdvanced.GetRouteNumber(ply)
+	if Metrostroi.Version > 1537278077 then
+		if (ply:GetInfoNum("metrostroi_route_number",61) == 61) then
+			ply:ConCommand("metrostroi_route_number "..rnum)
+		end
+	else
+		if (ply:GetInfoNum("ma_routenums",1) == 1) then
+			ply:SetNW2Int("MARouteNumber",rnum)
+		end
 	end
 	if AFK_TIME > 0 then
 		ply.NextAFK = CurTime() + AFK_TIME
@@ -357,63 +363,67 @@ hook.Add("MetrostroiCoupled","MA.SetTrainParams",function(train,train2)
 	end
 	
 	-- устанавливаем номер маршрута на состав
-	if (ply:GetInfoNum("ma_routenums",1) == 1) then
-		local rnum = 0
+	local rnum = 0
+	if Metrostroi.Version > 1537278077 then
+		rnum = ply:GetInfoNum("metrostroi_route_number",61)
+	else
 		rnum = ply:GetNW2Int("MARouteNumber")
-		if train:GetClass() == "gmod_subway_81-540_2" then
-			local rtype = train:GetNW2Int("Route",1)
-			if rtype == 1 then
-				if rnum < 10 then
-					rnum = "0"..tostring(rnum).."0"
-				else
-					rnum = tostring(rnum).."00"
-				end
-				train.RouteNumbera.RouteNumbera = rnum
-				train:SetNW2String("RouteNumbera",rnum)
+		if (ply:GetInfoNum("ma_routenums",1) == 0) then return end
+	end
+
+	if train:GetClass() == "gmod_subway_81-540_2" then
+		local rtype = train:GetNW2Int("Route",1)
+		if rtype == 1 then
+			if rnum < 10 then
+				rnum = "0"..tostring(rnum).."0"
+			else
+				rnum = tostring(rnum).."00"
 			end
-			if rtype == 2 then
-				if rnum < 10 then
-					rnum = "00"..tostring(rnum)
-				else
-					rnum = "0"..tostring(rnum)
-				end
-				train.RouteNumbera.RouteNumbera = rnum
-				train:SetNW2String("RouteNumbera",rnum)
-			end
-			if rtype == 3 then
-				if train.RouteNumberSys then
-					train.RouteNumberSys.CurrentRouteNumber = rnum
-				end
-			end
-		elseif train:GetClass() == "gmod_subway_81-540_2k" then
-			train.RouteNumber.RouteNumber = rnum
-			train.RouteNumber.CurrentRouteNumber = rnum
-		elseif train:GetClass() == "gmod_subway_81-722" or train:GetClass() == "gmod_subway_81-722_3" or train:GetClass() == "gmod_subway_81-722_new" or train:GetClass() == "gmod_subway_81-7175p" then
-			train.RouteNumberSys.CurrentRouteNumber = rnum
-		elseif train:GetClass() == "gmod_subway_81-717_6" then
-			train.ASNP.RouteNumber = rnum
-		elseif train:GetClass() == "gmod_subway_81-502" or train:GetClass() == "gmod_subway_81-540" or train:GetClass() == "gmod_subway_81-540_1" or train:GetClass() == "gmod_subway_81-540_8" or train:GetClass() == "gmod_subway_81-717_lvz" then
+			train.RouteNumbera.RouteNumbera = rnum
+			train:SetNW2String("RouteNumbera",rnum)
+		end
+		if rtype == 2 then
 			if rnum < 10 then
 				rnum = "00"..tostring(rnum)
 			else
 				rnum = "0"..tostring(rnum)
 			end
+			train.RouteNumbera.RouteNumbera = rnum
+			train:SetNW2String("RouteNumbera",rnum)
+		end
+		if rtype == 3 then
+			if train.RouteNumberSys then
+				train.RouteNumberSys.CurrentRouteNumber = rnum
+			end
+		end
+	elseif train:GetClass() == "gmod_subway_81-540_2k" then
+		train.RouteNumber.RouteNumber = rnum
+		train.RouteNumber.CurrentRouteNumber = rnum
+	elseif train:GetClass() == "gmod_subway_81-722" or train:GetClass() == "gmod_subway_81-722_3" or train:GetClass() == "gmod_subway_81-722_new" or train:GetClass() == "gmod_subway_81-7175p" then
+		train.RouteNumberSys.CurrentRouteNumber = rnum
+	elseif train:GetClass() == "gmod_subway_81-717_6" then
+		train.ASNP.RouteNumber = rnum
+	elseif train:GetClass() == "gmod_subway_81-502" or train:GetClass() == "gmod_subway_81-540" or train:GetClass() == "gmod_subway_81-540_1" or train:GetClass() == "gmod_subway_81-540_8" or train:GetClass() == "gmod_subway_81-717_lvz" then
+		if rnum < 10 then
+			rnum = "00"..tostring(rnum)
+		else
+			rnum = "0"..tostring(rnum)
+		end
+		train.RouteNumber.RouteNumber = rnum
+		train:SetNW2String("RouteNumber",rnum)
+	elseif train:GetClass() == "gmod_subway_81-760" or train:GetClass() == "gmod_subway_81-760a" then
+		train.BMCIS.RouteNumber = rnum
+		train:SetNW2Int("RouteNumber:RouteNumber",rnum)
+		train.RouteNumber.RouteNumber = rnum
+	else
+		if train.RouteNumber then
+			if rnum < 10 then
+				rnum = "0"..tostring(rnum).."0"
+			else
+				rnum = tostring(rnum).."0"
+			end
 			train.RouteNumber.RouteNumber = rnum
 			train:SetNW2String("RouteNumber",rnum)
-		elseif train:GetClass() == "gmod_subway_81-760" or train:GetClass() == "gmod_subway_81-760a" then
-			train.BMCIS.RouteNumber = rnum
-			train:SetNW2Int("RouteNumber:RouteNumber",rnum)
-			train.RouteNumber.RouteNumber = rnum
-		else
-			if train.RouteNumber then
-				if rnum < 10 then
-					rnum = "0"..tostring(rnum).."0"
-				else
-					rnum = tostring(rnum).."0"
-				end
-				train.RouteNumber.RouteNumber = rnum
-				train:SetNW2String("RouteNumber",rnum)
-			end
 		end
 	end
 end)

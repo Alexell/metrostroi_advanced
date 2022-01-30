@@ -10,7 +10,9 @@
 if SERVER then return end
 
 CreateClientConVar("ma_autoinformator","0",true,true,"Enable autoannouncer (def = 1 - enabled)")
-CreateClientConVar("ma_routenums","1",true,true,"Auto-generate route number on train spawn (def = 1 - enabled)")
+if Metrostroi.Version == 1537278077 then
+	CreateClientConVar("ma_routenums","1",true,true,"Auto-generate route number on train spawn (def = 1 - enabled)")
+end
 CreateClientConVar("ma_clientoptimize","1",true,false)
 CreateClientConVar("ma_voltage","0",false,false,"Third rail voltage")
 CreateClientConVar("ma_curlim","0",false,false,"Third rail current limit")
@@ -135,8 +137,10 @@ local function ClientPanel(panel)
 	panel:Help("") -- отступ
 	panel:Help("") -- отступ
 	panel:ControlHelp(lang("CPOptions"))
-	panel:CheckBox(lang("CPRouteNum"),"ma_routenums")
-	panel:Help("      "..lang("CPNeedReconnect"))
+	if Metrostroi.Version == 1537278077 then
+		panel:CheckBox(lang("CPRouteNum"),"ma_routenums")
+		panel:Help("      "..lang("CPNeedReconnect"))
+	end
 	panel:CheckBox(lang("CPUseAutoinform"),"ma_autoinformator")
 	panel:CheckBox(lang("CPUseAutoALSDecoder"),"ma_auto_alsdecoder")
 end
