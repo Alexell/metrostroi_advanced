@@ -1,3 +1,4 @@
+return
 ------------------------ Metrostroi Advanced -------------------------
 -- Developers:
 -- Alexell | https://steamcommunity.com/profiles/76561198210303223
@@ -47,6 +48,9 @@ function MetrostroiAdvanced.LoadLanguage(lang)
 end
 
 if SERVER then
+	local function lang(str)
+		return MetrostroiAdvanced.Lang[str]
+	end
 	-- Список слов из точек телепорта для игнорирования запрета спавна на станциях
 	function MetrostroiAdvanced.LoadStationsIgnore()
 		if not file.Exists("metrostroi_advanced/stations_ignore.txt","DATA") then
@@ -241,7 +245,7 @@ if SERVER then
 		else
 			ent_station = "N/A"
 		end
-		if (ent_station=="") then ent_station = MetrostroiAdvanced.Lang["UnknownPlace"] end
+		if (ent_station=="") then ent_station = lang("UnknownPlace") end
 		return ent_station
 	end
 
@@ -415,16 +419,16 @@ if SERVER then
 			end
 			if route_found and route_opened then
 				timer.Simple(0.2, function() 
-					ulx.fancyLog("#s opened emergency route #s.", ply:Nick(), Name:upper())
+					ulx.fancyLog("#s "..lang("OpenedEmerRoute").." #s.", ply:Nick(), Name:upper())
 				end)	 	
 			elseif route_found and not route_opened then
 				timer.Simple(0.2, function() 
-					ply:ChatPrint("Emergency route "..Name:upper().." is already opened.")
+					ply:ChatPrint(lang("EmerRoute").." "..Name:upper().." "..lang("AlreadyOpened")..".")
 				end)	 
 			end		
 			if not route_found then
 				timer.Simple(0.2, function() 
-					ply:ChatPrint("Emergency route "..Name:upper().." not found.")
+					ply:ChatPrint(lang("EmerRoute").." "..Name:upper().." "..lang("NotFound")..".")
 				end)
 			end
 		elseif comm == "!sdeactiv" then
@@ -444,16 +448,16 @@ if SERVER then
 			end
 			if route_found and route_closed then
 				timer.Simple(0.2, function() 
-					ulx.fancyLog("#s closed emergency route #s.", ply:Nick(), Name:upper())
+					ulx.fancyLog("#s "..lang("ClosedEmerRoute").." #s.", ply:Nick(), Name:upper())
 				end)	 	
 			elseif route_found and not route_closed then
 				timer.Simple(0.2, function() 
-					ply:ChatPrint("Emergency route "..Name:upper().." is already closed.") 
+					ply:ChatPrint(lang("EmerRoute").." "..Name:upper().." "..lang("AlreadyClosed")..".") 
 				end) 
 			end		
 			if not route_found then
 				timer.Simple(0.2, function() 
-					ply:ChatPrint("Emergency route "..Name:upper().." not found.")
+					ply:ChatPrint(lang("EmerRoute").." "..Name:upper().." "..lang("NotFound")..".")
 				end)
 			end
 		elseif comm == "!sclose" then
@@ -500,25 +504,25 @@ if SERVER then
 			end
 			if signal_found and signal_closed then
 				timer.Simple(0.2, function() 
-					ulx.fancyLog("#s closed signal #s.", ply:Nick(), Name:upper())
+					ulx.fancyLog("#s "..lang("ClosedSignal").." #s.", ply:Nick(), Name:upper())
 				end)	 	
 			elseif signal_found and not signal_closed then
 				timer.Simple(0.2, function() 
-					ply:ChatPrint("Signal "..Name:upper().." is already closed.")
+					ply:ChatPrint(lang("Signal").." "..Name:upper()..lang("AlreadyClosed")..".")
 				end)	 
 			end
 			if route_found and route_closed then
 				timer.Simple(0.2, function() 
-					ulx.fancyLog("#s closed route #s.", ply:Nick(), Name:upper())
+					ulx.fancyLog("#s "..lang("ClosedRoute").." #s.", ply:Nick(), Name:upper())
 				end)	 	
 			elseif route_found and not route_closed then
 				timer.Simple(0.2, function() 
-					ply:ChatPrint("Route "..Name:upper().." is already closed.")
+					ply:ChatPrint(lang("Route").." "..Name:upper()..lang("AlreadyClosed")..".")
 				end)	 
 			end		
 			if not route_found and not signal_found then
 				timer.Simple(0.2, function() 
-					ply:ChatPrint("Signal/Route "..Name:upper().." not found.")
+					ply:ChatPrint(lang("SignalOrRoute").." "..Name:upper()..lang("NotFound")..".")
 				end)	 	
 			end
 		elseif comm == "!sopen" then
@@ -552,25 +556,25 @@ if SERVER then
 			end	
 			if signal_found and signal_opened then
 				timer.Simple(0.2, function() 
-					ulx.fancyLog("#s opened signal #s.", ply:Nick(), Name:upper())
+					ulx.fancyLog("#s "..lang("OpenedSignal").." #s.", ply:Nick(), Name:upper())
 				end)	 	
 			elseif signal_found and not signal_opened then
 				timer.Simple(0.2, function() 
-					ply:ChatPrint("Signal "..Name:upper().." is already opened.")
+					ply:ChatPrint(lang("Signal").." "..Name:upper().." "..lang("AlreadyOpened")..".")
 				end)	 
 			end
 			if route_found and route_opened then
 				timer.Simple(0.2, function() 
-					ulx.fancyLog("#s opened route #s.", ply:Nick(), Name:upper())
+					ulx.fancyLog("#s "..lang("OpenedRoute").." #s.", ply:Nick(), Name:upper())
 				end)	 	
 			elseif route_found and not route_opened then
 				timer.Simple(0.2, function() 
-					ply:ChatPrint("Route "..Name:upper().." is already opened.")
+					ply:ChatPrint(lang("Route").." "..Name:upper().." "..lang("AlreadyOpened")..".")
 				end)	 
 			end	
 			if not route_found and not signal_found then
 				timer.Simple(0.2, function() 
-					ply:ChatPrint("Signal/Route "..Name:upper().." not found.")
+					ply:ChatPrint(lang("SignalOrRoute").." "..Name:upper()..lang("NotFound")..".")
 				end)	 	
 			end
 		elseif comm == "!sopps" then
@@ -587,11 +591,11 @@ if SERVER then
 			end	
 			if signal_found and signal_opened then
 				timer.Simple(0.2, function() 
-					ulx.fancyLog("#s opened IS on signal #s.", ply:Nick(), Name:upper())
+					ulx.fancyLog("#s "..lang("OpenedIS").." #s.", ply:Nick(), Name:upper())
 				end)
 			elseif not signal_found then
 				timer.Simple(0.2, function() 
-					ply:ChatPrint("Signal "..Name:upper().." not found.")
+					ply:ChatPrint(lang("Signal").." "..Name:upper()..lang("NotFound")..".")
 				end)
 			end
 		elseif comm == "!sclps" then
@@ -608,11 +612,11 @@ if SERVER then
 			end	
 			if signal_found and signal_closed then
 				timer.Simple(0.2, function() 
-					ulx.fancyLog("#s closed IS on signal #s.", ply:Nick(), Name:upper())
+					ulx.fancyLog("#s "..lang("ClosedIS").." #s.", ply:Nick(), Name:upper())
 				end)
 			elseif not signal_found then
 				timer.Simple(0.2, function() 
-					ply:ChatPrint("Signal "..Name:upper().." not found.")
+					ply:ChatPrint(lang("Signal").." "..Name:upper()..lang("NotFound")..".")
 				end)
 			end
 		elseif Metrostroi.Version > 1537278077 then
@@ -627,11 +631,11 @@ if SERVER then
 				end
 				if signal_found and ao_changed then
 					timer.Simple(0.2, function() 
-						ulx.fancyLog("#s enabled AO on signal #s.", ply:Nick(), Name:upper())
+						ulx.fancyLog("#s "..lang("EnabledAS").." #s.", ply:Nick(), Name:upper())
 					end)
 				elseif not signal_found then
 					timer.Simple(0.2, function() 
-						ply:ChatPrint("Signal "..Name:upper().." not found.")
+						ply:ChatPrint(lang("Signal").." "..Name:upper()..lang("NotFound")..".")
 					end)
 				end
 			elseif comm == "!sdisao" then
@@ -645,11 +649,11 @@ if SERVER then
 				end
 				if signal_found and ao_changed then
 					timer.Simple(0.2, function() 
-						ulx.fancyLog("#s disabled AO on signal #s.", ply:Nick(), Name:upper())
+						ulx.fancyLog("#s "..lang("DisabledAS").." #s.", ply:Nick(), Name:upper())
 					end)
 				elseif not signal_found then
 					timer.Simple(0.2, function() 
-						ply:ChatPrint("Signal "..Name:upper().." not found.")
+						ply:ChatPrint(lang("Signal").." "..Name:upper()..lang("NotFound")..".")
 					end)
 				end
 			end
