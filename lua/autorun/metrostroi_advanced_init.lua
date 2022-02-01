@@ -1,4 +1,3 @@
-return
 ------------------------ Metrostroi Advanced -------------------------
 -- Developers:
 -- Alexell | https://steamcommunity.com/profiles/76561198210303223
@@ -14,9 +13,7 @@ if not Metrostroi or not Metrostroi.Version or Metrostroi.Version < 1537278077 t
 end
 
 -- Создаем MetrostroiAdvanced глобально
-if not MetrostroiAdvanced then
-	MetrostroiAdvanced = {}
-end
+MetrostroiAdvanced = MetrostroiAdvanced or {}
 if SERVER then
 	MetrostroiAdvanced.TrainList = {}
 	MetrostroiAdvanced.StationsIgnore = {}
@@ -405,59 +402,71 @@ if SERVER then
 		if comm == "!sactiv" then
 			local route_found = false
 			local route_opened = false
+			local names = ""
 			for _, ent in pairs(ents.FindByClass("gmod_track_signal")) do
 				if ent.Routes then
 					for RouteID, RouteInfo in pairs(ent.Routes) do
 						if (RouteInfo.RouteName and RouteInfo.RouteName:upper() == Name:upper() or Name == "*") and RouteInfo.Emer then
 							route_found = true
 							if ent.LastOpenedRoute and k != ent.LastOpenedRoute then ent:CloseRoute(self.LastOpenedRoute) end
-							RouteInfo.IsOpened = true
-							route_opened = true
+							if not RouteInfo.IsOpened then
+								RouteInfo.IsOpened = true
+								route_opened = true
+							end
+							if names == "" then names = ent.Name
+							else names = names ..", "..ent.Name 
+							end
 						end
 					end
-				end	
+				end    
 			end
 			if route_found and route_opened then
 				timer.Simple(0.2, function() 
-					ulx.fancyLog("#s "..lang("OpenedEmerRoute").." #s.", ply:Nick(), Name:upper())
+					ulx.fancyLog("#s "..lang("OpenedEmerRoute").." #s.", ply:Nick(), names)
 				end)	 	
 			elseif route_found and not route_opened then
 				timer.Simple(0.2, function() 
-					ply:ChatPrint(lang("EmerRoute").." "..Name:upper().." "..lang("AlreadyOpened")..".")
+					ply:ChatPrint(lang("EmerRoute").." "..names.." "..lang("AlreadyEnabled")..".")
 				end)	 
 			end		
 			if not route_found then
 				timer.Simple(0.2, function() 
-					ply:ChatPrint(lang("EmerRoute").." "..Name:upper().." "..lang("NotFound")..".")
+					ply:ChatPrint(lang("EmerRoute").." "..names.." "..lang("NotFound")..".")
 				end)
 			end
 		elseif comm == "!sdeactiv" then
 			local route_found = false
 			local route_closed = false
+			local names = ""
 			for _, ent in pairs(ents.FindByClass("gmod_track_signal")) do
 				if ent.Routes then
 					for RouteID, RouteInfo in pairs(ent.Routes) do
 						if (RouteInfo.RouteName and RouteInfo.RouteName:upper() == Name:upper() or Name == "*") and RouteInfo.Emer then
 							route_found = true
 							if ent.LastOpenedRoute and k != ent.LastOpenedRoute then ent:CloseRoute(self.LastOpenedRoute) end
-							RouteInfo.IsOpened = false
-							route_closed = true
+							if RouteInfo.IsOpened then
+								RouteInfo.IsOpened = false
+								route_closed = true
+							end
+							if names == "" then names = ent.Name
+							else names = names ..", "..ent.Name 
+							end
 						end
 					end
-				end	
+				end    
 			end
 			if route_found and route_closed then
 				timer.Simple(0.2, function() 
-					ulx.fancyLog("#s "..lang("ClosedEmerRoute").." #s.", ply:Nick(), Name:upper())
+					ulx.fancyLog("#s "..lang("ClosedEmerRoute").." #s.", ply:Nick(), names)
 				end)	 	
 			elseif route_found and not route_closed then
 				timer.Simple(0.2, function() 
-					ply:ChatPrint(lang("EmerRoute").." "..Name:upper().." "..lang("AlreadyClosed")..".") 
+					ply:ChatPrint(lang("EmerRoute").." "..names.." "..lang("AlreadyDisabled")..".")
 				end) 
 			end		
 			if not route_found then
 				timer.Simple(0.2, function() 
-					ply:ChatPrint(lang("EmerRoute").." "..Name:upper().." "..lang("NotFound")..".")
+					ply:ChatPrint(lang("EmerRoute").." "..names.." "..lang("NotFound")..".")
 				end)
 			end
 		elseif comm == "!sclose" then
