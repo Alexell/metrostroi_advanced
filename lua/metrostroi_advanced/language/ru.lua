@@ -32,6 +32,7 @@ MetrostroiAdvanced.Lang["gmod_subway_81-720a"] 				= "81-720A (Яуза)"
 MetrostroiAdvanced.Lang["gmod_subway_81-722"] 				= "81-722 (Юбилейный)"
 MetrostroiAdvanced.Lang["gmod_subway_81-722_3"] 			= "81-722.3 (Юбилейный)"
 MetrostroiAdvanced.Lang["gmod_subway_81-722_new"] 			= "81-722 (Юбилейный)"
+MetrostroiAdvanced.Lang["gmod_subway_81-740_4"] 			= "81-740.4 (Русич)"
 MetrostroiAdvanced.Lang["gmod_subway_81-760"] 				= "81-760 (Ока)"
 MetrostroiAdvanced.Lang["gmod_subway_81-760a"] 				= "81-760A (Ока)"
 
