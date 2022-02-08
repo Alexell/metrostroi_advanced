@@ -262,14 +262,14 @@ if SERVER then
 				rnum = tonumber(train.RouteNumbera.RouteNumbera)
 			elseif cl == "gmod_subway_81-722" or cl == "gmod_subway_81-722_3" or cl == "gmod_subway_81-722_new" or cl == "gmod_subway_81-7175p" then
 				rnum2 = tonumber(train.RouteNumberSys.RouteNumber)
-			elseif cl == "gmod_subway_81-717_6" then
+			elseif cl == "gmod_subway_81-717_6" or cl == "gmod_subway_81-740_4" then
 				rnum2 = train.ASNP.RouteNumber
 			else
 				if train.RouteNumber then
 					rnum2 = tonumber(train.RouteNumber.RouteNumber)
 				end
 			end
-			if table.HasValue({"gmod_subway_81-702","gmod_subway_81-703","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_ezh3ru1","gmod_subway_81-717_mvm","gmod_subway_81-718","gmod_subway_81-720","gmod_subway_81-720_1","gmod_subway_81-720a","gmod_subway_81-717_freight"},cl) then rnum2 = rnum2 / 10 end
+			if table.HasValue({"gmod_subway_em508","gmod_subway_81-702","gmod_subway_81-703","gmod_subway_81-705_old","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_ezh3ru1","gmod_subway_81-717_mvm","gmod_subway_81-718","gmod_subway_81-720","gmod_subway_81-720_1","gmod_subway_81-720a","gmod_subway_81-717_freight"},cl) then rnum2 = rnum2 / 10 end
 			routes[owner:Nick()] = rnum2
 		end
 		if #routes > 0 then
@@ -348,8 +348,8 @@ if SERVER then
 			if station == "" and game.GetMap():find("gm_mus_loop") then return -1 end -- для таблички "Кольцевой" на MSS
 		end
 		
-		-- 81-720.1 и 81-717.5A (только ASNP)
-		if (station == -1 and (train:GetClass():find("81-720_1",1,true) or train:GetClass():find("81-717_5a",1,true)) and train.ASNP) then
+		-- 81-720.1, 81-717.5A и 81-740.4 (только ASNP)
+		if (station == -1 and (train:GetClass():find("81-720_1",1,true) or train:GetClass():find("81-717_5a",1,true) or train:GetClass():find("81-740_4",1,true)) and train.ASNP) then
 			if train.ASNP.State < 7 then return 1111 end
 			local tbl = Metrostroi.ASNPSetup[train:GetNW2Int("Announcer",1)] and Metrostroi.ASNPSetup[train:GetNW2Int("Announcer",1)][train.ASNP.Line]
 			if tbl and (tbl.Loop and train.ASNP.LastStation == 0) then tbl = nil return -1 end -- когда выбран "Кольцевой", срабатывать не будет

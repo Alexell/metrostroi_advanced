@@ -401,7 +401,7 @@ hook.Add("MetrostroiCoupled","MA.SetTrainParams",function(train,train2)
 		train.RouteNumber.CurrentRouteNumber = rnum
 	elseif train:GetClass() == "gmod_subway_81-722" or train:GetClass() == "gmod_subway_81-722_3" or train:GetClass() == "gmod_subway_81-722_new" or train:GetClass() == "gmod_subway_81-7175p" then
 		train.RouteNumberSys.CurrentRouteNumber = rnum
-	elseif train:GetClass() == "gmod_subway_81-717_6" then
+	elseif train:GetClass() == "gmod_subway_81-717_6" or train:GetClass() == "gmod_subway_81-740_4" then
 		train.ASNP.RouteNumber = rnum
 	elseif train:GetClass() == "gmod_subway_81-502" or train:GetClass() == "gmod_subway_81-540" or train:GetClass() == "gmod_subway_81-540_1" or train:GetClass() == "gmod_subway_81-540_8" or train:GetClass() == "gmod_subway_81-717_lvz" then
 		if rnum < 10 then

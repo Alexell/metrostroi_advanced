@@ -518,14 +518,14 @@ function ulx.wagons( calling_ply )
 			rnum = tonumber(train.RouteNumbera.RouteNumbera)
 		elseif cl == "gmod_subway_81-722" or cl == "gmod_subway_81-722_3" or cl == "gmod_subway_81-722_new" or cl == "gmod_subway_81-7175p" then
 			rnum = tonumber(train.RouteNumberSys.RouteNumber)
-		elseif cl == "gmod_subway_81-717_6" then
+		elseif cl == "gmod_subway_81-717_6" or cl == "gmod_subway_81-740_4" then
 			rnum = train.ASNP.RouteNumber
 		else
 			if train.RouteNumber then
 				rnum = tonumber(train.RouteNumber.RouteNumber)
 			end
 		end
-		if table.HasValue({"gmod_subway_81-702","gmod_subway_81-703","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_ezh3ru1","gmod_subway_81-717_mvm","gmod_subway_81-718","gmod_subway_81-720","gmod_subway_81-720_1","gmod_subway_81-720a","gmod_subway_81-717_freight"},cl) then
+		if table.HasValue({"gmod_subway_em508","gmod_subway_81-702","gmod_subway_81-703","gmod_subway_81-705_old","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_ezh3ru1","gmod_subway_81-717_mvm","gmod_subway_81-718","gmod_subway_81-720","gmod_subway_81-720_1","gmod_subway_81-720a","gmod_subway_81-717_freight"},cl) then
 			rnum = rnum / 10
 		end
 		Routes[ply:Nick()] = tostring(rnum)
