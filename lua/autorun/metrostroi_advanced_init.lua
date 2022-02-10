@@ -553,7 +553,7 @@ if SERVER then
 					for RouteID, RouteInfo in pairs(ent.Routes) do
 						if RouteInfo.RouteName and RouteInfo.RouteName:upper() == Name:upper() then
 							route_found = true
-							if ent.Route == ent.LastOpenedRoute and RouteID == ent.LastOpenedRoute and ent.Routes[RouteID].Switches then
+							if ent.Route == ent.LastOpenedRoute and RouteID == ent.LastOpenedRoute and ent.Routes[RouteID].IsOpened then
 								route_opened = false
 							else
 								ent:OpenRoute(RouteID)
