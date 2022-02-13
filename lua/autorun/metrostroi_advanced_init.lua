@@ -480,32 +480,32 @@ if SERVER then
 					if #ent.Routes == 1 and ent.Routes[1].Manual then
 						ent:CloseRoute(1)
 						signal_closed = true
-					elseif not ent.Close then
-						ent.Close = true
-						signal_closed = true
-					end
-					
-					if ent.InvationSignal then
-						ent.InvationSignal = false
-						signal_closed = true
-					end
-					
-					if (ent.LastOpenedRoute and ent.LastOpenedRoute == 1) or ent.Routes[1].Repeater then
-						ent:CloseRoute(1)
-						signal_closed = true
 					else
-						ent:OpenRoute(1)
+						if not ent.Close then
+							ent.Close = true
+							signal_closed = true
+						end
+						
+						if ent.InvationSignal then
+							ent.InvationSignal = false
+							signal_closed = true
+						end
+						
+						if (ent.LastOpenedRoute and ent.LastOpenedRoute == 1) or ent.Routes[1].Repeater then
+							ent:CloseRoute(1)
+							signal_closed = true
+						else
+							ent:OpenRoute(1)
+						end
 					end
-					
 				elseif #ent.Routes >= 1 then
 					for RouteID, RouteInfo in pairs(ent.Routes) do
 						if RouteInfo.RouteName and RouteInfo.RouteName:upper() == Name:upper() then
 							route_found = true
-							if ent.Route == ent.LastOpenedRoute and RouteID == ent.LastOpenedRoute and ent.Routes[RouteID].Switches then
+							if ent.LastOpenedRoute and ent.LastOpenedRoute == RouteID and ent.Routes[RouteID].Switches then
 								ent:CloseRoute(RouteID)
-								route_closed = true						
-							else
-								route_closed = false
+								ent.LastOpenedRoute = 0
+								route_closed = true	
 							end
 						end
 					end
@@ -553,10 +553,10 @@ if SERVER then
 					for RouteID, RouteInfo in pairs(ent.Routes) do
 						if RouteInfo.RouteName and RouteInfo.RouteName:upper() == Name:upper() then
 							route_found = true
-							if ent.Route == ent.LastOpenedRoute and RouteID == ent.LastOpenedRoute and ent.Routes[RouteID].IsOpened then
+							if ent.LastOpenedRoute and ent.LastOpenedRoute == RouteID and ent.Routes[RouteID].IsOpened then
 								route_opened = false
 							else
-								ent:OpenRoute(RouteID)
+								ent:OpenRoute(RouteID) 
 								route_opened = true
 							end
 						end
