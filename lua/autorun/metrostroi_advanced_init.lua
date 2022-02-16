@@ -408,7 +408,7 @@ if SERVER then
 					for RouteID, RouteInfo in pairs(ent.Routes) do
 						if (RouteInfo.RouteName and RouteInfo.RouteName:upper() == Name:upper() or Name == "*") and RouteInfo.Emer then
 							route_found = true
-							if ent.LastOpenedRoute and k != ent.LastOpenedRoute then ent:CloseRoute(self.LastOpenedRoute) end
+							if ent.LastOpenedRoute and k != ent.LastOpenedRoute then ent:CloseRoute(ent.LastOpenedRoute) end
 							if not RouteInfo.IsOpened then
 								RouteInfo.IsOpened = true
 								route_opened = true
@@ -443,7 +443,7 @@ if SERVER then
 					for RouteID, RouteInfo in pairs(ent.Routes) do
 						if (RouteInfo.RouteName and RouteInfo.RouteName:upper() == Name:upper() or Name == "*") and RouteInfo.Emer then
 							route_found = true
-							if ent.LastOpenedRoute and k != ent.LastOpenedRoute then ent:CloseRoute(self.LastOpenedRoute) end
+							if ent.LastOpenedRoute and k != ent.LastOpenedRoute then ent:CloseRoute(ent.LastOpenedRoute) end
 							if RouteInfo.IsOpened then
 								RouteInfo.IsOpened = false
 								route_closed = true
