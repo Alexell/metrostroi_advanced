@@ -590,7 +590,7 @@ if SERVER then
 			for _, ent in pairs(ents.FindByClass("gmod_track_signal")) do
 				if ent.Name == Name:upper() then
 					signal_found = true
-					if not ent.InvationSignal and ent.GoodInvationSignal > 1 then
+					if not ent.InvationSignal and ent.GoodInvationSignal != 0 then
 						ent.InvationSignal = true
 						signal_opened = true
 					end
@@ -611,7 +611,7 @@ if SERVER then
 			for _, ent in pairs(ents.FindByClass("gmod_track_signal")) do
 				if ent.Name == Name:upper() then
 					signal_found = true
-					if ent.InvationSignal and ent.GoodInvationSignal > 1 then
+					if ent.InvationSignal and ent.GoodInvationSignal != 0 then
 						ent.InvationSignal = false
 						signal_closed = true
 					end
