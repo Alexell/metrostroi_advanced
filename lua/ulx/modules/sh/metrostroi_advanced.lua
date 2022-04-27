@@ -756,30 +756,30 @@ function ulx.ch( calling_ply )
 	if not IsValid(calling_ply) then return end
 	local seat = calling_ply:GetVehicle()
 	if not IsValid(seat) then return end
-	local seattype = seat:GetNW2String("SeatType")
 	local train = seat:GetNW2Entity("TrainEntity")
 	if not IsValid(train) then return end
-	local seatpos = train:WorldToLocal(seat:GetPos())
-	for t,wag in pairs(train.WagonList) do
-		if (wag:GetClass() == train:GetClass() and wag ~= train) then
-			calling_ply:ExitVehicle()
-			calling_ply:SetMoveType(8)
-			if seattype == "driver" then
-				wag.DriverSeat:UseClientSideAnimation()
-				timer.Simple(1, function()
-					wag.DriverSeat:Use(calling_ply,calling_ply,3,1)
-				end)
+	local seatlink = ""
+	
+	local seats = {"DriverSeat","InstructorsSeat","ExtraSeat"}
+	for _,st in pairs(seats) do
+		for i=0,4 do
+			if i == 0 then i = "" end
+			if IsValid(train[st..i]) and train[st..i] == seat then
+				seatlink = st..i
 				break
-			else
-				local seats = ents.FindInSphere(wag:LocalToWorld(seatpos),2)
-				for w,s in pairs(seats) do
-					if s:GetNW2String("SeatType") ~= "instructor" then return end
-					s:UseClientSideAnimation()
-					timer.Simple(1, function()
-						s:Use(calling_ply,calling_ply,3,1)
-					end)
-					break
-				end
+			end
+		end
+	end
+	
+	if seatlink ~= "" then
+		for t,wag in pairs(train.WagonList) do
+			if (wag:GetClass() == train:GetClass() and wag ~= train) then
+				calling_ply:ExitVehicle()
+				calling_ply:SetMoveType(8)
+				wag[seatlink]:UseClientSideAnimation()
+				timer.Simple(1, function()
+					wag[seatlink]:Use(calling_ply,calling_ply,3,1)
+				end)
 			end
 		end
 	end

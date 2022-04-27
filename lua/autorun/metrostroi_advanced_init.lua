@@ -517,7 +517,7 @@ if SERVER then
 				end)	 	
 			elseif signal_found and not signal_closed then
 				timer.Simple(0.2, function() 
-					ply:ChatPrint(lang("Signal").." "..Name:upper()..lang("AlreadyClosed")..".")
+					ply:ChatPrint(lang("Signal").." "..Name:upper().." "..lang("AlreadyClosed")..".")
 				end)	 
 			end
 			if route_found and route_closed then
@@ -526,12 +526,12 @@ if SERVER then
 				end)	 	
 			elseif route_found and not route_closed then
 				timer.Simple(0.2, function() 
-					ply:ChatPrint(lang("Route").." "..Name:upper()..lang("AlreadyClosed")..".")
+					ply:ChatPrint(lang("Route").." "..Name:upper().." "..langlang("AlreadyClosed")..".")
 				end)	 
 			end		
 			if not route_found and not signal_found then
 				timer.Simple(0.2, function() 
-					ply:ChatPrint(lang("SignalOrRoute").." "..Name:upper()..lang("NotFound")..".")
+					ply:ChatPrint(lang("SignalOrRoute").." "..Name:upper().." "..lang("NotFound")..".")
 				end)	 	
 			end
 		elseif comm == "!sopen" then
@@ -581,7 +581,7 @@ if SERVER then
 			end	
 			if not route_found and not signal_found then
 				timer.Simple(0.2, function() 
-					ply:ChatPrint(lang("SignalOrRoute").." "..Name:upper()..lang("NotFound")..".")
+					ply:ChatPrint(lang("SignalOrRoute").." "..Name:upper().." "..lang("NotFound")..".")
 				end)	 	
 			end
 		elseif comm == "!sopps" then
@@ -602,7 +602,7 @@ if SERVER then
 				end)
 			elseif not signal_found then
 				timer.Simple(0.2, function() 
-					ply:ChatPrint(lang("Signal").." "..Name:upper()..lang("NotFound")..".")
+					ply:ChatPrint(lang("Signal").." "..Name:upper().." "..lang("NotFound")..".")
 				end)
 			end
 		elseif comm == "!sclps" then
@@ -623,7 +623,7 @@ if SERVER then
 				end)
 			elseif not signal_found then
 				timer.Simple(0.2, function() 
-					ply:ChatPrint(lang("Signal").." "..Name:upper()..lang("NotFound")..".")
+					ply:ChatPrint(lang("Signal").." "..Name:upper().." "..lang("NotFound")..".")
 				end)
 			end
 		elseif Metrostroi.Version > 1537278077 then
@@ -642,7 +642,7 @@ if SERVER then
 					end)
 				elseif not signal_found then
 					timer.Simple(0.2, function() 
-						ply:ChatPrint(lang("Signal").." "..Name:upper()..lang("NotFound")..".")
+						ply:ChatPrint(lang("Signal").." "..Name:upper().." "..lang("NotFound")..".")
 					end)
 				end
 			elseif comm == "!sdisao" then
@@ -660,7 +660,7 @@ if SERVER then
 					end)
 				elseif not signal_found then
 					timer.Simple(0.2, function() 
-						ply:ChatPrint(lang("Signal").." "..Name:upper()..lang("NotFound")..".")
+						ply:ChatPrint(lang("Signal").." "..Name:upper().." "..lang("NotFound")..".")
 					end)
 				end
 			end
