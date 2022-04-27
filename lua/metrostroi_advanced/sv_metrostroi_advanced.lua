@@ -453,15 +453,14 @@ timer.Simple(1,function()
 			if (not v.AITimer) then v.AITimer = CurTime() end
 			if ((CurTime() - v.AITimer) < 1 ) then return end -- задержка выполнения
 			v.AITimer = CurTime()
-			if (not IsValid(v.CurrentTrain)) then return end
+			if not IsValid(v.CurrentTrain) then return end
 			local ctrain = v.CurrentTrain
-			if (not MetrostroiAdvanced.IsHeadWagon(ctrain)) then return end
+			--if (not MetrostroiAdvanced.IsHeadWagon(ctrain)) then return end
 			
 			-- Объявление на станции, если на прибывающий поезд посадки нет
 			if noentry_ann:GetInt() == 1 then
-				if ctrain.Speed < 1 and not v.LastCurrentTrain then v.LastCurrentTrain = ctrain end
-				if ctrain.Speed > 10 and (not v.LastCurrentTrain or ctrain ~= v.LastCurrentTrain) then
-					if not v.LastCurrentTrain then v.LastCurrentTrain = ctrain end
+				if ctrain.Speed == 0 then v.LastCurrentTrain = ctrain end
+				if ctrain.Speed > 0 and ctrain != v.LastCurrentTrain then
 					local last_st = MetrostroiAdvanced.GetLastStationID(ctrain)
 					if last_st > -1 then
 						local play_snd
@@ -494,8 +493,7 @@ timer.Simple(1,function()
 							end
 						end
 					end
-				elseif not v.CurrentTrain then
-					v.LastCurrentTrain = nil
+					v.LastCurrentTrain = ctrain
 				end
 			end
 			
