@@ -259,7 +259,7 @@ if SERVER then
 			if owner == ply then continue end
 			local rnum2 = 0
 			if cl == "gmod_subway_81-540_2" then
-				rnum = tonumber(train.RouteNumbera.RouteNumbera)
+				rnum2 = tonumber(train.RouteNumbera.RouteNumbera)
 			elseif cl == "gmod_subway_81-722" or cl == "gmod_subway_81-722_3" or cl == "gmod_subway_81-722_new" or cl == "gmod_subway_81-7175p" then
 				rnum2 = tonumber(train.RouteNumberSys.RouteNumber)
 			elseif cl == "gmod_subway_81-717_6" or cl == "gmod_subway_81-740_4" then
