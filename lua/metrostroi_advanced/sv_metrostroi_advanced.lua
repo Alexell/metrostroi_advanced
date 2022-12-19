@@ -278,16 +278,19 @@ end)
 	
 hook.Add("PlayerInitialSpawn","MA.SetPlyParams",function(ply)
 	-- выдаем игроку номер маршрута
-	local rnum = MetrostroiAdvanced.GetRouteNumber(ply)
-	if Metrostroi.Version > 1537278077 then
-		if (ply:GetInfoNum("metrostroi_route_number",61) == 61) then
-			ply:ConCommand("metrostroi_route_number "..rnum)
+	timer.Simple(3, function()
+		local rnum = MetrostroiAdvanced.GetRouteNumber(ply)
+		if Metrostroi.Version > 1537278077 then
+			if (ply:GetInfoNum("metrostroi_route_number",61) == 61) then
+				ply:ConCommand("metrostroi_route_number "..rnum)
+			end
+		else
+			if (ply:GetInfoNum("ma_routenums",1) == 1) then
+				ply:SetNW2Int("MARouteNumber",rnum)
+			end
 		end
-	else
-		if (ply:GetInfoNum("ma_routenums",1) == 1) then
-			ply:SetNW2Int("MARouteNumber",rnum)
-		end
-	end
+	end)
+		
 	if AFK_TIME > 0 then
 		ply.NextAFK = CurTime() + AFK_TIME
 		ply.WarningAFK = 0
