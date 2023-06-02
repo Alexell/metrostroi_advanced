@@ -23,6 +23,10 @@ local buttonmessage = CreateConVar("metrostroi_advanced_buttonmessage", 1, FCVAR
 local noentry_ann = CreateConVar("metrostroi_advanced_noentryann", 1, FCVAR_ARCHIVE, "Enable automatic station announcements when there is no entry on an arriving train (def = 1 - enabled)")
 local twotosix_rest = CreateConVar("metrostroi_advanced_26restrict", 0, FCVAR_ARCHIVE, "Train restrictions for maps with 2/6 signalling (def = 0 - disabled)")
 
+SetGlobalInt("metrostroi_advanced_trainsrestrict", train_rest:GetInt())
+SetGlobalInt("metrostroi_advanced_maxwagons", max_wags:GetInt())
+SetGlobalInt("metrostroi_advanced_autowags", auto_wags:GetInt())
+
 util.AddNetworkString("MA.ServerCommands")
 util.AddNetworkString("MA.AddNewButtons")
 
@@ -96,6 +100,18 @@ timer.Simple(1.5,function()
 		AFK_TIME = new * 60
 		AFK_WARN1 = AFK_TIME * 0.6
 		AFK_WARN2 = AFK_TIME * 0.4
+	end)
+	cvars.AddChangeCallback("metrostroi_advanced_trainsrestrict", function(cvar, old, new)
+		if (old == new) then return end
+		SetGlobalInt("metrostroi_advanced_trainsrestrict", new)
+	end)
+	cvars.AddChangeCallback("metrostroi_advanced_maxwagons", function(cvar, old, new)
+		if (old == new) then return end
+		SetGlobalInt("metrostroi_advanced_maxwagons", new)
+	end)
+	cvars.AddChangeCallback("metrostroi_advanced_autowags", function(cvar, old, new)
+		if (old == new) then return end
+		SetGlobalInt("metrostroi_advanced_autowags", new)
 	end)
 end)
 
