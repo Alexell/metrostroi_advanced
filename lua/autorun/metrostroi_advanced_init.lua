@@ -72,13 +72,20 @@ if SERVER then
 	
 	-- Определяем тип сигнализации на карте
 	function MetrostroiAdvanced.GetSignallingType()
-		if game.GetMap():find("gm_jar_pll_remastered_v") then return end -- на одной линии 1/5, на другой 2/6
-		for _,sig in pairs(ents.FindByClass("gmod_track_signal")) do
-			if (sig.TwoToSix ~= nil and sig.TwoToSix == true) then
-				MetrostroiAdvanced.TwoToSixMap = true
-				break
+		local type26 = 0
+		local type15 = 0
+		for _, ent in pairs(ents.FindByClass("gmod_track_platform")) do
+			local src_point = Metrostroi.GetPositionOnTrack(ent.PlatformStart)
+			local signal = Metrostroi.GetARSJoint(src_point[1].node1, src_point[1].x, true)
+			if IsValid(signal) then
+				if signal.TwoToSix == true then
+					type26 = type26 + 1
+				else
+					type15 = type15 + 1
+				end
 			end
 		end
+		if type26 > 0 and type15 == 0 then MetrostroiAdvanced.TwoToSixMap = true end
 	end
 	
 

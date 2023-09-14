@@ -146,6 +146,7 @@ hook.Add("MetrostroiSpawnerRestrict","MA.TrainSpawnerLimits",function(ply,settin
 	if not IsValid(ply) then return end
 	-- ограничение составов по правам ULX
 	local train = settings.Train
+	local tr_ent = scripted_ents.GetStored(train).t
 	
 	if (train_rest:GetInt() == 1) then
 		if (not PlayerPermission(ply,train)) then
@@ -165,6 +166,7 @@ hook.Add("MetrostroiSpawnerRestrict","MA.TrainSpawnerLimits",function(ply,settin
 	if (twotosix_rest:GetInt() == 1 and MetrostroiAdvanced.TwoToSixMap) then
 		if ((tonumber(train:sub(16,18)) and tonumber(train:sub(16,18)) < 717) or train:find("ezh3")
 		or train:find("lvz") or train:find("freight") or train:find("7175p") or train:find("722")) then
+		if not tr_ent.SubwayTrain.ALS.TwoToSix then
 			ply:ChatPrint(lang("Restrict26"))
 			return true
 		end
