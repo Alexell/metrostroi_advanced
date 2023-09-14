@@ -240,13 +240,18 @@ hook.Add("MetrostroiSpawnerRestrict","MA.TrainSpawnerLimits",function(ply,settin
 			local loc = ""
 			if tr.Hit then
 				loc = MetrostroiAdvanced.GetLocation(ply,tr.HitPos)
+			if tr.Hit and tr.HitPos then
+				loc = MetrostroiAdvanced.GetLocation(tr.HitPos)
 			end
 			if (not PlayerPermission(ply,"metrostroi_station_spawn")) then
 				local founded = false
+				local found = false
 				for k,v in pairs(MetrostroiAdvanced.StationsIgnore) do
 					if loc:find(v) then founded = true break end
+					if loc:find(v) then found = true break end
 				end
 				if not founded then
+				if not found then
 					ply:ChatPrint(lang("StationRestrict"))
 					return true
 				end
@@ -279,6 +284,7 @@ hook.Add("MetrostroiSpawnerRestrict","MA.TrainSpawnerLimits",function(ply,settin
 		if wag_num >= 5 then wag_str = lang("wagon3") end
 		if ulx then
 			ulx.fancyLog(lang("Player").." #s "..lang("Spawned").." #s #s #s.\n"..lang("Location")..": #s.",ply:Nick(),tostring(wag_num),wag_str,MetrostroiAdvanced.GetTrainName(settings.Train),MetrostroiAdvanced.GetLocation(ply))
+			ulx.fancyLog(lang("Player").." #s "..lang("Spawned").." #s #s #s.\n"..lang("Location")..": #s.",ply:Nick(),tostring(wag_num),wag_str,MetrostroiAdvanced.GetTrainName(settings.Train),MetrostroiAdvanced.GetLocation(ply:GetPos()))
 		end
 	end
 	if (settings.Train == "gmod_subway_81-717_mvm_custom") then
