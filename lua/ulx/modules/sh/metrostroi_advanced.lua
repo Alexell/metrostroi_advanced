@@ -50,306 +50,350 @@ local function GotoTrain (ply,tply,train,sit)
     end
 end
 
-------------------------------------------------------
---		***	METROSTROI TRAIN START SCRIPT ***		--
---				Made by Agent Smith					--
---		https://steamcommunity.com/id/ag-sm1th/		--
-------------------------------------------------------
-
-local function Set(button,state,train)
-	if not IsValid(train) then return end
-	if train[button] then
-		train[button]:TriggerInput("Set",state)
-	end
-end
+----------------------------------------------------------
+--			***	TRAIN START/STOP SCRIPT ***				--
+--				  Made by Agent Smith					--
+----------------------------------------------------------
 
 local function TrainStart(train)
 	if not IsValid(train) then return end
+	local cursig
 	-- Проход по составам - самая большая группа - Номерной и древнее
-	if train:GetClass() and (train:GetClass():sub(13,18) ~= "81-718" and train:GetClass():sub(13,18) ~= "81-720" and train:GetClass():sub(13,18) ~= "81-722") then
-		if train.KVWrenchMode ~= 1  or train.KVWrenchMode == 1 then
-			train:PlayOnce("revers_in","cabin", 0.7)
+	if train:GetClass() and (train:GetClass():sub(13,18) != "81-718" and train:GetClass():sub(13,18) != "81-720" and train:GetClass():sub(13,18) != "81-722" and train:GetClass():sub(13,18) != "81-760") then
+		if train.KVWrenchMode != 1  or train.KVWrenchMode == 1 then
+			train:PlayOnce("revers_in", "cabin", 0.7)
 			train.KVWrenchMode = 1
 			train.KV:TriggerInput("Enabled", 1)
 		end
 		if train.KVWrenchMode == 1  then
 			train.KV:TriggerInput("ReverserSet", 1)
 		end 
-		if train.Pneumatic.DriverValvePosition ~= 2 then
+		if train.Pneumatic.DriverValvePosition != 2 then
 			train.Pneumatic:TriggerInput("BrakeSet", 2)
 		end
-		Set("ALS",0, train)
-		Set("ARS", 0, train)	
-		Set("EPK", 0, train)
-		Set("EPV", 0, train)
-		timer.Simple(0.5, function()	
-			Set("A53", 1, train)
-			Set("A49", 1, train)
-			Set("A63", 1, train)
-			Set("VB", 1, train)
-			--Set("BPSNon", 1, train)
-			Set("VMK", 1, train)
-			Set("V1", 1, train)
-			Set("KU1", 1, train)	-- МК для Еж
-			Set("VUS", 1, train)	
+		if train.ALS then train.ALS:TriggerInput("Set", 0) end
+		if train.ARS then train.ARS:TriggerInput("Set", 0) end
+		if train.EPK then train.EPK:TriggerInput("Set", 0) end
+		if train.EPV then train.EPV:TriggerInput("Set", 0) end
+		timer.Simple(0.5, function()
+			if train.VMK then train.VMK:TriggerInput("Set", 1) end
+			if train.V1 then train.V1:TriggerInput("Set", 1) end
+			if train.KU1 then train.KU1:TriggerInput("Set", 1) end
+			if train.VUS then train.VUS:TriggerInput("Set", 1) end	
 		end)
-		timer.Simple(1, function()	
-			Set("VUD1", 1, train)
-			Set("V2", 1, train)
-			Set("L_1", 1, train)
-			Set("L_3", 1, train)
-			Set("L_4", 1, train)
-			Set("R_UNch", 1, train)
-			Set("R_ZS", 1, train)
-			Set("R_G", 1, train)
-			Set("R_Radio", 1, train)
-			Set("PLights", 1, train) -- для Еж3
-			Set("GLights", 1, train) -- для Еж3
-			Set("VU14", 1, train)	-- для Еж3
-			Set("KU16", 1, train)	-- Фары для Еж
-			Set("KU2", 1, train)	-- двери для Еж
+		timer.Simple(1, function()
+			if train.VUD1 then train.VUD1:TriggerInput("Set", 1) end
+			if train.V2 then train.V2:TriggerInput("Set", 1) end
+			if train.L_1 then train.L_1:TriggerInput("Set", 1) end
+			if train.L_3 then train.L_3:TriggerInput("Set", 1) end
+			if train.L_4 then train.L_4:TriggerInput("Set", 1) end	
+			if train.R_UNch then train.R_UNch:TriggerInput("Set", 1) end
+			if train.R_ZS then train.R_ZS:TriggerInput("Set", 1) end
+			if train.R_G then train.R_G:TriggerInput("Set", 1) end
+			if train.R_Radio then train.R_Radio:TriggerInput("Set", 1) end
+			if train.PLights then train.PLights:TriggerInput("Set", 1) end
+			if train.GLights then train.GLights:TriggerInput("Set", 1) end
+			if train.VU14 then train.VU14:TriggerInput("Set", 1) end
+			if train.KU16 then train.KU16:TriggerInput("Set", 1) end
+			if train.KU2 then train.KU2:TriggerInput("Set", 1) end
 		end)
-		if train.ALS_ARS then 	-- условие на наличие АРС
-			timer.Simple(1.5, function() -- таймер на AРC
-				Set("ALS", 1, train)
-				Set("ARS", 1, train)
-				Set("EPK", 1, train)
-				Set("EPV", 1, train)			
+		timer.Simple(2, function() -- таймер на AРC
+			if train.ALS then train.ALS:TriggerInput("Set", 1) end
+			if train.ARS then train.ARS:TriggerInput("Set", 1) end
+			if train.EPK then train.EPK:TriggerInput("Set", 1) end
+			if train.EPV then train.EPV:TriggerInput("Set", 1) end
+		end)
+		timer.Simple(3, function() -- таймер на разобщительный кран и на краны двойной тяги
+			if train.DriverValveDisconnect then train.DriverValveDisconnect:TriggerInput("Set", 1) end
+			if train.DriverValveBLDisconnect then train.DriverValveBLDisconnect:TriggerInput("Set", 1) end
+			if train.DriverValveTLDisconnect then train.DriverValveTLDisconnect:TriggerInput("Set", 1) end
+		end)
+		timer.Simple(4, function() -- таймер на дешифратор
+			local pos = Metrostroi.TrainPositions[train]
+			if pos then pos = pos[1] end
+			if pos then
+				cursig = Metrostroi.GetARSJoint(pos.node1, pos.x, Metrostroi.TrainDirections[train])
+			end
+			if IsValid(cursig) and cursig.TwoToSix then
+				if train.ALSFreq then train.ALSFreq:TriggerInput("Set", 1) end
+			else
+				if train.ALSFreq then train.ALSFreq:TriggerInput("Set", 0) end
+			end
+		end)
+		timer.Simple(5, function() -- таймер на отмену КВТ
+			if train.KB then train.KB:TriggerInput("Toggle", 1) end
+			if train.KVT then train.KVT:TriggerInput("Toggle", 1) end
+			timer.Simple(4, function()
+				if train.KB then train.KB:TriggerInput("Toggle", 1) end
+				if train.KVT then train.KVT:TriggerInput("Toggle", 1) end
 			end)
-			timer.Simple(2.5, function() -- таймер на разобщительный кран (013)
-				Set("DriverValveDisconnect", 1, train)
-			end)
-			timer.Simple(2, function() -- таймер на краны двойной тяги (334)
-				Set("DriverValveBLDisconnect", 1, train)
-				Set("DriverValveTLDisconnect", 1, train)
-			end)
-			timer.Create("KBPressed", 4, 2, function() -- таймер на отмену КВТ (Ема)
-				Set("KB", 1, train)
-			end)
-			timer.Create("KBReleased", 5, 2, function() -- таймер на отмену КВТ (Ема)
-				Set("KB", 0, train)
-			end)
-			timer.Create("KVTPressed", 4, 2, function() -- таймер на отмену КВТ
-				Set("KVT", 1, train)		
-			end)	
-			timer.Create("KVTReleased", 5, 2, function() -- таймер на отмену КВТ
-				Set("KVT", 0, train)		
-			end)
-		else
-			timer.Simple(2, function() -- таймер на разобщительный кран (013)
-				Set("DriverValveDisconnect", 1, train)
-			end)
-			timer.Simple(2, function() -- таймер на краны двойной тяги (334)
-				Set("DriverValveBLDisconnect", 1, train)
-				Set("DriverValveTLDisconnect", 1, train)
-			end)	
-		end
+		end)
 	-- ТИСУ
 	elseif train:GetClass():sub(13,18) == "81-718" then
-		if train.WrenchMode ~= 1 or train.WrenchMode == 1 then
+		if train.WrenchMode != 1 or train.WrenchMode == 1 then
 			train:PlayOnce("kr_in", "cabin",1)
 			train.WrenchMode = 1
 		end
 		if train.WrenchMode == 1 then
 			train.KR:TriggerInput("Set", train.KR.Position + 1)
 		end
-		if train.Pneumatic.DriverValvePosition ~= 2 then
+		if train.Pneumatic.DriverValvePosition != 2 then
 			train.Pneumatic:TriggerInput("BrakeSet", 2)
 		end
-		Set("SA15", 0, train)
-		Set("SA13", 0, train)
-		Set("EPK", 0, train)	
-		Set("SA16", 1, train)
-		Set("SAP39", 1, train)		
+		if train.SA15 then train.SA15:TriggerInput("Set", 0) end
+		if train.SA13 then train.SA13:TriggerInput("Set", 0) end
+		if train.SA16 then train.SA16:TriggerInput("Set", 1) end
+		if train.SAP39 then train.SAP39:TriggerInput("Set", 1) end
+		if train.EPK then train.EPK:TriggerInput("Set", 0) end
 		timer.Simple(0.5, function() -- таймер на тумблера
-			Set("SA2/1", 1, train)
-			Set("SA4/1", 1, train)				
-			Set("SA5", 1, train)
+			if train["SA2/1"] then train["SA2/1"]:TriggerInput("Set", 1) end
+			if train["SA4/1"] then train["SA4/1"]:TriggerInput("Set", 1) end
+			if train.SA5 then train.SA5:TriggerInput("Set", 1) end
 		end)
 		timer.Simple(1, function() -- таймер на AРC
-			Set("SA15", 1, train)
-			Set("SA13", 1, train)
-			Set("EPK", 1, train)
+			if train.SA15 then train.SA15:TriggerInput("Set", 1) end
+			if train.SA13 then train.SA13:TriggerInput("Set", 1) end
+			if train.EPK then train.EPK:TriggerInput("Set", 1) end
 		end)
-		timer.Simple(1.5, function() -- таймер на разобщительный кран (013)
-			Set("DriverValveDisconnect", 1, train)
+		timer.Simple(2, function() -- таймер на разобщительный кран (013)
+			if train.DriverValveDisconnect then train.DriverValveDisconnect:TriggerInput("Set", 1) end
 		end)
-		timer.Simple(2, function() -- таймер на отмену КВТ
-			Set("SB9", 1, train)		
-		end)	
 		timer.Simple(3, function() -- таймер на отмену КВТ
-			Set("SB9", 0, train)		
+			if train.SB9 then train.SB9:TriggerInput("Toggle", 1) end
+			timer.Simple(3, function()
+				if train.SB9 then train.SB9:TriggerInput("Toggle", 1) end
+			end)
+		end)
+		timer.Simple(4, function() -- таймер на дешифратор
+			local pos = Metrostroi.TrainPositions[train]
+			if pos then pos = pos[1] end
+			if pos then
+				cursig = Metrostroi.GetARSJoint(pos.node1, pos.x, Metrostroi.TrainDirections[train])
+			end
+			if IsValid(cursig) and cursig.TwoToSix then
+				if train.SAP14 then train.SAP14:TriggerInput("Set", 1) end
+			else
+				if train.SAP14 then train.SAP14:TriggerInput("Set", 0) end
+			end
 		end)
 	-- Яуза	
-	elseif train:GetClass():sub(13,18) == "81-720" then 	-- не проверено!
-		if train.WrenchMode ~= 1 or train.WrenchMode == 1 then
+	elseif train:GetClass():sub(13,18) == "81-720" then
+		if train.WrenchMode != 1 or train.WrenchMode == 1 then
 			train:PlayOnce("kro_in", "cabin",1)
 			train.WrenchMode = 1
-			timer.Simple(0.25, function() -- таймер на переключение реверса
+			timer.Simple(0.5, function() -- таймер на переключение реверса
 				train.RV:TriggerInput("KROSet", train.RV.KROPosition + 1)
 			end)
 		end	
-		timer.Simple(0.5, function() -- таймер на тумблера сзади
-			Set("Headlights1", 1, train) -- Фары для Яузы
-			Set("Headlights2", 1, train) -- Фары для Яузы
-			Set("CabLightStrength", 1, train) -- Фары для Яузы				
+		timer.Simple(1, function() -- таймер на тумблера сзади
+			if train.Headlights1 then train.Headlights1:TriggerInput("Set", 1) end
+			if train.Headlights2 then train.Headlights2:TriggerInput("Set", 1) end
+			if train.CabLightStrength then train.CabLightStrength:TriggerInput("Set", 1) end
 		end)
 		timer.Simple(1, function() -- таймер на переход в штатный режим
-			if train["BUKP"].State ~= 5 then
-				train["BUKP"].State = 5
+			if train.BUKP.State != 5 then
+				train.BUKP.State = 5
 			end
 		end)
-		timer.Simple(1.5, function() -- таймер на кнопки спереди
-			Set("DoorClose", 1, train) 
-			Set("DoorSelectL", 1, train) 
-			Set("DoorSelectR", 0, train) 
+		timer.Simple(2, function() -- таймер на кнопки спереди
+			if train.DoorClose then train.DoorClose:TriggerInput("Set", 1) end
+		end)
+		timer.Simple(2.5, function() -- таймер на кнопки спереди
+			if train.DoorSelectL then train.DoorSelectL:TriggerInput("Set", 1) end
+			if train.DoorSelectR then train.DoorSelectR:TriggerInput("Set", 0) end
 		end)
 		timer.Create("AttentionPressed1", 3, 2, function() -- таймер на отмену (Яуза)
-			Set("AttentionMessage", 1, train)
-			Set("AttentionBrake", 1, train)
+			if train.AttentionMessage then train.AttentionMessage:TriggerInput("Toggle", 1) end
+			if train.AttentionBrake then train.AttentionBrake:TriggerInput("Toggle", 1) end
+			timer.Simple(2, function()
+				if train.AttentionMessage then train.AttentionMessage:TriggerInput("Toggle", 1) end
+				if train.AttentionBrake then train.AttentionBrake:TriggerInput("Toggle", 1) end
+			end)
 		end)
-		timer.Create("AttentionReleased1", 3.25, 2, function() -- таймер на отмену (Яуза)
-			Set("AttentionMessage", 0, train)
-			Set("AttentionBrake", 0, train)
+		timer.Simple(4, function() -- таймер на дешифратор
+			local pos = Metrostroi.TrainPositions[train]
+			if pos then pos = pos[1] end
+			if pos then
+				cursig = Metrostroi.GetARSJoint(pos.node1, pos.x, Metrostroi.TrainDirections[train])
+			end
+			if IsValid(cursig) and cursig.TwoToSix then
+				if train.ALSFreq then train.ALSFreq:TriggerInput("Set", 1) end
+			else
+				if train.ALSFreq then train.ALSFreq:TriggerInput("Set", 0) end
+			end
 		end)
-	else
-	-- Юбилейный (без комментариев)
-		if train:GetClass():sub(13,18) == "81-722" then 	
-			Set("ALS", 0, train)
-			Set("ARS", 0, train)
-			if train.MFDU.State ~= 1 then train.MFDU.State = 1 end
-			timer.Simple(0.5, function() 
-				train.BUKP.Active = 1
-				train:SetPackedBool("MFDUActive", true)	
-				Set("PassVent", 2, train)					
-			end)
-			timer.Simple(1, function() 
-				Set("ALS", 1, train)
-				Set("ARS", 1, train)			
-			end)
-			timer.Simple(1.5, function() 
-				Set("Vigilance", 1, train)		
-			end)	
-			timer.Simple(2, function() 
-				Set("Vigilance", 0, train)		
-				Set("Headlights", 2, train)
-				Set("DoorClose", 2, train)
-			end)
-			timer.Simple(2.5, function() 
-				train.KRO:TriggerInput("Set", 2) 
-			end)
-		end
+	-- Юбилейный
+	elseif train:GetClass():sub(13,18) == "81-722" then
+		if train.ALS then train.ALS:TriggerInput("Set", 0) end
+		if train.ARS then train.ARS:TriggerInput("Set", 0) end
+		if train.MFDU.State != 1 then train.MFDU.State = 1 end
+		timer.Simple(0.5, function() 
+			train.BUKP.Active = 1
+			train:SetPackedBool("MFDUActive", true)	
+		end)
+		timer.Simple(1, function() 
+			if train.ALS then train.ALS:TriggerInput("Set", 1) end
+			if train.ARS then train.ARS:TriggerInput("Set", 1) end
+		end)
+		timer.Simple(2, function() 
+			if train.Vigilance then train.Vigilance:TriggerInput("Toggle", 1) end
+			if train.PassVent then train.PassVent:TriggerInput("Set", 2) end
+		end)	
+		timer.Simple(3, function() 
+			if train.Vigilance then train.Vigilance:TriggerInput("Toggle", 1) end
+			if train.Headlights then train.Headlights:TriggerInput("Set", 2) end
+			if train.DoorClose then train.DoorClose:TriggerInput("Set", 2) end
+		end)
+		timer.Simple(3.5, function() 
+			train.KRO:TriggerInput("Set", 2) 
+		end)
+	-- Ока
+	elseif train:GetClass():sub(13,18) == "81-760" then
+		timer.Simple(0.5, function() -- таймер на переключение реверса
+			train.RV:TriggerInput("KROSet", train.RV.KROPosition + 1)
+		end)
+		timer.Simple(1.5, function() -- таймер на переход в штатный режим
+			if train.BUKP.State != 5 then
+				train.BUKP.State = 5
+			end
+		end)
+		timer.Simple(2, function() -- таймер на кнопки спереди
+			if train.DoorSelectL then train.DoorSelectL:TriggerInput("Toggle", 1) end
+			if train.DoorClose then train.DoorClose:TriggerInput("Toggle", 1) end
+		end)
+		timer.Simple(2.5, function() -- таймер на дешифратор
+			local pos = Metrostroi.TrainPositions[train]
+			if pos then pos = pos[1] end
+			if pos then
+				cursig = Metrostroi.GetARSJoint(pos.node1, pos.x, Metrostroi.TrainDirections[train])
+			end
+			if IsValid(cursig) and cursig.TwoToSix then
+				if train.SA14k then train.SA14k:TriggerInput("Set", 0) end
+				if train.SA14 then train.SA14:TriggerInput("Set", 1) end
+			else
+				if train.SA14k then train.SA14k:TriggerInput("Set", 1) end
+				if train.SA14 then train.SA14:TriggerInput("Set", 0) end
+			end
+		end)
 	end
 end
 
 local function TrainStop(train)
 	-- Проход по составам - самая большая группа - Номерной и древнее
-	if train:GetClass() and (train:GetClass():sub(13,18) ~= "81-718" and train:GetClass():sub(13,18) ~= "81-720" and train:GetClass():sub(13,18) ~= "81-722") then
-		if train.Pneumatic.DriverValvePosition ~= 5 then
+	if train:GetClass() and (train:GetClass():sub(13,18) ~= "81-718" and train:GetClass():sub(13,18) ~= "81-720" and train:GetClass():sub(13,18) ~= "81-722" and train:GetClass():sub(13,18) ~= "81-760") then
+		if train.Pneumatic.DriverValvePosition != 5 then
 			train.Pneumatic:TriggerInput("BrakeSet", 5)
 		end
 		timer.Simple(0.5, function ()
-			Set("R_UNch", 0, train)
-			Set("R_ZS", 0, train)
-			Set("R_G", 0, train)
-			Set("V1", 0, train)
+			if train.R_UNch then train.R_UNch:TriggerInput("Set", 0) end
+			if train.R_ZS then train.R_ZS:TriggerInput("Set", 0) end
+			if train.R_G then train.R_G:TriggerInput("Set", 0) end
+			if train.R_Radio then train.R_Radio:TriggerInput("Set", 0) end
+			if train.V1 then train.V1:TriggerInput("Set", 0) end
 		end)
 		timer.Simple(1, function ()
-			Set("KU1", 0, train)	-- МК для Еж
-			Set("KU2", 0, train)
-			Set("PLights", 0, train) -- свет в кабине для Еж3
-			Set("VMK", 0, train)
+			if train.KU1 then train.KU1:TriggerInput("Set", 0) end
+			if train.KU2 then train.KU2:TriggerInput("Set", 0) end
+			if train.PLights then train.PLights:TriggerInput("Set", 0) end
+			if train.VMK then train.VMK:TriggerInput("Set", 0) end
 		end)		
 		timer.Simple(1.5, function ()
-			Set("DriverValveDisconnect", 0, train)
-			Set("DriverValveBLDisconnect", 0, train)
-			Set("DriverValveTLDisconnect", 0, train)
+			if train.DriverValveDisconnect then train.DriverValveDisconnect:TriggerInput("Set", 0) end
+			if train.DriverValveBLDisconnect then train.DriverValveBLDisconnect:TriggerInput("Set", 0) end
+			if train.DriverValveTLDisconnect then train.DriverValveTLDisconnect:TriggerInput("Set", 0) end
 		end)		
-		timer.Simple(2, function() -- таймер на полное служебное торможение	
-			Set("ALS", 0, train)
-			Set("ARS", 0, train)	
-			timer.Simple(1, function()			
-				Set("VUD1", 0, train)	
-				Set("V2", 0, train)			
-				train.Pneumatic:TriggerInput("BrakeSet", 2)	
-				end)
+		timer.Simple(2, function()
+			if train.ALS then train.ALS:TriggerInput("Set", 0) end
+			if train.ARS then train.ARS:TriggerInput("Set", 0) end
 		end)
-		if train.KVWrenchMode == 1  then
-			train.KV:TriggerInput("ControllerSet", 0)				
-		end 
-		if train.KVWrenchMode ~= 0  then
-			timer.Simple(2.5, function() -- таймер на откл реверса
+		timer.Simple(2.5, function()
+			if train.KVWrenchMode == 1  then
+				train.KV:TriggerInput("ControllerSet", 0)				
+			end 
+		end)
+		timer.Simple(3, function()			
+			if train.VUD1 then train.VUD1:TriggerInput("Set", 0) end
+			if train.V2 then train.V2:TriggerInput("Set", 0) end
+			train.Pneumatic:TriggerInput("BrakeSet", 2)	
+		end)
+		timer.Simple(4, function() -- таймер на откл реверса
+			if train.KVWrenchMode != 0  then
 				train.KV:TriggerInput("ReverserSet", 0)
 				timer.Simple(0.5, function()
 					train.KV:TriggerInput("Enabled", 0)
 					train.KVWrenchMode = 0
 				end)
-			end)					
-		end	
+			end
+		end)					
 	-- ТИСУ
 	elseif train:GetClass() and train:GetClass():sub(13,18) == "81-718" then
-		if train.Pneumatic.DriverValvePosition ~= 6 then
+		if train.Pneumatic.DriverValvePosition != 6 then
 			train.Pneumatic:TriggerInput("BrakeSet", 5)
 		end
 		timer.Simple(3, function() -- таймер на полное служебное торможение ТИСУ
-			Set("DriverValveDisconnect", 0, train)
+			if train.DriverValveDisconnect then train.DriverValveDisconnect:TriggerInput("Set", 0) end
 		end)
 		timer.Simple(4, function()
-			Set("SAP39", 0, train)
-			Set("SA5", 0, train)
-			Set("SA16", 0, train)
+			if train.SA5 then train.SA5:TriggerInput("Set", 0) end
+			if train.SA16 then train.SA16:TriggerInput("Set", 0) end
+			if train.SAP39 then train.SAP39:TriggerInput("Set", 0) end
 		end)						
-		if train.WrenchMode ~= 0 then
+		if train.WrenchMode != 0 then
 			timer.Simple(5, function() -- таймер на откл реверса. ТИСУ
 				train.KR:TriggerInput("Set", train.KR.Position - 1)
-				Set("SA15", 0, train)
-				Set("SA13", 0, train)
-				timer.Simple(1, function() -- таймер на откл реверса. ТИСУ
-					train.WrenchMode = 0
-					train.Pneumatic:TriggerInput("BrakeSet", 2)
-				end)
+				if train.SA15 then train.SA15:TriggerInput("Set", 0) end
+				if train.SA13 then train.SA13:TriggerInput("Set", 0) end
 			end)			
+			timer.Simple(6, function() -- таймер на откл реверса. ТИСУ
+				train.WrenchMode = 0
+				train.Pneumatic:TriggerInput("BrakeSet", 2)
+			end)
 		end		
 	-- Яуза
 	elseif train:GetClass() and train:GetClass():sub(13,18) == "81-720" then
-		if train.WrenchMode ~= 0 then
-			train.RV:TriggerInput("KROSet", train.RV.KROPosition - 1)
-			timer.Simple(0.5, function() -- таймер на откл реверса. Яуза
-				Set("DoorClose", 0, train) 
-				Set("DoorSelectL", 0, train) 
-				Set("DoorSelectR", 0, train) 
-			end)			
+		if train.WrenchMode != 0 then
 			timer.Simple(1, function() -- таймер на откл реверса. Яуза
+				train.RV:TriggerInput("KROSet", train.RV.KROPosition - 1) 
+			end)
+			timer.Simple(1.5, function() -- таймер на откл реверса. Яуза
 				train.WrenchMode = 0
 			end)
-			timer.Simple(1.5, function() -- таймер на откл кнопок
-				Set("DoorClose", 0, train) 
-				Set("DoorSelectL", 0, train) 
-				Set("DoorSelectR", 0, train) 
+			timer.Simple(2, function() -- таймер на откл кнопок
+				if train.DoorClose then train.DoorClose:TriggerInput("Set", 0) end
+				if train.DoorSelectL then train.DoorSelectL:TriggerInput("Set", 0) end
+				if train.DoorSelectR then train.DoorSelectR:TriggerInput("Set", 0) end
 			end)
 		end	
-	else 
 	-- Юбилейный (без комментариев)
-		if train:GetClass():sub(13,18) == "81-722" then 	
+	elseif train:GetClass():sub(13,18) == "81-722" then 
 			timer.Simple(0.5, function() 
 				train.KRO:TriggerInput("Set", 1) 
 			end)
 			timer.Simple(1, function() 
-				Set("ALS", 0, train)
-				Set("ARS", 0, train)			
+				if train.ALS then train.ALS:TriggerInput("Set", 0) end
+				if train.ARS then train.ARS:TriggerInput("Set", 0) end		
 			end)
 			timer.Simple(1.5, function() 
 				train.BUKP.Active = 0
 				train:SetPackedBool("MFDUActive", false)	
-				Set("DoorClose", 1, train)				
+				if train.DoorClose then train.DoorClose:TriggerInput("Set", 1) end			
 			end)
-		end
+	-- Oka
+	elseif train:GetClass():sub(13,18) == "81-760" then 
+		timer.Simple(1, function() -- таймер на переключение реверса
+			train.RV:TriggerInput("KROSet", train.RV.KROPosition - 1)
+		end)
+		timer.Simple(1.5, function() -- таймер на кнопки спереди
+			if train.DoorSelectL then train.DoorSelectL:TriggerInput("Set", 0) end
+			if train.DoorSelectR then train.DoorSelectR:TriggerInput("Set", 0) end
+			if train.DoorClose then train.DoorClose:TriggerInput("Set", 0) end
+		end)
 	end
 end
 
-------------------------------------------------------
---			***	TRAIN START SCRIPT END	***			--
-------------------------------------------------------
+----------------------------------------------------------
+--			***	TRAIN START/STOP SCRIPT END	***			--
+----------------------------------------------------------
 
 -- Смена кабины
 local function ChangeCab (ply,train1,train2)
@@ -795,10 +839,6 @@ function ulx.smartch( calling_ply )
 	if seattype ~= "driver" then return end
 	local train1 = seat:GetNW2Entity("TrainEntity")
 	if not IsValid(train1) then return end
-	if train1:GetClass() == "gmod_subway_81-760" or train1:GetClass() == "gmod_subway_81-760a" then
-		calling_ply:ChatPrint(lang("TS760"))
-		return
-	end
 	local train2
 	for t,wag in pairs(train1.WagonList) do
 		if (wag:GetClass() == train1:GetClass() and wag ~= train1) then
@@ -815,10 +855,6 @@ function ulx.trainstart( calling_ply )
 	if not IsValid(calling_ply) then return end
     local train = calling_ply:GetTrain()
 	if not IsValid(train) then return end
-	if train:GetClass() == "gmod_subway_81-760" or train:GetClass() == "gmod_subway_81-760a" then
-		calling_ply:ChatPrint(lang("TS760"))
-		return
-	end
 	TrainStart(train)
 	ulx.fancyLog("#s "..lang("UseTrainStart"),calling_ply:Nick())
 end
@@ -830,10 +866,6 @@ function ulx.trainstop( calling_ply )
 	if not IsValid(calling_ply) then return end
     local train = calling_ply:GetTrain()
 	if not IsValid(train) then return end
-	if train:GetClass() == "gmod_subway_81-760" or train:GetClass() == "gmod_subway_81-760a" then
-		calling_ply:ChatPrint("Oka is not supported yet.")
-		return
-	end
 	TrainStop(train)
 end
 local trainstop = ulx.command( CATEGORY_NAME, "ulx trainstop", ulx.trainstop, "!trainstop" )
