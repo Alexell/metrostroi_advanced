@@ -44,6 +44,8 @@ timer.Create("MetrostroiAdvanced.Init",3,1,function()
 	MetrostroiAdvanced.LoadMapWagonsLimit()
 	MetrostroiAdvanced.LoadMapButtons()
 	MetrostroiAdvanced.GetSignallingType()
+	MetrostroiAdvanced.CenteringStationPositions()
+	MetrostroiAdvanced.DefinePlatformPaths()
 	MetrostroiAdvanced.LastSpawned = os.time()
 	if not file.Exists("sound/metrostroi_advanced/no_entry_ann/"..madv_lang:GetString(),"GAME") then
 		RunConsoleCommand("metrostroi_advanced_noentryann",0)

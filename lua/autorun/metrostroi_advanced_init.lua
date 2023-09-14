@@ -81,6 +81,74 @@ if SERVER then
 		end
 	end
 	
+
+	-- отцентровка точек для поиска станций 
+	function MetrostroiAdvanced.CenteringStationPositions()
+		if not Metrostroi.StationConfigurations then return end
+		for k1, v1 in pairs(ents.FindByClass("gmod_track_platform")) do
+			if not Metrostroi.StationConfigurations[v1.StationIndex] then continue end
+			for k2, v2 in pairs(ents.FindByClass("gmod_track_platform")) do
+				if v1.StationIndex == v2.StationIndex and v1.PlatformIndex == 1 and v2.PlatformIndex == 2 then
+					local pos1 = LerpVector(0.5, v1.PlatformStart, v2.PlatformStart)
+					local pos2 = LerpVector(0.5, v1.PlatformEnd, v2.PlatformEnd)
+					if isvector(pos1) and isvector(pos2) then 
+						local centre = LerpVector(0.5, pos1, pos2) 
+					end
+					if isvector(centre) and istable(Metrostroi.StationConfigurations[v1.StationIndex].positions) then
+						table.insert(Metrostroi.StationConfigurations[v1.StationIndex].positions, 2, {centre, Angle(0, 0, 33)})
+					end
+				end
+			end
+		end
+	end
+
+	-- путь по названию сигнала
+	local function PathBySignalName(signal)
+		if not signal.Name then return nil end
+		if tonumber(signal.Name) then return signal.Name end
+		local namesub = string.sub(signal.Name,-1)
+		local namesub2 = string.sub(signal.Name,-2,-2)
+		if tonumber(namesub) then
+			return namesub
+		elseif tonumber(namesub2) then 
+			return namesub2 
+		else
+			return nil 
+		end
+	end
+
+	-- исправляем пути на платформах
+	function MetrostroiAdvanced.DefinePlatformPaths()
+		print("MA: Processing true platform paths definition ...")
+		for k, v in pairs(ents.FindByClass("gmod_track_platform")) do
+			if v.PlatformIndex > 2 then continue end
+			local src_point = Metrostroi.GetPositionOnTrack(v.PlatformStart)
+			local src_point2 = Metrostroi.GetPositionOnTrack(v.PlatformEnd)
+			local center_point = Metrostroi.GetPositionOnTrack(LerpVector(0.5, v.PlatformStart, v.PlatformEnd))
+			local signal = Metrostroi.GetARSJoint(src_point[1].node1, src_point[1].x, true)
+			if not IsValid(signal) then
+				signal = Metrostroi.GetARSJoint(src_point2[1].node1, src_point2[1].x, true)
+			end
+			if IsValid(signal) then 
+				if signal.RouteNumber and signal.RouteNumber != "" then 
+					local path = tonumber(signal.RouteNumber)
+				else
+					local path = PathBySignalName(signal)
+					path = path % 2 == 0 and 2 or 1
+					if path != v.PlatformIndex then
+						v.PlatformIndex = path
+						v:SetNWInt("PlatformIndex", path)
+						v.TrackPos = center_point[1].x
+						v.TrackID = center_point[1].path.id
+						v.PlatformLen = v.PlatformStart:DistToSqr(v.PlatformEnd)
+						v.PlatformLenX = math.abs(src_point[1].x - src_point2[1].x)
+					end
+				end
+			end
+		end
+		Metrostroi.UpdateStations()
+	end
+
 	-- Кнопки на картах
 	function MetrostroiAdvanced.LoadMapButtons()
 		local source_data = [[
