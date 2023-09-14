@@ -87,7 +87,6 @@ if SERVER then
 		end
 		if type26 > 0 and type15 == 0 then MetrostroiAdvanced.TwoToSixMap = true end
 	end
-	
 
 	-- отцентровка точек для поиска станций 
 	function MetrostroiAdvanced.CenteringStationPositions()
@@ -281,7 +280,7 @@ if SERVER then
 		else
 			ent_station = "N/A"
 		end
-		if (ent_station=="") then ent_station = lang("UnknownPlace") end
+		if ent_station == "" then ent_station = lang("UnknownPlace") end
 		return ent_station
 	end
 
@@ -565,7 +564,7 @@ if SERVER then
 				end)	 	
 			elseif route_found and not route_closed then
 				timer.Simple(0.2, function() 
-					ply:ChatPrint(lang("Route").." "..Name:upper().." "..langlang("AlreadyClosed")..".")
+					ply:ChatPrint(lang("Route").." "..Name:upper().." "..lang("AlreadyClosed")..".")
 				end)	 
 			end		
 			if not route_found and not signal_found then

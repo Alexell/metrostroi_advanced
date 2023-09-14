@@ -146,6 +146,7 @@ hook.Add("MetrostroiSpawnerRestrict","MA.TrainSpawnerLimits",function(ply,settin
 	if not IsValid(ply) then return end
 	-- ограничение составов по правам ULX
 	local train = settings.Train
+	if string.find(train, "custom") then train = train:sub(1, -8) end
 	local tr_ent = scripted_ents.GetStored(train).t
 	
 	if (train_rest:GetInt() == 1) then
@@ -164,8 +165,6 @@ hook.Add("MetrostroiSpawnerRestrict","MA.TrainSpawnerLimits",function(ply,settin
 	
 	-- ограничение составов на картах с сигналкой 2/6
 	if (twotosix_rest:GetInt() == 1 and MetrostroiAdvanced.TwoToSixMap) then
-		if ((tonumber(train:sub(16,18)) and tonumber(train:sub(16,18)) < 717) or train:find("ezh3")
-		or train:find("lvz") or train:find("freight") or train:find("7175p") or train:find("722")) then
 		if not tr_ent.SubwayTrain.ALS.TwoToSix then
 			ply:ChatPrint(lang("Restrict26"))
 			return true
@@ -240,19 +239,14 @@ hook.Add("MetrostroiSpawnerRestrict","MA.TrainSpawnerLimits",function(ply,settin
 		if (not PlayerPermission(ply,"metrostroi_anyplace_spawn")) then
 			local tr = util.TraceLine(util.GetPlayerTrace(ply))
 			local loc = ""
-			if tr.Hit then
-				loc = MetrostroiAdvanced.GetLocation(ply,tr.HitPos)
 			if tr.Hit and tr.HitPos then
 				loc = MetrostroiAdvanced.GetLocation(tr.HitPos)
 			end
 			if (not PlayerPermission(ply,"metrostroi_station_spawn")) then
-				local founded = false
 				local found = false
 				for k,v in pairs(MetrostroiAdvanced.StationsIgnore) do
-					if loc:find(v) then founded = true break end
 					if loc:find(v) then found = true break end
 				end
-				if not founded then
 				if not found then
 					ply:ChatPrint(lang("StationRestrict"))
 					return true
@@ -285,19 +279,11 @@ hook.Add("MetrostroiSpawnerRestrict","MA.TrainSpawnerLimits",function(ply,settin
 		if wag_num >= 2 and wag_num <= 4 then wag_str = lang("wagon2") end
 		if wag_num >= 5 then wag_str = lang("wagon3") end
 		if ulx then
-			ulx.fancyLog(lang("Player").." #s "..lang("Spawned").." #s #s #s.\n"..lang("Location")..": #s.",ply:Nick(),tostring(wag_num),wag_str,MetrostroiAdvanced.GetTrainName(settings.Train),MetrostroiAdvanced.GetLocation(ply))
 			ulx.fancyLog(lang("Player").." #s "..lang("Spawned").." #s #s #s.\n"..lang("Location")..": #s.",ply:Nick(),tostring(wag_num),wag_str,MetrostroiAdvanced.GetTrainName(settings.Train),MetrostroiAdvanced.GetLocation(ply:GetPos()))
 		end
 	end
-	if (settings.Train == "gmod_subway_81-717_mvm_custom") then
-		ply:SetNW2String("MATrainClass","gmod_subway_81-717_mvm")
-	elseif(settings.Train == "gmod_subway_81-717_lvz_custom") then
-		ply:SetNW2String("MATrainClass","gmod_subway_81-717_lvz")
-	elseif(settings.Train == "gmod_subway_81-717_5a_custom") then
-		ply:SetNW2String("MATrainClass","gmod_subway_81-717_5a")
-	else
-		ply:SetNW2String("MATrainClass",settings.Train)
-	end
+
+	ply:SetNW2String("MATrainClass", train)
 	MetrostroiAdvanced.LastSpawned = os.time()
 	return
 end)
@@ -383,7 +369,7 @@ hook.Add("MetrostroiCoupled","MA.SetTrainParams",function(train,train2)
 	if not MetrostroiAdvanced.TrainList[train:GetClass()] then return end
 	local ply = train.Owner
 	if not IsValid(ply) then return end
-	
+
 	-- переключаем дешифратор АЛС
 	if (ply:GetInfoNum("ma_auto_alsdecoder",1) == 1 and MetrostroiAdvanced.TwoToSixMap) then
 		for _,sw in pairs({"ALSFreq","SAP14","SA14k","SA14"}) do
@@ -432,7 +418,7 @@ hook.Add("MetrostroiCoupled","MA.SetTrainParams",function(train,train2)
 		train.RouteNumberSys.CurrentRouteNumber = rnum
 	elseif train:GetClass() == "gmod_subway_81-717_6" or train:GetClass() == "gmod_subway_81-740_4" then
 		train.ASNP.RouteNumber = rnum
-	elseif train:GetClass() == "gmod_subway_81-502" or train:GetClass() == "gmod_subway_81-540" or train:GetClass() == "gmod_subway_81-540_1" or train:GetClass() == "gmod_subway_81-540_8" or train:GetClass() == "gmod_subway_81-717_lvz" then
+	elseif train:GetClass() == "gmod_subway_81-502" or train:GetClass() == "gmod_subway_81-540" or train:GetClass() == "gmod_subway_81-540_1" or train:GetClass() == "gmod_subway_81-540_8" or train:GetClass() == "gmod_subway_81-717_lvz" or train:GetClass() == "gmod_subway_81-540_2_lvz" then
 		if rnum < 10 then
 			rnum = "00"..tostring(rnum)
 		else
