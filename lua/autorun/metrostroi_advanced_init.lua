@@ -243,7 +243,7 @@ if SERVER then
 
 	-- Получение местоположения
 	function MetrostroiAdvanced.GetLocation(pos)
-		local ent_station = ""
+		local ent_station = lang("UnknownPlace")
 		local map_pos
 		local radius = 4000 -- Радиус по умолчанию для станций на всех картах
 		local cur_map = game.GetMap()
@@ -272,7 +272,7 @@ if SERVER then
 						Sz = math.abs(train_pos.z - map_pos[1].z)
 					end
 					if S < radius and Sz < 200 then 
-						ent_station = (v.names[1])
+						ent_station = v.names[1]
 						radius = S
 					end
 				end
@@ -280,7 +280,6 @@ if SERVER then
 		else
 			ent_station = "N/A"
 		end
-		if ent_station == "" then ent_station = lang("UnknownPlace") end
 		return ent_station
 	end
 
