@@ -91,6 +91,7 @@ if SERVER then
 	-- отцентровка точек для поиска станций 
 	function MetrostroiAdvanced.CenteringStationPositions()
 		if not Metrostroi.StationConfigurations then return end
+		local centre
 		for k1, v1 in pairs(ents.FindByClass("gmod_track_platform")) do
 			if not Metrostroi.StationConfigurations[v1.StationIndex] then continue end
 			for k2, v2 in pairs(ents.FindByClass("gmod_track_platform")) do
@@ -98,7 +99,7 @@ if SERVER then
 					local pos1 = LerpVector(0.5, v1.PlatformStart, v2.PlatformStart)
 					local pos2 = LerpVector(0.5, v1.PlatformEnd, v2.PlatformEnd)
 					if isvector(pos1) and isvector(pos2) then 
-						local centre = LerpVector(0.5, pos1, pos2) 
+						centre = LerpVector(0.5, pos1, pos2) 
 					end
 					if isvector(centre) and istable(Metrostroi.StationConfigurations[v1.StationIndex].positions) then
 						table.insert(Metrostroi.StationConfigurations[v1.StationIndex].positions, 2, {centre, Angle(0, 0, 33)})

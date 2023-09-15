@@ -276,10 +276,11 @@ hook.Add("MetrostroiSpawnerRestrict","MA.TrainSpawnerLimits",function(ply,settin
 	if (spawn_mes:GetInt() == 1) then
 		local wag_str = lang("wagon1")
 		local wag_num = settings.WagNum
+		local tr = util.TraceLine(util.GetPlayerTrace(ply))
 		if wag_num >= 2 and wag_num <= 4 then wag_str = lang("wagon2") end
 		if wag_num >= 5 then wag_str = lang("wagon3") end
-		if ulx then
-			ulx.fancyLog(lang("Player").." #s "..lang("Spawned").." #s #s #s.\n"..lang("Location")..": #s.",ply:Nick(),tostring(wag_num),wag_str,MetrostroiAdvanced.GetTrainName(settings.Train),MetrostroiAdvanced.GetLocation(ply:GetPos()))
+		if ulx and tr.Hit and tr.HitPos then
+			ulx.fancyLog(lang("Player").." #s "..lang("Spawned").." #s #s #s.\n"..lang("Location")..": #s.",ply:Nick(),tostring(wag_num),wag_str,MetrostroiAdvanced.GetTrainName(settings.Train),MetrostroiAdvanced.GetLocation(tr.HitPos))
 		end
 	end
 
