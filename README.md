@@ -1,6 +1,6 @@
 # Metrostroi Advanced
 
-**Версия: 2.4**
+**Версия: 2.5**
 
 **Разработчики:** [Alexell](https://steamcommunity.com/profiles/76561198210303223) и [Agent Smith](https://steamcommunity.com/profiles/76561197990364979)
  
