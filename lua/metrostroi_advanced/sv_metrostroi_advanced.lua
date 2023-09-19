@@ -239,9 +239,10 @@ hook.Add("MetrostroiSpawnerRestrict","MA.TrainSpawnerLimits",function(ply,settin
 		if (not PlayerPermission(ply,"metrostroi_anyplace_spawn")) then
 			local tr = util.TraceLine(util.GetPlayerTrace(ply))
 			local loc = ""
-			if tr.Hit and tr.HitPos then
-				loc = MetrostroiAdvanced.GetLocation(tr.HitPos)
-			end
+			local rr =  Metrostroi.RerailGetTrackData(tr.HitPos,ply:GetAimVector())
+            if tr.Hit and tr.HitPos and rr.centerpos then
+                loc = MetrostroiAdvanced.GetLocation(rr.centerpos)
+            end
 			if (not PlayerPermission(ply,"metrostroi_station_spawn")) then
 				local found = false
 				for k,v in pairs(MetrostroiAdvanced.StationsIgnore) do
@@ -368,7 +369,8 @@ end)
 
 hook.Add("MetrostroiCoupled","MA.SetTrainParams",function(train,train2)
 	if not IsValid(train) then return end
-	if not MetrostroiAdvanced.TrainList[train:GetClass()] then return end
+	local class = train:GetClass()
+	if not MetrostroiAdvanced.TrainList[class] then return end
 	local ply = train.Owner
 	if not IsValid(ply) then return end
 
@@ -388,7 +390,10 @@ hook.Add("MetrostroiCoupled","MA.SetTrainParams",function(train,train2)
 		if (ply:GetInfoNum("ma_routenums",1) == 0) then return end
 	end
 
-	if train:GetClass() == "gmod_subway_81-540_2" then
+	if class:find("540_2k") then
+		train.RouteNumber.RouteNumber = rnum
+		train.RouteNumber.CurrentRouteNumber = rnum
+	elseif class:find("540_2") then
 		local rtype = train:GetNW2Int("Route",1)
 		if rtype == 1 then
 			if rnum < 10 then
@@ -413,14 +418,11 @@ hook.Add("MetrostroiCoupled","MA.SetTrainParams",function(train,train2)
 				train.RouteNumberSys.CurrentRouteNumber = rnum
 			end
 		end
-	elseif train:GetClass() == "gmod_subway_81-540_2k" then
-		train.RouteNumber.RouteNumber = rnum
-		train.RouteNumber.CurrentRouteNumber = rnum
-	elseif train:GetClass() == "gmod_subway_81-722" or train:GetClass() == "gmod_subway_81-722_3" or train:GetClass() == "gmod_subway_81-722_new" or train:GetClass() == "gmod_subway_81-7175p" then
+	elseif class:find("722") or class:find("7175p") then
 		train.RouteNumberSys.CurrentRouteNumber = rnum
-	elseif train:GetClass() == "gmod_subway_81-717_6" or train:GetClass() == "gmod_subway_81-740_4" then
+	elseif class:find("717_6") or class:find("740_4") then
 		train.ASNP.RouteNumber = rnum
-	elseif train:GetClass() == "gmod_subway_81-502" or train:GetClass() == "gmod_subway_81-540" or train:GetClass() == "gmod_subway_81-540_1" or train:GetClass() == "gmod_subway_81-540_8" or train:GetClass() == "gmod_subway_81-717_lvz" or train:GetClass() == "gmod_subway_81-540_2_lvz" then
+	elseif class:find("502") or class:find("540") or class:find("717_lvz") or class:find("540_2_lvz") then
 		if rnum < 10 then
 			rnum = "00"..tostring(rnum)
 		else
@@ -428,7 +430,7 @@ hook.Add("MetrostroiCoupled","MA.SetTrainParams",function(train,train2)
 		end
 		train.RouteNumber.RouteNumber = rnum
 		train:SetNW2String("RouteNumber",rnum)
-	elseif train:GetClass() == "gmod_subway_81-760" or train:GetClass() == "gmod_subway_81-760a" then
+	elseif class:find("760") then
 		train.BMCIS.RouteNumber = rnum
 		train:SetNW2Int("RouteNumber:RouteNumber",rnum)
 		train.RouteNumber.RouteNumber = rnum

@@ -37,7 +37,7 @@ function MetrostroiAdvanced.LoadLanguage(lang)
 		file.Write("metrostroi_advanced/trains.txt","") -- очищаем файл с составами для перезаписи
 		for _,class in pairs(Metrostroi.TrainClasses) do
 			local ENT = scripted_ents.Get(class)
-			if not ENT.Spawner or not ENT.SubwayTrain then continue end
+			if not class:find("717_ars_minsk") and (not ENT.Spawner or not ENT.SubwayTrain) then continue end
 			file.Append("metrostroi_advanced/trains.txt",class.."\n")
 			MetrostroiAdvanced.TrainList[class] = MetrostroiAdvanced.Lang[class] or ENT.PrintName or class
 		end
@@ -133,23 +133,20 @@ if SERVER then
 			local src_point2 = Metrostroi.GetPositionOnTrack(v.PlatformEnd)
 			local center_point = Metrostroi.GetPositionOnTrack(LerpVector(0.5, v.PlatformStart, v.PlatformEnd))
 			local signal = Metrostroi.GetARSJoint(src_point[1].node1, src_point[1].x, true)
-			if not IsValid(signal) then
+			local path = tonumber(signal.RouteNumber) and signal.RouteNumber or PathBySignalName(signal)
+			if not IsValid(signal) or not path then
 				signal = Metrostroi.GetARSJoint(src_point2[1].node1, src_point2[1].x, true)
+				path = tonumber(signal.RouteNumber) and signal.RouteNumber or PathBySignalName(signal)
 			end
-			if IsValid(signal) then 
-				if signal.RouteNumber and signal.RouteNumber != "" then 
-					local path = tonumber(signal.RouteNumber)
-				else
-					local path = PathBySignalName(signal)
-					path = path % 2 == 0 and 2 or 1
-					if path != v.PlatformIndex then
-						v.PlatformIndex = path
-						v:SetNWInt("PlatformIndex", path)
-						v.TrackPos = center_point[1].x
-						v.TrackID = center_point[1].path.id
-						v.PlatformLen = v.PlatformStart:DistToSqr(v.PlatformEnd)
-						v.PlatformLenX = math.abs(src_point[1].x - src_point2[1].x)
-					end
+			if IsValid(signal) and path then 
+				path = path % 2 == 0 and 2 or 1
+				if path != v.PlatformIndex then
+					v.PlatformIndex = path
+					v:SetNWInt("PlatformIndex", path)
+					v.TrackPos = center_point[1].x
+					v.TrackID = center_point[1].path.id
+					v.PlatformLen = v.PlatformStart:DistToSqr(v.PlatformEnd)
+					v.PlatformLenX = math.abs(src_point[1].x - src_point2[1].x)
 				end
 			end
 		end
@@ -296,18 +293,18 @@ if SERVER then
 			if not IsValid(owner) then continue end
 			if owner == ply then continue end
 			local rnum2 = 0
-			if cl == "gmod_subway_81-540_2" then
+			if cl:find("540_2") then
 				rnum2 = tonumber(train.RouteNumbera.RouteNumbera)
-			elseif cl == "gmod_subway_81-722" or cl == "gmod_subway_81-722_3" or cl == "gmod_subway_81-722_new" or cl == "gmod_subway_81-7175p" then
+			elseif cl:find("722") or cl:find("7175p") then
 				rnum2 = tonumber(train.RouteNumberSys.RouteNumber)
-			elseif cl == "gmod_subway_81-717_6" or cl == "gmod_subway_81-740_4" then
+			elseif cl:find("717_6") or cl:find("740_4") then
 				rnum2 = train.ASNP.RouteNumber
 			else
 				if train.RouteNumber then
 					rnum2 = tonumber(train.RouteNumber.RouteNumber)
 				end
 			end
-			if table.HasValue({"gmod_subway_em508","gmod_subway_81-702","gmod_subway_81-703","gmod_subway_81-705_old","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_ezh3ru1","gmod_subway_81-717_mvm","gmod_subway_81-718","gmod_subway_81-720","gmod_subway_81-720_1","gmod_subway_81-720a","gmod_subway_81-717_freight","gmod_subway_81-717_5a"},cl) then rnum2 = rnum2 / 10 end
+			if table.HasValue({"gmod_subway_em508","gmod_subway_81-702","gmod_subway_81-703","gmod_subway_81-705_old","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_ezh3ru1","gmod_subway_81-717_mvm","gmod_subway_81-718","gmod_subway_81-720","gmod_subway_81-720_1","gmod_subway_81-720a","gmod_subway_81-717_freight","gmod_subway_81-717_5a", "gmod_subway_81-717_ars_minsk"},cl) then rnum2 = rnum2 / 10 end
 			routes[owner:Nick()] = rnum2
 		end
 		if #routes > 0 then
@@ -330,21 +327,21 @@ if SERVER then
 		if (not IsValid(ent)) then return false end
 		if (not MetrostroiAdvanced.TrainList[ent:GetClass()]) then return false end -- только головные
 		local class = ent:GetClass()
-		if class:sub(13,18) == "81-760" or class:sub(13,19) == "81-760a" then
+		if class:find("760") then
 			if ent.RV.KROPosition ~= 0 then
 				return true
 			end
-		elseif class:sub(13,18) == "81-722" then
+		elseif class:find("722") then
 			if ent.Electric.CabActive ~= 0 then
 				return true
 			end
-		elseif class:sub(13,18) == "81-720" then
+		elseif class:find("720") then
 			if ent.WrenchMode ~= 0 then
 				if ent.RV.KROPosition ~= 0 then
 					return true
 				end
 			end
-		elseif class:sub(13,18) == "81-718" then
+		elseif class:find("718") then
 			if ent.WrenchMode ~= 0 then
 				if ent.KR.Position ~= 0 then
 					return true
@@ -370,7 +367,7 @@ if SERVER then
 		local station = -1
 		
 		-- 81-540.2K
-		if train:GetClass():find("81-540_2k",1,true) and train.ASNP then
+		if train:GetClass():find("540_2k",1,true) and train.ASNP then
 			if (train:GetNW2String("Inf:Tablo1") == "обкатка" or train:GetNW2String("Inf:Tablo1") == "перегонка") then return 1111 end
 			-- у меня на табло станци не отображаются, будем брать с информатора
 			if train.ASNP.State < 2 then return 1111 end
@@ -387,7 +384,7 @@ if SERVER then
 		end
 		
 		-- 81-720.1, 81-717.5A и 81-740.4 (только ASNP)
-		if (station == -1 and (train:GetClass():find("81-720_1",1,true) or train:GetClass():find("81-717_5a",1,true) or train:GetClass():find("81-740_4",1,true)) and train.ASNP) then
+		if (station == -1 and (train:GetClass():find("720_1") or train:GetClass():find("717_5a") or train:GetClass():find("740_4")) and train.ASNP) then
 			if train.ASNP.State < 7 then return 1111 end
 			local tbl = Metrostroi.ASNPSetup[train:GetNW2Int("Announcer",1)] and Metrostroi.ASNPSetup[train:GetNW2Int("Announcer",1)][train.ASNP.Line]
 			if tbl and (tbl.Loop and train.ASNP.LastStation == 0) then tbl = nil return -1 end -- когда выбран "Кольцевой", срабатывать не будет
@@ -396,7 +393,7 @@ if SERVER then
 		end
 		
 		-- 81-722
-		if (station == -1 and train:GetClass():find("81-722",1,true) and train.SarmatUPO) then
+		if (station == -1 and train:GetClass():find("722") and train.SarmatUPO) then
 			if train.SarmatUPO.Line < 1 then return 1111 end -- сервисная надпись табло
 			local tbl = Metrostroi.SarmatUPOSetup[train:GetNW2Int("Announcer",1)] and Metrostroi.SarmatUPOSetup[train:GetNW2Int("Announcer",1)][train.SarmatUPO.Line]
 			if tbl and (tbl.Loop and train.SarmatUPO.LastStationName == "Кольцевой") then tbl = nil return -1 end
@@ -407,7 +404,7 @@ if SERVER then
 		-- 81-* LVZ (на остальных нельзя выбирать конечную и нет трафаретов)
 		
 		-- 81-760
-		if (station == -1 and train:GetClass():find("81-760",1,true) and train.BMCIS) then
+		if (station == -1 and train:GetClass():find("760") and train.BMCIS) then
 			if train.BMCIS.Line < 1 then return 1111 end -- сервисная надпись табло
 			if train.BMCIS.State1 < 7 then return 1111 end
 			local tbl = Metrostroi.CISConfig[train.CISConfig] and Metrostroi.CISConfig[train.CISConfig][train.BMCIS.Line]

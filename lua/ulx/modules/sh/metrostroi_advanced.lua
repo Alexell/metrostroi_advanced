@@ -57,9 +57,10 @@ end
 
 local function TrainStart(train)
 	if not IsValid(train) then return end
+	local class = train:GetClass()
 	local cursig
 	-- Проход по составам - самая большая группа - Номерной и древнее
-	if train:GetClass() and (train:GetClass():sub(13,18) != "81-718" and train:GetClass():sub(13,18) != "81-720" and train:GetClass():sub(13,18) != "81-722" and train:GetClass():sub(13,18) != "81-760") then
+	if class and (not class:find("718") and not class:find("720") and not class:find("722") and not class:find("760")) then
 		if train.KVWrenchMode != 1  or train.KVWrenchMode == 1 then
 			train:PlayOnce("revers_in", "cabin", 0.7)
 			train.KVWrenchMode = 1
@@ -129,7 +130,7 @@ local function TrainStart(train)
 			end)
 		end)
 	-- ТИСУ
-	elseif train:GetClass():sub(13,18) == "81-718" then
+	elseif class:find("718") then
 		if train.WrenchMode != 1 or train.WrenchMode == 1 then
 			train:PlayOnce("kr_in", "cabin",1)
 			train.WrenchMode = 1
@@ -177,7 +178,7 @@ local function TrainStart(train)
 			end
 		end)
 	-- Яуза	
-	elseif train:GetClass():sub(13,18) == "81-720" then
+	elseif class:find("720") then
 		if train.WrenchMode != 1 or train.WrenchMode == 1 then
 			train:PlayOnce("kro_in", "cabin",1)
 			train.WrenchMode = 1
@@ -223,7 +224,7 @@ local function TrainStart(train)
 			end
 		end)
 	-- Юбилейный
-	elseif train:GetClass():sub(13,18) == "81-722" then
+	elseif class:find("722") then
 		if train.ALS then train.ALS:TriggerInput("Set", 0) end
 		if train.ARS then train.ARS:TriggerInput("Set", 0) end
 		if train.MFDU.State != 1 then train.MFDU.State = 1 end
@@ -248,7 +249,7 @@ local function TrainStart(train)
 			train.KRO:TriggerInput("Set", 2) 
 		end)
 	-- Ока
-	elseif train:GetClass():sub(13,18) == "81-760" then
+	elseif class:find("760") then
 		timer.Simple(0.5, function() -- таймер на переключение реверса
 			train.RV:TriggerInput("KROSet", train.RV.KROPosition + 1)
 		end)
@@ -279,8 +280,9 @@ local function TrainStart(train)
 end
 
 local function TrainStop(train)
+	local class = train:GetClass()
 	-- Проход по составам - самая большая группа - Номерной и древнее
-	if train:GetClass() and (train:GetClass():sub(13,18) ~= "81-718" and train:GetClass():sub(13,18) ~= "81-720" and train:GetClass():sub(13,18) ~= "81-722" and train:GetClass():sub(13,18) ~= "81-760") then
+	if class and (not class:find("718") and not class:find("720") and not class:find("722") and not class:find("760")) then
 		if train.Pneumatic.DriverValvePosition != 5 then
 			train.Pneumatic:TriggerInput("BrakeSet", 5)
 		end
@@ -326,7 +328,7 @@ local function TrainStop(train)
 			end
 		end)					
 	-- ТИСУ
-	elseif train:GetClass() and train:GetClass():sub(13,18) == "81-718" then
+	elseif class:find("718") then
 		if train.Pneumatic.DriverValvePosition != 6 then
 			train.Pneumatic:TriggerInput("BrakeSet", 5)
 		end
@@ -350,7 +352,7 @@ local function TrainStop(train)
 			end)
 		end		
 	-- Яуза
-	elseif train:GetClass() and train:GetClass():sub(13,18) == "81-720" then
+	elseif class:find("720") then
 		if train.WrenchMode != 0 then
 			timer.Simple(1, function() -- таймер на откл реверса. Яуза
 				train.RV:TriggerInput("KROSet", train.RV.KROPosition - 1) 
@@ -365,7 +367,7 @@ local function TrainStop(train)
 			end)
 		end	
 	-- Юбилейный (без комментариев)
-	elseif train:GetClass():sub(13,18) == "81-722" then 
+	elseif class:find("722") then
 			timer.Simple(0.5, function() 
 				train.KRO:TriggerInput("Set", 1) 
 			end)
@@ -379,7 +381,7 @@ local function TrainStop(train)
 				if train.DoorClose then train.DoorClose:TriggerInput("Set", 1) end			
 			end)
 	-- Oka
-	elseif train:GetClass():sub(13,18) == "81-760" then 
+	elseif class:find("760") then
 		timer.Simple(1, function() -- таймер на переключение реверса
 			train.RV:TriggerInput("KROSet", train.RV.KROPosition - 1)
 		end)
@@ -400,8 +402,9 @@ local function ChangeCab (ply,train1,train2)
     local tim = 3
 	local tim2 = tim + 1.5
 	local tim3 = tim2 + 1.5
-	if ply:GetNW2String("MATrainClass","") == "gmod_subway_81-720" then tim = 1  tim2 = tim + 1 tim3 = tim2 + 1 end
-	if ply:GetNW2String("MATrainClass","") == "gmod_subway_81-722" then tim = 1  tim2 = tim + 1 tim3 = tim2 + 1 end
+	if ply:GetNW2String("MATrainClass",""):find("720") or ply:GetNW2String("MATrainClass",""):find("722") then
+		tim = 1  tim2 = tim + 1 tim3 = tim2 + 1
+	end
 	TrainStop(train1)	
 	timer.Simple(tim, function()
 		ply:ExitVehicle()
@@ -558,22 +561,22 @@ function ulx.wagons( calling_ply )
 		Trains[ply:Nick()] = MetrostroiAdvanced.TrainList[cl]
 		Wags[ply:Nick()] = #train.WagonList
 		local rnum = 0
-		if cl == "gmod_subway_81-540_2" then
+		if cl:find("540_2") then
 			rnum = tonumber(train.RouteNumbera.RouteNumbera)
-		elseif cl == "gmod_subway_81-722" or cl == "gmod_subway_81-722_3" or cl == "gmod_subway_81-722_new" or cl == "gmod_subway_81-7175p" then
+		elseif cl:find("722") or cl:find("7175p") then
 			rnum = tonumber(train.RouteNumberSys.RouteNumber)
-		elseif cl == "gmod_subway_81-717_6" or cl == "gmod_subway_81-740_4" then
+		elseif cl:find("717_6") or cl:find("740_4") then
 			rnum = train.ASNP.RouteNumber
 		else
 			if train.RouteNumber then
 				rnum = tonumber(train.RouteNumber.RouteNumber)
 			end
 		end
-		if table.HasValue({"gmod_subway_em508","gmod_subway_81-702","gmod_subway_81-703","gmod_subway_81-705_old","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_ezh3ru1","gmod_subway_81-717_mvm","gmod_subway_81-718","gmod_subway_81-720","gmod_subway_81-720_1","gmod_subway_81-720a","gmod_subway_81-717_freight","gmod_subway_81-717_5a"},cl) then
+		if table.HasValue({"gmod_subway_em508","gmod_subway_81-702","gmod_subway_81-703","gmod_subway_81-705_old","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_ezh3ru1","gmod_subway_81-717_mvm","gmod_subway_81-718","gmod_subway_81-720","gmod_subway_81-720_1","gmod_subway_81-720a","gmod_subway_81-717_freight","gmod_subway_81-717_5a", "gmod_subway_81-717_ars_minsk"},cl) then
 			rnum = rnum / 10
 		end
 		Routes[ply:Nick()] = tostring(rnum)
-		Locs[ply:Nick()] = MetrostroiAdvanced.GetLocation(train)
+		Locs[ply:Nick()] = MetrostroiAdvanced.GetLocation(train:GetPos())
 	end
 	
 	for k,v in pairs(Trains) do
@@ -614,24 +617,24 @@ function ulx.traintp( calling_ply, target_ply )
 	local ents = ents.FindByClass(class)
 	for k,v in pairs(ents) do
 		if v.Owner:Nick() == target_ply:Nick() then
-			if class:sub(13,18) == "81-760" or class:sub(13,19) == "81-760a" then
+			if class:find("760") then
 				if v.RV.KROPosition ~= 0 then
 					GotoTrain(calling_ply,target_ply,v,true)
 					teleported = true
 				end
-			elseif class:sub(13,18) == "81-722" then
+			elseif class:find("722") then
 				if v.Electric.CabActive ~= 0 then
 					GotoTrain(calling_ply,target_ply,v,true) 
 					teleported = true
 				end
-			elseif class:sub(13,18) == "81-720" then
+			elseif class:find("720") then
 				if v.WrenchMode ~= 0 then
 					if v.RV.KROPosition ~= 0 then
 						GotoTrain(calling_ply,target_ply,v,true)
 						teleported = true
 					end
 				end
-			elseif class:sub(13,18) == "81-718" then
+			elseif class:find("718") then
 				if v.WrenchMode ~= 0 then
 					if v.KR.Position ~= 0 then
 						GotoTrain(calling_ply,target_ply,v,true)
