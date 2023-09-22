@@ -281,7 +281,7 @@ hook.Add("MetrostroiSpawnerRestrict","MA.TrainSpawnerLimits",function(ply,settin
 		local rr =  Metrostroi.RerailGetTrackData(tr.HitPos,ply:GetAimVector())
 		if wag_num >= 2 and wag_num <= 4 then wag_str = lang("wagon2") end
 		if wag_num >= 5 then wag_str = lang("wagon3") end
-		if ulx then
+		if ulx and tr.Hit and tr.HitPos and rr.centerpos then
 			ulx.fancyLog(lang("Player").." #s "..lang("Spawned").." #s #s #s.\n"..lang("Location")..": #s.",ply:Nick(),tostring(wag_num),wag_str,MetrostroiAdvanced.GetTrainName(settings.Train),MetrostroiAdvanced.GetLocation(rr.centerpos))
 		end
 	end
