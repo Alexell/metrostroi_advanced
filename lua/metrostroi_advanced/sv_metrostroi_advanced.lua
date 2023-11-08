@@ -397,12 +397,12 @@ hook.Add("MetrostroiCoupled","MA.SetTrainParams",function(train,train2)
 		local rtype = train:GetNW2Int("Route",1)
 		if rtype == 1 then
 			if rnum < 10 then
-				rnum = "0"..tostring(rnum).."0"
+				rnum = "00"..tostring(rnum)
 			else
-				rnum = tostring(rnum).."00"
+				rnum = "0"..tostring(rnum)
 			end
-			train.RouteNumbera.RouteNumbera = rnum
-			train:SetNW2String("RouteNumbera",rnum)
+			train.RouteNumber.RouteNumber = rnum
+			train:SetNW2String("RouteNumber",rnum)
 		end
 		if rtype == 2 then
 			if rnum < 10 then
