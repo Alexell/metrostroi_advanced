@@ -561,9 +561,7 @@ function ulx.wagons( calling_ply )
 		Trains[ply:Nick()] = MetrostroiAdvanced.TrainList[cl]
 		Wags[ply:Nick()] = #train.WagonList
 		local rnum = 0
-		if cl:find("540_2") then
-			rnum = tonumber(train.RouteNumbera.RouteNumbera)
-		elseif cl:find("722") or cl:find("7175p") then
+		if cl:find("722") or cl:find("7175p") then
 			rnum = tonumber(train.RouteNumberSys.RouteNumber)
 		elseif cl:find("717_6") or cl:find("740_4") then
 			rnum = train.ASNP.RouteNumber
