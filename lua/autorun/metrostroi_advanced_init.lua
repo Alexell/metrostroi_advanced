@@ -44,6 +44,16 @@ function MetrostroiAdvanced.LoadLanguage(lang)
 	end
 end
 
+function MetrostroiAdvanced.FixedRoute(class,route)
+	local classes = {"gmod_subway_em508","gmod_subway_81-702","gmod_subway_81-703","gmod_subway_81-705_old","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_ezh3ru1","gmod_subway_81-717_mvm","gmod_subway_81-718","gmod_subway_81-720","gmod_subway_81-720_1","gmod_subway_81-720a","gmod_subway_81-717_freight","gmod_subway_81-717_5a", "gmod_subway_81-717_ars_minsk"}
+	local rnum = tonumber(route)
+	if table.HasValue(classes, class) then
+		rnum = rnum / 10
+		route = rnum
+	end
+	return route
+end
+
 if SERVER then
 	local function lang(str)
 		return MetrostroiAdvanced.Lang[str]
@@ -293,18 +303,21 @@ if SERVER then
 			if not IsValid(owner) then continue end
 			if owner == ply then continue end
 			local rnum2 = 0
-			if cl:find("540_2") then
-				rnum2 = tonumber(train.RouteNumbera.RouteNumbera)
-			elseif cl:find("722") or cl:find("7175p") then
-				rnum2 = tonumber(train.RouteNumberSys.RouteNumber)
+			if cl:find("722") or cl:find("7175p") then
+				if train.RouteNumberSys then
+					rnum2 = tonumber(train.RouteNumberSys.RouteNumber)
+				end
 			elseif cl:find("717_6") or cl:find("740_4") then
-				rnum2 = train.ASNP.RouteNumber
+				if train.ASNP then
+					rnum2 = train.ASNP.RouteNumber
+				end
 			else
 				if train.RouteNumber then
 					rnum2 = tonumber(train.RouteNumber.RouteNumber)
 				end
 			end
-			if table.HasValue({"gmod_subway_em508","gmod_subway_81-702","gmod_subway_81-703","gmod_subway_81-705_old","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_ezh3ru1","gmod_subway_81-717_mvm","gmod_subway_81-718","gmod_subway_81-720","gmod_subway_81-720_1","gmod_subway_81-720a","gmod_subway_81-717_freight","gmod_subway_81-717_5a", "gmod_subway_81-717_ars_minsk"},cl) then rnum2 = rnum2 / 10 end
+			if rnum2 == 0 then continue end
+			rnum2 = MetrostroiAdvanced.FixedRoute(cl,rnum2)
 			routes[owner:Nick()] = rnum2
 		end
 		if #routes > 0 then

@@ -562,17 +562,19 @@ function ulx.wagons( calling_ply )
 		Wags[ply:Nick()] = #train.WagonList
 		local rnum = 0
 		if cl:find("722") or cl:find("7175p") then
-			rnum = tonumber(train.RouteNumberSys.RouteNumber)
+			if train.RouteNumberSys then
+				rnum = tonumber(train.RouteNumberSys.RouteNumber)
+			end
 		elseif cl:find("717_6") or cl:find("740_4") then
-			rnum = train.ASNP.RouteNumber
+			if train.ASNP then
+				rnum = train.ASNP.RouteNumber
+			end
 		else
 			if train.RouteNumber then
 				rnum = tonumber(train.RouteNumber.RouteNumber)
 			end
 		end
-		if table.HasValue({"gmod_subway_em508","gmod_subway_81-702","gmod_subway_81-703","gmod_subway_81-705_old","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_ezh3ru1","gmod_subway_81-717_mvm","gmod_subway_81-718","gmod_subway_81-720","gmod_subway_81-720_1","gmod_subway_81-720a","gmod_subway_81-717_freight","gmod_subway_81-717_5a", "gmod_subway_81-717_ars_minsk"},cl) then
-			rnum = rnum / 10
-		end
+		rnum = MetrostroiAdvanced.FixedRoute(cl,rnum)
 		Routes[ply:Nick()] = tostring(rnum)
 		Locs[ply:Nick()] = MetrostroiAdvanced.GetLocation(train:GetPos())
 	end

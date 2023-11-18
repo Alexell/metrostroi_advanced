@@ -391,11 +391,20 @@ hook.Add("MetrostroiCoupled","MA.SetTrainParams",function(train,train2)
 	end
 
 	if class:find("540_2k") then
-		train.RouteNumber.RouteNumber = rnum
-		train.RouteNumber.CurrentRouteNumber = rnum
-	elseif class:find("540_2") then
-		local rtype = train:GetNW2Int("Route",1)
-		if rtype == 1 then
+		if train.RouteNumber then
+			train.RouteNumber.RouteNumber = rnum
+			train.RouteNumber.CurrentRouteNumber = rnum
+		end
+	elseif class:find("722") or class:find("7175p") then
+		if train.RouteNumberSys then
+			train.RouteNumberSys.CurrentRouteNumber = rnum
+		end
+	elseif class:find("717_6") or class:find("740_4") then
+		if train.ASNP then
+			train.ASNP.RouteNumber = rnum
+		end
+	elseif class:find("502") or class:find("540") or class:find("717_lvz") then
+		if train.RouteNumber then
 			if rnum < 10 then
 				rnum = "00"..tostring(rnum)
 			else
@@ -404,36 +413,12 @@ hook.Add("MetrostroiCoupled","MA.SetTrainParams",function(train,train2)
 			train.RouteNumber.RouteNumber = rnum
 			train:SetNW2String("RouteNumber",rnum)
 		end
-		if rtype == 2 then
-			if rnum < 10 then
-				rnum = "00"..tostring(rnum)
-			else
-				rnum = "0"..tostring(rnum)
-			end
-			train.RouteNumbera.RouteNumbera = rnum
-			train:SetNW2String("RouteNumbera",rnum)
-		end
-		if rtype == 3 then
-			if train.RouteNumberSys then
-				train.RouteNumberSys.CurrentRouteNumber = rnum
-			end
-		end
-	elseif class:find("722") or class:find("7175p") then
-		train.RouteNumberSys.CurrentRouteNumber = rnum
-	elseif class:find("717_6") or class:find("740_4") then
-		train.ASNP.RouteNumber = rnum
-	elseif class:find("502") or class:find("540") or class:find("717_lvz") or class:find("540_2_lvz") then
-		if rnum < 10 then
-			rnum = "00"..tostring(rnum)
-		else
-			rnum = "0"..tostring(rnum)
-		end
-		train.RouteNumber.RouteNumber = rnum
-		train:SetNW2String("RouteNumber",rnum)
 	elseif class:find("760") then
-		train.BMCIS.RouteNumber = rnum
-		train:SetNW2Int("RouteNumber:RouteNumber",rnum)
-		train.RouteNumber.RouteNumber = rnum
+		if train.BMCIS and train.RouteNumber then
+			train.BMCIS.RouteNumber = rnum
+			train:SetNW2Int("RouteNumber:RouteNumber",rnum)
+			train.RouteNumber.RouteNumber = rnum
+		end
 	else
 		if train.RouteNumber then
 			if rnum < 10 then
