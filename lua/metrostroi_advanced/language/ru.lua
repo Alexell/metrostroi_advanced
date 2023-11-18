@@ -8,8 +8,11 @@ MetrostroiAdvanced.Lang = {}
 
 -- Trains
 MetrostroiAdvanced.Lang["gmod_subway_81-502"] 				= "81-502 (Ема-502)"
+MetrostroiAdvanced.Lang["gmod_subway_em508"] 				= "81-508 (Ем-508)"
 MetrostroiAdvanced.Lang["gmod_subway_81-540"] 				= "81-540 (Номерной СПБ)"
 MetrostroiAdvanced.Lang["gmod_subway_81-540_1"] 			= "81-540.1 (Номерной СПБ)"
+MetrostroiAdvanced.Lang["gmod_subway_81-540_2_lvz"] 		= "81-540.2 (Пришелец СПБ)"
+MetrostroiAdvanced.Lang["gmod_subway_81-540_2k"] 			= "81-540.2K (Пришелец Киев)"
 MetrostroiAdvanced.Lang["gmod_subway_81-540_8"] 			= "81-540.8 (Номерной СПБ)"
 MetrostroiAdvanced.Lang["gmod_subway_81-702"] 				= "81-702 (Д)"
 MetrostroiAdvanced.Lang["gmod_subway_81-703"] 				= "81-703 (E)"
@@ -21,6 +24,7 @@ MetrostroiAdvanced.Lang["gmod_subway_81-717_mvm"]			= "81-717 (Номерной 
 MetrostroiAdvanced.Lang["gmod_subway_81-717_mvm_custom"]	= "81-717 (Номерной МСК)"
 MetrostroiAdvanced.Lang["gmod_subway_81-717_lvz"] 			= "81-717 (Номерной СПБ)"
 MetrostroiAdvanced.Lang["gmod_subway_81-717_lvz_custom"] 	= "81-717 (Номерной СПБ)"
+MetrostroiAdvanced.Lang["gmod_subway_81-717_ars_minsk"] 	= "81-717 (Номерной Минск)"
 MetrostroiAdvanced.Lang["gmod_subway_81-717_5a"] 			= "81-717.5A"
 MetrostroiAdvanced.Lang["gmod_subway_81-717_5a_custom"] 	= "81-717.5A"
 MetrostroiAdvanced.Lang["gmod_subway_81-717_6"] 			= "81-717.6"
