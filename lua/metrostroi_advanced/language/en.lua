@@ -1,5 +1,5 @@
 ------------------------ Metrostroi Advanced -------------------------
--- Language: ru
+-- Language: en
 -- Translation Authors:
 -- Agent Smith | https://steamcommunity.com/profiles/76561197990364979
 ----------------------------------------------------------------------
