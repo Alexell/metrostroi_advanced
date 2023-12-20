@@ -240,21 +240,23 @@ hook.Add("MetrostroiSpawnerRestrict","MA.TrainSpawnerLimits",function(ply,settin
 			local tr = util.TraceLine(util.GetPlayerTrace(ply))
 			local loc = ""
 			local rr =  Metrostroi.RerailGetTrackData(tr.HitPos,ply:GetAimVector())
-            if tr.Hit and tr.HitPos and rr.centerpos then
+            if tr.Hit and tr.HitPos and rr and rr.centerpos then
                 loc = MetrostroiAdvanced.GetLocation(rr.centerpos)
-            end
-			if (not PlayerPermission(ply,"metrostroi_station_spawn")) then
-				local found = false
-				for k,v in pairs(MetrostroiAdvanced.StationsIgnore) do
-					if loc:find(v) then found = true break end
+				if (not PlayerPermission(ply,"metrostroi_station_spawn")) then
+					local found = false
+					for k,v in pairs(MetrostroiAdvanced.StationsIgnore) do
+						if loc:find(v) then found = true break end
+					end
+					if not found then
+						ply:ChatPrint(lang("StationRestrict"))
+						return true
+					end
 				end
-				if not found then
-					ply:ChatPrint(lang("StationRestrict"))
+				if (loc == lang("UnknownPlace")) then
+					ply:ChatPrint(lang("AnyPlaceRestrict"))
 					return true
 				end
-			end
-			if (loc == lang("UnknownPlace")) then
-				ply:ChatPrint(lang("AnyPlaceRestrict"))
+            else
 				return true
 			end
 		end
@@ -281,7 +283,7 @@ hook.Add("MetrostroiSpawnerRestrict","MA.TrainSpawnerLimits",function(ply,settin
 		local rr =  Metrostroi.RerailGetTrackData(tr.HitPos,ply:GetAimVector())
 		if wag_num >= 2 and wag_num <= 4 then wag_str = lang("wagon2") end
 		if wag_num >= 5 then wag_str = lang("wagon3") end
-		if ulx and tr.Hit and tr.HitPos and rr.centerpos then
+		if ulx and tr.Hit and tr.HitPos and rr and rr.centerpos then
 			ulx.fancyLog(lang("Player").." #s "..lang("Spawned").." #s #s #s.\n"..lang("Location")..": #s.",ply:Nick(),tostring(wag_num),wag_str,MetrostroiAdvanced.GetTrainName(settings.Train),MetrostroiAdvanced.GetLocation(rr.centerpos))
 		end
 	end
