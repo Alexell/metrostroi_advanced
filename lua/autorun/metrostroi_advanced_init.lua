@@ -84,14 +84,15 @@ if SERVER then
 	function MetrostroiAdvanced.GetSignallingType()
 		local type26 = 0
 		local type15 = 0
-		for _, ent in pairs(ents.FindByClass("gmod_track_platform")) do
-			local src_point = Metrostroi.GetPositionOnTrack(ent.PlatformStart)
-			local signal = Metrostroi.GetARSJoint(src_point[1].node1, src_point[1].x, true)
-			if IsValid(signal) then
-				if signal.TwoToSix == true then
-					type26 = type26 + 1
-				else
-					type15 = type15 + 1
+		for k, v in pairs(Metrostroi.Stations) do 
+			for a, b in pairs(v) do 
+				local signal = Metrostroi.GetARSJoint(b.node_start, b.x_start, true)
+				if IsValid(signal) then
+					if signal.TwoToSix == true then
+						type26 = type26 + 1
+					else
+						type15 = type15 + 1
+					end
 				end
 			end
 		end
@@ -137,28 +138,34 @@ if SERVER then
 	-- исправляем пути на платформах
 	function MetrostroiAdvanced.DefinePlatformPaths()
 		print("MA: Processing true platform paths definition ...")
-		for k, v in pairs(ents.FindByClass("gmod_track_platform")) do
-			if v.PlatformIndex > 2 then continue end
-			local src_point = Metrostroi.GetPositionOnTrack(v.PlatformStart)
-			local src_point2 = Metrostroi.GetPositionOnTrack(v.PlatformEnd)
-			local center_point = Metrostroi.GetPositionOnTrack(LerpVector(0.5, v.PlatformStart, v.PlatformEnd))
-			local signal = Metrostroi.GetARSJoint(src_point[1].node1, src_point[1].x, true)
-			local path = tonumber(signal.RouteNumber) and signal.RouteNumber or PathBySignalName(signal)
-			if not IsValid(signal) or not path then
-				signal = Metrostroi.GetARSJoint(src_point2[1].node1, src_point2[1].x, true)
-				path = tonumber(signal.RouteNumber) and signal.RouteNumber or PathBySignalName(signal)
-			end
-			if IsValid(signal) and path then 
-				path = path % 2 == 0 and 2 or 1
-				if path != v.PlatformIndex then
-					v.PlatformIndex = path
-					v:SetNWInt("PlatformIndex", path)
-					v.TrackPos = center_point[1].x
-					v.TrackID = center_point[1].path.id
-					v.PlatformLen = v.PlatformStart:DistToSqr(v.PlatformEnd)
-					v.PlatformLenX = math.abs(src_point[1].x - src_point2[1].x)
+		for k, v in pairs(Metrostroi.Stations) do 
+			for a, b in pairs(v) do 
+				-- b.x_start -- координаты начала платформы
+				-- b.x_end -- координаты конца платформы
+				-- b.length -- длина платформы
+				-- b.node_start -- node начала платформы
+				-- b.node_end -- node конца платформы
+				-- b.ent -- энтити платформы
+				if b.ent.PlatformIndex > 2 then continue end
+				local center_point = Metrostroi.GetPositionOnTrack(LerpVector(0.5, b.ent.PlatformStart, b.ent.PlatformEnd))
+				local signal = Metrostroi.GetARSJoint(b.node_start, b.x_start, true)
+				local path = tonumber(signal.RouteNumber) and signal.RouteNumber or PathBySignalName(signal)
+				if not IsValid(signal) or not path then
+					signal = Metrostroi.GetARSJoint(b.node_end, b.x_end, true)
+					path = tonumber(signal.RouteNumber) and signal.RouteNumber or PathBySignalName(signal)
 				end
-			end
+				if IsValid(signal) and path then 
+					path = path % 2 == 0 and 2 or 1
+					if path != b.ent.PlatformIndex then
+						b.ent.PlatformIndex = path
+						b.ent:SetNWInt("PlatformIndex", path)
+						b.ent.TrackPos = center_point[1].x
+						b.ent.TrackID = center_point[1].path.id
+						b.ent.PlatformLen = b.ent.PlatformStart:DistToSqr(b.ent.PlatformEnd)
+						b.ent.PlatformLenX = math.abs(b.x_start - b.x_end)
+					end
+				end
+			end 
 		end
 		Metrostroi.UpdateStations()
 	end

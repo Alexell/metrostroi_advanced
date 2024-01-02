@@ -22,6 +22,7 @@ local timezone = CreateConVar("metrostroi_advanced_timezone", 3, FCVAR_ARCHIVE, 
 local buttonmessage = CreateConVar("metrostroi_advanced_buttonmessage", 1, FCVAR_ARCHIVE, "Enable chat notifications for station control panel's buttons (def = 1 - enabled)")
 local noentry_ann = CreateConVar("metrostroi_advanced_noentryann", 1, FCVAR_ARCHIVE, "Enable automatic station announcements when there is no entry on an arriving train (def = 1 - enabled)")
 local twotosix_rest = CreateConVar("metrostroi_advanced_26restrict", 0, FCVAR_ARCHIVE, "Train restrictions for maps with 2/6 signalling (def = 0 - disabled)")
+local fix_paths = CreateConVar("metrostroi_advanced_fixpaths", 1, FCVAR_ARCHIVE, "Enable auto-fix for platforms paths (def = 1 - enabled)")
 
 SetGlobalInt("metrostroi_advanced_trainsrestrict", train_rest:GetInt())
 SetGlobalInt("metrostroi_advanced_maxwagons", max_wags:GetInt())
@@ -45,7 +46,9 @@ timer.Create("MetrostroiAdvanced.Init",3,1,function()
 	MetrostroiAdvanced.LoadMapButtons()
 	MetrostroiAdvanced.GetSignallingType()
 	MetrostroiAdvanced.CenteringStationPositions()
-	MetrostroiAdvanced.DefinePlatformPaths()
+	if fix_paths:GetInt() == 1 then
+		MetrostroiAdvanced.DefinePlatformPaths()
+	end
 	MetrostroiAdvanced.LastSpawned = os.time()
 	if not file.Exists("sound/metrostroi_advanced/no_entry_ann/"..madv_lang:GetString(),"GAME") then
 		RunConsoleCommand("metrostroi_advanced_noentryann",0)
