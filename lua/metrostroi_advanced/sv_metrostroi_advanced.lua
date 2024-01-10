@@ -448,13 +448,13 @@ end)
 -- Список объявлений
 local snd_dir = "metrostroi_advanced/no_entry_ann/"..madv_lang:GetString()
 local ann_sounds = {}
-ann_sounds[1] = {snd_dir.."/p1/1.mp3",snd_dir.."/p1/2.mp3",snd_dir.."/p1/3.mp3",snd_dir.."/p1/4.mp3",snd_dir.."/p1/5.mp3"}
-ann_sounds[2] = {snd_dir.."/p2/1.mp3",snd_dir.."/p2/2.mp3",snd_dir.."/p2/3.mp3",snd_dir.."/p2/4.mp3",snd_dir.."/p2/5.mp3"}
+ann_sounds[1] = {snd_dir.."/p1/1.mp3",snd_dir.."/p1/2.mp3",snd_dir.."/p1/3.mp3",snd_dir.."/p1/4.mp3",snd_dir.."/p1/5.mp3",snd_dir.."/p1/6.mp3"}
+ann_sounds[2] = {snd_dir.."/p2/1.mp3",snd_dir.."/p2/2.mp3",snd_dir.."/p2/3.mp3",snd_dir.."/p2/4.mp3",snd_dir.."/p2/5.mp3",snd_dir.."/p2/6.mp3"}
 ann_sounds[3] = {snd_dir.."/p3/1.mp3"}
 ann_sounds[4] = {snd_dir.."/p4/1.mp3"}
 
 -- Инжект в код платформ
-timer.Simple(1,function()
+timer.Simple(4,function()
 	for k,v in pairs(ents.FindByClass("gmod_track_platform")) do
 		local OriginalThink = v.Think
 		local Think = function()
@@ -476,7 +476,7 @@ timer.Simple(1,function()
 						if v.PlatformIndex > 2 then
 							play_snd = ann_sounds[v.PlatformIndex][1]
 						else
-							play_snd = ann_sounds[v.PlatformIndex][math.random(5)]
+							play_snd = ann_sounds[v.PlatformIndex][math.random(6)]
 						end
 
 						if last_st < 1000 then
