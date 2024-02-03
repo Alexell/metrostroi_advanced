@@ -20,6 +20,8 @@ CreateClientConVar("ma_requirethirdrail","0",false,false,"Require third rail")
 CreateClientConVar("ma_button_sourcename", "", false, false)
 CreateClientConVar("ma_button_output", "", false, false)
 CreateClientConVar("ma_auto_alsdecoder", "1", true, true,"Enable auto ALS decoder switching (def = 1 - enabled)")
+CreateClientConVar("ma_cl_crosshair","1",true,false, "Crosshair in the train")
+CreateClientConVar("ma_cl_crosshair_hide","1",true,false, "Auto-hide cursor in train on mouse inactivity")
 
 -- Дублирующие серверные квары для админов
 local AdminCVarList = {
@@ -142,11 +144,16 @@ local function ClientPanel(panel)
 	panel:Help("") -- отступ
 	panel:ControlHelp(lang("CPOptions"))
 	if Metrostroi.Version == 1537278077 then
-		panel:CheckBox(lang("CPRouteNum"),"ma_routenums")
-		panel:Help("      "..lang("CPNeedReconnect"))
+		panel:CheckBox(lang("CPRouteNum").."\n"..lang("CPNeedReconnect"),"ma_routenums")
 	end
 	panel:CheckBox(lang("CPUseAutoinform"),"ma_autoinformator")
 	panel:CheckBox(lang("CPUseAutoALSDecoder"),"ma_auto_alsdecoder")
+	local cbox2,lb2 = panel:ComboBox(lang("CPTrainCrosshair"),"ma_cl_crosshair")
+	cbox2:AddChoice(lang("CPDefault"),3)
+	cbox2:AddChoice(lang("CPOpaque"),2)
+	cbox2:AddChoice(lang("CPSemiTransp"),1)
+	cbox2:AddChoice(lang("CPDisabled"),0)
+	panel:CheckBox(lang("TrainCrosshairHide"),"ma_cl_crosshair_hide")
 end
 
 local function AdminPanel(panel)
@@ -196,4 +203,231 @@ end
 hook.Add("PopulateToolMenu", "MetrostroiAdvancedACP", function()
 	spawnmenu.AddToolMenuOption("Utilities", "Metrostroi Advanced", "MetrostroiAdvancedCP", lang("ACPClient"), "", "", ClientPanel)
 	spawnmenu.AddToolMenuOption("Utilities", "Metrostroi Advanced", "MetrostroiAdvancedAP", lang("ACPAdmin"), "", "", AdminPanel)
+end)
+
+local color_default = Color(255, 255, 255, 255)
+local color_default_t = Color(255, 255, 255, 100)
+local color_hover = Color(255, 0, 0, 255)
+local color_hover_t = Color(255, 0, 0, 100)
+
+local drawCrosshair
+local canDrawCrosshair
+local toolTipText
+local toolTipColor
+local lastAimButtonChange
+local lastAimButton
+local C_DrawDebug = GetConVar("metrostroi_drawdebug")
+
+-- функции из gmod_subway_base\cl_init.lua (нужны для работы переопределяемых хуков)
+local function isValidTrainDriver(ply)
+    local train
+    local seat = ply:GetVehicle()
+    if IsValid(seat) then train = seat:GetNW2Entity("TrainEntity") end
+    if IsValid(train) then return train end
+    local weapon = IsValid(LocalPlayer():GetActiveWeapon()) and LocalPlayer():GetActiveWeapon():GetClass()
+    if weapon == "train_kv_wrench"  or weapon == "train_kv_wrench_gold" then
+        train = util.TraceLine({
+            start = LocalPlayer():GetPos(),
+            endpos = LocalPlayer():GetPos() - LocalPlayer():GetAngles():Up() * 100,
+            filter = function( ent ) if ent.ButtonMap ~= nil then return true end end
+        }).Entity
+        if not IsValid(train) then
+            train = util.TraceLine({
+                start = LocalPlayer():EyePos(),
+                endpos = LocalPlayer():EyePos() + LocalPlayer():EyeAngles():Forward() * 300,
+                filter = function( ent ) if ent.ButtonMap ~= nil then return true end end
+            }).Entity
+        end
+    end
+    return train, true
+end
+
+local function LinePlaneIntersect(PlanePos,PlaneNormal,LinePos,LineDir)
+    local dot = LineDir:Dot(PlaneNormal)
+    local fac = LinePos-PlanePos
+    local dis = -PlaneNormal:Dot(fac) / dot
+    return LineDir * dis + LinePos
+end
+
+local function WorldToScreen(vWorldPos, vPos, vScale, aRot)
+    vWorldPos = vWorldPos - vPos
+    vWorldPos:Rotate(Angle(0, -aRot.y, 0))
+    vWorldPos:Rotate(Angle(-aRot.p, 0, 0))
+    vWorldPos:Rotate(Angle(0, 0, -aRot.r))
+
+    return vWorldPos.x / vScale, (-vWorldPos.y) / vScale
+end
+
+local function findAimButton(ply,train)
+    local panel,panelDist = nil,1e9
+    for kp,pan in pairs(train.ButtonMap) do
+        if not train:ShouldDrawPanel(kp) then continue end
+        --If player is looking at this panel
+        if pan.aimedAt and (pan.buttons or pan.sensor or pan.mouse) and pan.aimedAt < panelDist then
+            panel = pan
+            panelDist = pan.aimedAt
+        end
+    end
+    if not panel then return false end
+    if panel.aimX and panel.aimY and (panel.sensor or panel.mouse) and math.InRangeXY(panel.aimX,panel.aimY,0,0,panel.width,panel.height) then return false,panel.aimX,panel.aimY,panel.system end
+    if not panel.buttons then return false end
+
+    local buttonTarget
+    for _,button in pairs(panel.buttons) do
+        if (train.Hidden[button.PropName] or train.Hidden.button[button.PropName]) and (not train.ClientProps[button.PropName] or not train.ClientProps[button.PropName].config or not train.ClientProps[button.PropName].config.staylabel) then continue end
+        if (train.Hidden[button.ID] or train.Hidden.button[button.ID])  and (not train.ClientProps[button.ID] or not train.ClientProps[button.ID].config or not train.ClientProps[button.ID].config.staylabel) then  continue end
+        if button.w and button.h then
+            if  panel.aimX >= button.x and panel.aimX <= (button.x + button.w) and
+                    panel.aimY >= button.y and panel.aimY <= (button.y + button.h) then
+                buttonTarget = button
+                --table.insert(foundbuttons,{button,panel.aimedAt})
+            end
+        else
+            --If the aim location is withing button radis
+            local dist = math.Distance(button.x,button.y,panel.aimX,panel.aimY)
+            if dist < (button.radius or 10) then
+                buttonTarget = button
+                --table.insert(foundbuttons,{button,panel.aimedAt})
+            end
+        end
+    end
+
+    if not buttonTarget then return false end
+
+    return buttonTarget
+end
+------------------------------------------
+
+-- функции хуков из gmod_subway_base\cl_init.lua (измененные)
+local lastCursorX = 0
+local lastCursorY = 0
+local lastCursorTime = 0
+local function metrostroi_cabin_panel()
+    local ply = LocalPlayer()
+    if not IsValid(ply) then return end
+
+    toolTipText = nil
+    drawCrosshair = false
+    canDrawCrosshair = false
+	
+	-- отключение указателя игроком
+	if GetConVar("ma_cl_crosshair"):GetInt() == 0 then return end
+	
+	-- отключение указателя при отсутствии движения курсора
+	if GetConVar("ma_cl_crosshair_hide"):GetInt() == 1 then
+		local cursorX, cursorY = input.GetCursorPos()
+		if (cursorX ~= lastCursorX or cursorY ~= lastCursorY) then
+			lastCursorX = cursorX
+			lastCursorY = cursorY
+			lastCursorTime = CurTime()
+		else
+			if (CurTime() - lastCursorTime) > 3 then return end
+		end
+	end
+	
+    local train, outside = isValidTrainDriver(ply)
+    if not IsValid(train) then return end
+    if train.ButtonMap ~= nil then
+        canDrawCrosshair = true
+        local plyaimvec
+        if outside then
+            plyaimvec = ply:GetAimVector()
+        else
+            local x,y = input.GetCursorPos()
+            plyaimvec = gui.ScreenToVector(x,y)
+        end
+
+        -- Loop trough every panel
+        for k2,panel in pairs(train.ButtonMap) do
+            if not train:ShouldDrawPanel(kp2) then continue end
+            local pang = train:LocalToWorldAngles(panel.ang)
+
+            if plyaimvec:Dot(pang:Up()) < 0 then
+                local campos = not outside and train.CamPos or ply:EyePos()
+                local ppos = train:LocalToWorld(panel.pos)
+                local isectPos = LinePlaneIntersect(ppos,pang:Up(),campos,plyaimvec)
+                local localx,localy = WorldToScreen(isectPos,ppos,panel.scale,pang)
+
+                panel.aimX = localx
+                panel.aimY = localy
+                if plyaimvec:Dot(isectPos - campos)/(isectPos-campos):Length() > 0 and localx > 0 and localx < panel.width and localy > 0 and localy < panel.height then
+                    panel.aimedAt = isectPos:Distance(campos)
+                    drawCrosshair = panel.aimedAt
+                else
+                    panel.aimedAt = false
+                end
+                panel.outside = outside
+            else
+                panel.aimedAt = false
+            end
+        end
+
+        -- Tooltips
+        local ttdelay = GetConVarNumber("metrostroi_tooltip_delay")
+        if GetConVarNumber("metrostroi_disablehovertext") == 0 and ttdelay and ttdelay >= 0 then
+            local button = findAimButton(ply,train)
+            if button and
+                ((train.Hidden[button.ID] or train.Hidden[button.PropName]) and (not train.ClientProps[button.ID].config or not train.ClientProps[button.ID].config.staylabel) or
+                (train.Hidden.button[button.ID] or train.Hidden.button[button.PropName]) and (not train.ClientProps[button.PropName].config or not train.ClientProps[button.PropName].config.staylabel)) then
+                return
+            end
+            if button ~= lastAimButton then
+                lastAimButtonChange = CurTime()
+                lastAimButton = button
+            end
+
+            if button then
+                if ttdelay == 0 or CurTime() - lastAimButtonChange > ttdelay then
+                    if C_DrawDebug:GetInt() > 0 then
+                        toolTipText,_,toolTipColor = button.ID,Color(255,0,255)
+                    elseif button.plombed then
+                        toolTipText,_,toolTipColor = button.plombed(train)
+                    else
+                        toolTipText,_,toolTipColor = button.tooltip
+                    end
+                end
+            end
+        end
+    end
+end
+
+local function metrostroi_draw_crosshair_tooltip()
+    if not canDrawCrosshair then return end
+    if IsValid(LocalPlayer()) then
+		local cvarCrosshair = GetConVar("ma_cl_crosshair"):GetInt()
+        local scrX,scrY = surface.ScreenWidth(),surface.ScreenHeight()
+
+		if cvarCrosshair == 3 then
+			-- стандартный курсор
+			surface.DrawCircle(scrX/2,scrY/2,4.1,drawCrosshair and Color(255,0,0) or Color(255,255,150))
+		else
+			-- новый курсор
+			draw.RoundedBox(3, ScrW() / 2 - 3, ScrH() / 2 - 3, 6, 6, drawCrosshair and (cvarCrosshair == 1 and color_hover_t or color_hover) or (cvarCrosshair == 1 and color_default_t or color_default))
+		end
+
+        if toolTipText ~= nil then
+            local text1 = string.sub(toolTipText,1,string.find(toolTipText,"\n"))
+            local text2 = string.sub(toolTipText,string.find(toolTipText,"\n") or 1e9)
+            surface.SetFont("MetrostroiLabels")
+            local w,h = surface.GetTextSize("SomeText")
+            local height = h*1.1
+            local texts = string.Explode("\n",toolTipText)
+            surface.SetDrawColor(0,0,0,125)
+            for i,v in ipairs(texts) do
+                if #v==0 then continue end
+                local w2,h2 = surface.GetTextSize(v)
+                surface.DrawRect(scrX/2-w2/2-5, scrY/2-h2/2+height*(i), w2+10, h2)
+                draw.SimpleText(v,"MetrostroiLabels",scrX/2,scrY/2+height*(i), toolTipColor or Color(255,255,255),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
+            end
+        end
+    end
+end
+------------------------------------------------
+
+-- замена хуков
+timer.Simple(1, function()
+	hook.Remove("Think", "metrostroi-cabin-panel")
+	hook.Add("Think", "metrostroi-cabin-panel", metrostroi_cabin_panel)
+	hook.Remove("HUDPaint", "metrostroi-draw-crosshair-tooltip")
+	hook.Add("HUDPaint", "metrostroi-draw-crosshair-tooltip", metrostroi_draw_crosshair_tooltip)
 end)
