@@ -476,8 +476,10 @@ if SERVER then
 				end    
 			end
 			if route_found and route_opened then
-				timer.Simple(0.2, function() 
-					ulx.fancyLog("#s "..lang("OpenedEmerRoute").." #s.", ply:Nick(), names)
+				timer.Simple(0.2, function()
+					if GetConVar("metrostroi_advanced_signalsmessage"):GetInt() == 1 then
+						ulx.fancyLog("#s "..lang("OpenedEmerRoute").." #s.", ply:Nick(), names)
+					end
 				end)	 	
 			elseif route_found and not route_opened then
 				timer.Simple(0.2, function() 
@@ -511,8 +513,10 @@ if SERVER then
 				end    
 			end
 			if route_found and route_closed then
-				timer.Simple(0.2, function() 
-					ulx.fancyLog("#s "..lang("ClosedEmerRoute").." #s.", ply:Nick(), names)
+				timer.Simple(0.2, function()
+					if GetConVar("metrostroi_advanced_signalsmessage"):GetInt() == 1 then
+						ulx.fancyLog("#s "..lang("ClosedEmerRoute").." #s.", ply:Nick(), names)
+					end
 				end)	 	
 			elseif route_found and not route_closed then
 				timer.Simple(0.2, function() 
@@ -567,8 +571,10 @@ if SERVER then
 				end		
 			end
 			if signal_found and signal_closed then
-				timer.Simple(0.2, function() 
-					ulx.fancyLog("#s "..lang("ClosedSignal").." #s.", ply:Nick(), Name:upper())
+				timer.Simple(0.2, function()
+					if GetConVar("metrostroi_advanced_signalsmessage"):GetInt() == 1 then
+						ulx.fancyLog("#s "..lang("ClosedSignal").." #s.", ply:Nick(), Name:upper())
+					end
 				end)	 	
 			elseif signal_found and not signal_closed then
 				timer.Simple(0.2, function() 
@@ -576,8 +582,10 @@ if SERVER then
 				end)	 
 			end
 			if route_found and route_closed then
-				timer.Simple(0.2, function() 
-					ulx.fancyLog("#s "..lang("ClosedRoute").." #s.", ply:Nick(), Name:upper())
+				timer.Simple(0.2, function()
+					if GetConVar("metrostroi_advanced_signalsmessage"):GetInt() == 1 then
+						ulx.fancyLog("#s "..lang("ClosedRoute").." #s.", ply:Nick(), Name:upper())
+					end
 				end)	 	
 			elseif route_found and not route_closed then
 				timer.Simple(0.2, function() 
@@ -617,8 +625,10 @@ if SERVER then
 				end
 			end	
 			if signal_found and signal_opened then
-				timer.Simple(0.2, function() 
-					ulx.fancyLog("#s "..lang("OpenedSignal").." #s.", ply:Nick(), Name:upper())
+				timer.Simple(0.2, function()
+					if GetConVar("metrostroi_advanced_signalsmessage"):GetInt() == 1 then
+						ulx.fancyLog("#s "..lang("OpenedSignal").." #s.", ply:Nick(), Name:upper())
+					end
 				end)	 	
 			elseif signal_found and not signal_opened then
 				timer.Simple(0.2, function() 
@@ -626,8 +636,10 @@ if SERVER then
 				end)	 
 			end
 			if route_found and route_opened then
-				timer.Simple(0.2, function() 
-					ulx.fancyLog("#s "..lang("OpenedRoute").." #s.", ply:Nick(), Name:upper())
+				timer.Simple(0.2, function()
+					if GetConVar("metrostroi_advanced_signalsmessage"):GetInt() == 1 then
+						ulx.fancyLog("#s "..lang("OpenedRoute").." #s.", ply:Nick(), Name:upper())
+					end
 				end)	 	
 			elseif route_found and not route_opened then
 				timer.Simple(0.2, function() 
@@ -652,8 +664,10 @@ if SERVER then
 				end
 			end	
 			if signal_found and signal_opened then
-				timer.Simple(0.2, function() 
-					ulx.fancyLog("#s "..lang("OpenedIS").." #s.", ply:Nick(), Name:upper())
+				timer.Simple(0.2, function()
+					if GetConVar("metrostroi_advanced_signalsmessage"):GetInt() == 1 then
+						ulx.fancyLog("#s "..lang("OpenedIS").." #s.", ply:Nick(), Name:upper())
+					end
 				end)
 			elseif not signal_found then
 				timer.Simple(0.2, function() 
@@ -673,8 +687,10 @@ if SERVER then
 				end
 			end	
 			if signal_found and signal_closed then
-				timer.Simple(0.2, function() 
-					ulx.fancyLog("#s "..lang("ClosedIS").." #s.", ply:Nick(), Name:upper())
+				timer.Simple(0.2, function()
+					if GetConVar("metrostroi_advanced_signalsmessage"):GetInt() == 1 then
+						ulx.fancyLog("#s "..lang("ClosedIS").." #s.", ply:Nick(), Name:upper())
+					end
 				end)
 			elseif not signal_found then
 				timer.Simple(0.2, function() 
@@ -692,8 +708,10 @@ if SERVER then
 					end
 				end
 				if signal_found and ao_changed then
-					timer.Simple(0.2, function() 
-						ulx.fancyLog("#s "..lang("EnabledAS").." #s.", ply:Nick(), Name:upper())
+					timer.Simple(0.2, function()
+						if GetConVar("metrostroi_advanced_signalsmessage"):GetInt() == 1 then
+							ulx.fancyLog("#s "..lang("EnabledAS").." #s.", ply:Nick(), Name:upper())
+						end
 					end)
 				elseif not signal_found then
 					timer.Simple(0.2, function() 
@@ -710,8 +728,10 @@ if SERVER then
 					end
 				end
 				if signal_found and ao_changed then
-					timer.Simple(0.2, function() 
-						ulx.fancyLog("#s "..lang("DisabledAS").." #s.", ply:Nick(), Name:upper())
+					timer.Simple(0.2, function()
+						if GetConVar("metrostroi_advanced_signalsmessage"):GetInt() == 1 then
+							ulx.fancyLog("#s "..lang("DisabledAS").." #s.", ply:Nick(), Name:upper())
+						end
 					end)
 				elseif not signal_found then
 					timer.Simple(0.2, function() 

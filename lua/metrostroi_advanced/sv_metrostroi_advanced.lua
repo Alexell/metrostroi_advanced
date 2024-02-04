@@ -13,6 +13,7 @@ if CLIENT then return end
 local spawn_int = CreateConVar("metrostroi_advanced_spawninterval", 0, FCVAR_ARCHIVE, "Global delay between spawns in seconds (def = 0 - disabled)")
 local train_rest = CreateConVar("metrostroi_advanced_trainsrestrict", 0, FCVAR_ARCHIVE, "Global train restrictions convar for ulx groups (def = 0 - disabled)")
 local spawn_mes = CreateConVar("metrostroi_advanced_spawnmessage", 1, FCVAR_ARCHIVE, "Global chat outputs for every spawned train (def = 1 - enabled)")
+local signals_mes = CreateConVar("metrostroi_advanced_signalsmessage", 1, FCVAR_ARCHIVE, "Global chat outputs for actions with signalling (def = 1 - enabled)")
 local max_wags = CreateConVar("metrostroi_advanced_maxwagons", 4, FCVAR_ARCHIVE, "Maximum wagon count for a player to spawn (def = 4)")
 local min_wags = CreateConVar("metrostroi_advanced_minwagons", 2, FCVAR_ARCHIVE, "Minimum wagon count for a player to spawn (def = 2)")
 local auto_wags = CreateConVar("metrostroi_advanced_autowags", 0, FCVAR_ARCHIVE, "Automatic permission to spawn 4 wagons instead of 3 wagons for the first 3 players to spawn a train, in case metrostroi_advanced_maxwagons convar is set to less than 4 (def = 0 - disabled)")
