@@ -122,7 +122,7 @@ timer.Simple(1.5,function()
 end)
 
 net.Receive("MA.ServerCommands",function(ln,ply)
-	if (not ply:IsAdmin()) then return end
+	if (not ply:IsSuperAdmin()) then return end
 	local com = net.ReadString()
 	local val = net.ReadString()
 	if (com == "ma_voltage") then com = "metrostroi_voltage" end
