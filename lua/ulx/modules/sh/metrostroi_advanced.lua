@@ -2,7 +2,6 @@
 -- Developers:
 -- Alexell | https://steamcommunity.com/profiles/76561198210303223
 -- Agent Smith | https://steamcommunity.com/profiles/76561197990364979
--- Version: 2.4
 -- License: MIT
 -- Source code: https://github.com/Alexell/metrostroi_advanced
 ----------------------------------------------------------------------
@@ -421,7 +420,7 @@ end
 
 -- Вывод станций в чат
 function ulx.sts( calling_ply )
-	if Metrostroi.Version > 1537278077 then
+	if Metrostroi.Version > 1537278077 and calling_ply:GetInfoNum("ma_statiosview",1) == 1 then
         net.Start("metrostroi_stations_gui")
         net.Send(calling_ply)
 	else
@@ -501,7 +500,7 @@ function ulx.tps( calling_ply,station )
         local key = st[1]
         st = Metrostroi.StationConfigurations[key]
         local ptbl
-        if add > 0 then
+        if Metrostroi.Version == 1537278077 and add > 0 then
             local pos = st.positions
             ptbl = pos[math.min(#pos,add+1)]
         else

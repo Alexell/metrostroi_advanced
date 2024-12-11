@@ -2,7 +2,6 @@
 -- Developers:
 -- Alexell | https://steamcommunity.com/profiles/76561198210303223
 -- Agent Smith | https://steamcommunity.com/profiles/76561197990364979
--- Version: 2.4
 -- License: MIT
 -- Source code: https://github.com/Alexell/metrostroi_advanced
 ----------------------------------------------------------------------
@@ -22,6 +21,9 @@ CreateClientConVar("ma_button_output", "", false, false)
 CreateClientConVar("ma_auto_alsdecoder", "1", true, true,"Enable auto ALS decoder switching (def = 1 - enabled)")
 CreateClientConVar("ma_cl_crosshair","1",true,false, "Crosshair in the train")
 CreateClientConVar("ma_cl_crosshair_hide","1",true,false, "Auto-hide cursor in train on mouse inactivity")
+if Metrostroi.Version > 1537278077 then
+	CreateClientConVar("ma_statiosview","1",true,true,"How to get the results of the !stations command (def = 1 - modal window)")
+end
 
 -- Дублирующие серверные квары для админов
 local AdminCVarList = {
@@ -154,6 +156,11 @@ local function ClientPanel(panel)
 	cbox2:AddChoice(lang("CPSemiTransp"),1)
 	cbox2:AddChoice(lang("CPDisabled"),0)
 	panel:CheckBox(lang("TrainCrosshairHide"),"ma_cl_crosshair_hide")
+	if Metrostroi.Version > 1537278077 then
+		local cbox3,lb3 = panel:ComboBox(lang("CPStationsView"),"ma_statiosview")
+		cbox3:AddChoice(lang("CPStationsViewDef"),1)
+		cbox3:AddChoice(lang("CPStationsViewOld"),2)
+	end
 end
 
 local function AdminPanel(panel)
@@ -327,6 +334,7 @@ local function metrostroi_cabin_panel()
 	
     local train, outside = isValidTrainDriver(ply)
     if not IsValid(train) then return end
+    if gui.IsConsoleVisible() or gui.IsGameUIVisible() or IsValid(vgui.GetHoveredPanel()) and not vgui.IsHoveringWorld() and  vgui.GetHoveredPanel():GetParent() ~= vgui.GetWorldPanel() then return end
     if train.ButtonMap ~= nil then
         canDrawCrosshair = true
         local plyaimvec
@@ -385,6 +393,11 @@ local function metrostroi_cabin_panel()
                     else
                         toolTipText,_,toolTipColor = button.tooltip
                     end
+                    if Metrostroi.Version > 1537278077 then
+                        if GetConVar("metrostroi_disablehovertextpos"):GetInt() == 0 and button.tooltipState and button.tooltip then
+                            toolTipText = toolTipText..button.tooltipState(train)
+                        end
+                    end
                 end
             end
         end
@@ -406,18 +419,17 @@ local function metrostroi_draw_crosshair_tooltip()
 		end
 
         if toolTipText ~= nil then
-            local text1 = string.sub(toolTipText,1,string.find(toolTipText,"\n"))
-            local text2 = string.sub(toolTipText,string.find(toolTipText,"\n") or 1e9)
             surface.SetFont("MetrostroiLabels")
             local w,h = surface.GetTextSize("SomeText")
             local height = h*1.1
             local texts = string.Explode("\n",toolTipText)
             surface.SetDrawColor(0,0,0,125)
             for i,v in ipairs(texts) do
+                local y = scrY/2+height*(i)
                 if #v==0 then continue end
                 local w2,h2 = surface.GetTextSize(v)
                 surface.DrawRect(scrX/2-w2/2-5, scrY/2-h2/2+height*(i), w2+10, h2)
-                draw.SimpleText(v,"MetrostroiLabels",scrX/2,scrY/2+height*(i), toolTipColor or Color(255,255,255),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
+                draw.SimpleText(v,"MetrostroiLabels",scrX/2,y, toolTipColor or Color(255,255,255),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
             end
         end
     end

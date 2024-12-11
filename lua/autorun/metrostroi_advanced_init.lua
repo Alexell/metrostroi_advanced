@@ -2,7 +2,6 @@
 -- Developers:
 -- Alexell | https://steamcommunity.com/profiles/76561198210303223
 -- Agent Smith | https://steamcommunity.com/profiles/76561197990364979
--- Version: 2.4
 -- License: MIT
 -- Source code: https://github.com/Alexell/metrostroi_advanced
 ----------------------------------------------------------------------
@@ -69,7 +68,7 @@ if SERVER then
 	-- Список карт и кол-во разрешенных вагонов на состав
 	function MetrostroiAdvanced.LoadMapWagonsLimit()
 		if not file.Exists("metrostroi_advanced/map_wagons.txt","DATA") then
-			file.Write("metrostroi_advanced/map_wagons.txt","gm_jar_pll_remastered_v9 4\ngm_mustox_neocrimson_line_a 4\ngm_metro_crossline_n3 6\ngm_metro_crossline_r199h 6\ngm_mus_loopline_e 5\ngm_metro_ruralline_v29 4\ngm_metro_jar_imagine_line_v4 6\ngm_mus_neoorange_d 3\ngm_metro_surfacemetro_w 4\ngm_metro_virus_v2 6\ngm_metro_mosldl_v1 8\ngm_metro_nsk_line_2_v4 4\ngm_metro_nekrasovskaya_line_v5 5\ngm_metro_kalinin_v1 4")
+			file.Write("metrostroi_advanced/map_wagons.txt","gm_jar_pll_remastered_v12 4\ngm_mustox_neocrimson_line_a 4\ngm_metro_crossline_n3 6\ngm_metro_crossline_r199h 6\ngm_mus_loopline_e 5\ngm_metro_ruralline_v29 4\ngm_metro_jar_imagine_line_v4 6\ngm_mus_neoorange_e 3\ngm_metro_surfacemetro_w 4\ngm_metro_virus 6\ngm_metro_mosldl_v1 8\ngm_metro_nsk_line_2_v7 4\ngm_metro_nekrasovskaya_line_v6 5\ngm_metro_kalinin_v3 5\ngm_smr_1987 4\ngm_metro_lightrail_v2a 4\ngm_metro_minsk_1984 5\ngm_metro_chapaevskaya_line_redux 5\ngm_metro_krl_v1 6\ngm_metro_kaluzhskaya_line6 6")
 		end
 		local mapwagons = string.Explode("\n",file.Read("metrostroi_advanced/map_wagons.txt","DATA"))
 		for _,str in pairs(mapwagons) do
@@ -113,7 +112,7 @@ if SERVER then
 						centre = LerpVector(0.5, pos1, pos2) 
 					end
 					if isvector(centre) and istable(Metrostroi.StationConfigurations[v1.StationIndex].positions) then
-						table.insert(Metrostroi.StationConfigurations[v1.StationIndex].positions, 2, {centre, Angle(0, 0, 33)})
+						table.insert(Metrostroi.StationConfigurations[v1.StationIndex].positions, 2, {centre, Angle(0, 0, 0)})
 					end
 				end
 			end
@@ -174,7 +173,7 @@ if SERVER then
 	function MetrostroiAdvanced.LoadMapButtons()
 		local source_data = [[
 {
-	"gm_metro_kalinin_v2":
+	"gm_metro_kalinin_v3":
    {
 		"mr_ao_b": "[Марксистская] АО ВКЛ",
 		"mr_b_nb": "[Марксистская] Табло ПОСАДКИ НЕТ",

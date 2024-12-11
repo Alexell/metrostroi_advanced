@@ -2,7 +2,6 @@
 -- Developers:
 -- Alexell | https://steamcommunity.com/profiles/76561198210303223
 -- Agent Smith | https://steamcommunity.com/profiles/76561197990364979
--- Version: 2.4
 -- License: MIT
 -- Source code: https://github.com/Alexell/metrostroi_advanced
 ----------------------------------------------------------------------
@@ -66,19 +65,14 @@ timer.Create("MetrostroiAdvanced.Init",3,1,function()
 end)
 
 if Metrostroi.Version == 1537278077 then
-	timer.Simple(0.5, function()
-		local ENT = scripted_ents.GetStored("gmod_track_signal").t
-		function ENT:Initialize()
-			self:SetModel("models/metrostroi/signals/mus/ars_box.mdl")
-			self.Sprites = {}
-			self.Sig = ""
-			self.FreeBS = 1
-			self.OldBSState = 1
-			self.OutputARS = 1
-			self.EnableDelay = {}
-			self.PostInitalized = true
-
-			self.Controllers = nil
+	timer.Simple(4, function()
+		local PlayerSayHooks = hook.GetTable()["PlayerSay"]
+		if PlayerSayHooks then
+			for name,_ in pairs(PlayerSayHooks) do
+				if name:find("metrostroi%-signal%-say") then
+					hook.Remove("PlayerSay", name)
+				end
+			end
 		end
 	end)
 end
@@ -401,15 +395,11 @@ hook.Add("MetrostroiCoupled","MA.SetTrainParams",function(train,train2)
 			train.RouteNumber.RouteNumber = rnum
 			train.RouteNumber.CurrentRouteNumber = rnum
 		end
-	elseif class:find("722") or class:find("7175p") then
+	elseif ((Metrostroi.Version == 1537278077 and class:find("722")) or class:find("7175p")) then
 		if train.RouteNumberSys then
 			train.RouteNumberSys.CurrentRouteNumber = rnum
 		end
-	elseif class:find("717_6") or class:find("740_4") then
-		if train.ASNP then
-			train.ASNP.RouteNumber = rnum
-		end
-	elseif class:find("502") or class:find("540") or class:find("717_lvz") then
+	elseif (class:find("502") or class:find("540") or (Metrostroi.Version == 1537278077 and class:find("717_lvz"))) then
 		if train.RouteNumber then
 			if rnum < 10 then
 				rnum = "00"..tostring(rnum)
@@ -426,7 +416,7 @@ hook.Add("MetrostroiCoupled","MA.SetTrainParams",function(train,train2)
 			train.RouteNumber.RouteNumber = rnum
 		end
 	else
-		if train.RouteNumber then
+		if Metrostroi.Version == 1537278077 and train.RouteNumber then
 			if rnum < 10 then
 				rnum = "0"..tostring(rnum).."0"
 			else
@@ -435,6 +425,9 @@ hook.Add("MetrostroiCoupled","MA.SetTrainParams",function(train,train2)
 			train.RouteNumber.RouteNumber = rnum
 			train:SetNW2String("RouteNumber",rnum)
 		end
+	end
+	if train.ASNP then
+		train.ASNP.RouteNumber = rnum
 	end
 end)
 
