@@ -427,6 +427,9 @@ hook.Add("MetrostroiCoupled","MA.SetTrainParams",function(train,train2)
 		end
 	end
 	if train.ASNP then
+		if Metrostroi.Version == 1537278077 then
+			rnum = rnum / 10
+		end
 		train.ASNP.RouteNumber = rnum
 	end
 end)
