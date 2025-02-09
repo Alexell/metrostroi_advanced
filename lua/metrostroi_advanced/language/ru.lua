@@ -14,6 +14,7 @@ MetrostroiAdvanced.Lang["gmod_subway_81-540_1"] 			= "81-540.1 (Номерной
 MetrostroiAdvanced.Lang["gmod_subway_81-540_2_lvz"] 		= "81-540.2 (Пришелец СПБ)"
 MetrostroiAdvanced.Lang["gmod_subway_81-540_2k"] 			= "81-540.2K (Пришелец Киев)"
 MetrostroiAdvanced.Lang["gmod_subway_81-540_8"] 			= "81-540.8 (Номерной СПБ)"
+MetrostroiAdvanced.Lang["gmod_subway_am"] 					= "81-700 (А)"
 MetrostroiAdvanced.Lang["gmod_subway_81-702"] 				= "81-702 (Д)"
 MetrostroiAdvanced.Lang["gmod_subway_81-703"] 				= "81-703 (E)"
 MetrostroiAdvanced.Lang["gmod_subway_81-705_old"] 			= "81-705 (Ем)"

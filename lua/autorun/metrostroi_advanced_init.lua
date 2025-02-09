@@ -44,7 +44,7 @@ function MetrostroiAdvanced.LoadLanguage(lang)
 end
 
 function MetrostroiAdvanced.FixedRoute(class,route)
-	local classes = {"gmod_subway_em508","gmod_subway_81-702","gmod_subway_81-703","gmod_subway_81-705_old","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_ezh3ru1","gmod_subway_81-717_mvm","gmod_subway_81-718","gmod_subway_81-720","gmod_subway_81-720_1","gmod_subway_81-720a","gmod_subway_81-717_freight","gmod_subway_81-717_5a", "gmod_subway_81-717_ars_minsk"}
+	local classes = {"gmod_subway_em508","gmod_subway_81-702","gmod_subway_81-703","gmod_subway_81-705_old","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_ezh3ru1","gmod_subway_81-717_mvm","gmod_subway_81-718","gmod_subway_81-720","gmod_subway_81-720_1","gmod_subway_81-720a","gmod_subway_81-717_freight","gmod_subway_81-717_5a", "gmod_subway_81-717_ars_minsk", "gmod_subway_am"}
 	local rnum = tonumber(route)
 	if table.HasValue(classes, class) then
 		rnum = rnum / 10
@@ -384,6 +384,8 @@ if SERVER then
 		
 		if not IsValid(train) then return -1 end
 		local station = -1
+		
+		if train:GetClass() == "gmod_subway_am" or train:GetClass() == "gmod_subway_ap" then return -1 end
 		
 		-- 81-540.2K
 		if train:GetClass():find("540_2k",1,true) and train.ASNP then
