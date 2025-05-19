@@ -111,8 +111,6 @@ local function ClientOptimize(opt)
 		RunConsoleCommand("r_queued_ropes",1)
 		RunConsoleCommand("cl_smooth",0)
 		RunConsoleCommand("r_eyemove",0)	
-		RunConsoleCommand("datacachesize",512)
-		RunConsoleCommand("mem_max_heapsize",2048)
 	elseif (tonumber(opt) == 1) then
 		RunConsoleCommand("gmod_mcore_test",0)
 		RunConsoleCommand("mat_queue_mode",-1)
@@ -125,8 +123,6 @@ local function ClientOptimize(opt)
 		RunConsoleCommand("r_queued_ropes",1)
 		RunConsoleCommand("cl_smooth",1)
 		RunConsoleCommand("r_eyemove",1)
-		RunConsoleCommand("datacachesize",64)
-		RunConsoleCommand("mem_max_heapsize",256)
 	end
 end
 ClientOptimize(GetConVar("ma_clientoptimize"):GetInt())
