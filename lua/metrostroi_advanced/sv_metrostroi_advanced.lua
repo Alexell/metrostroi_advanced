@@ -44,6 +44,7 @@ timer.Create("MetrostroiAdvanced.Init",3,1,function()
 	MetrostroiAdvanced.LoadStationsIgnore()
 	MetrostroiAdvanced.LoadMapWagonsLimit()
 	MetrostroiAdvanced.LoadMapButtons()
+	MetrostroiAdvanced.GetSignalClass()
 	MetrostroiAdvanced.GetSignallingType()
 	MetrostroiAdvanced.CenteringStationPositions()
 	if fix_paths:GetInt() == 1 then

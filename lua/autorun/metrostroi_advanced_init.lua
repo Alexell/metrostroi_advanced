@@ -19,6 +19,7 @@ if SERVER then
 	MetrostroiAdvanced.MapWagons = {}
 	MetrostroiAdvanced.MapButtonNames = {}
 	MetrostroiAdvanced.TwoToSixMap = false
+	MetrostroiAdvanced.SignalClass = "gmod_track_signal"
 end
 
 -- Загрузка локализации
@@ -75,6 +76,19 @@ if SERVER then
 			local tbl = string.Explode(" ",str)
 			if tbl[1] ~= "" and tonumber(tbl[2]) then
 				MetrostroiAdvanced.MapWagons[tbl[1]] = tonumber(tbl[2]) or nil
+			end
+		end
+	end
+	
+	-- Определяем класс сигналов на карте
+	function MetrostroiAdvanced.GetSignalClass()
+		local defaultClass = MetrostroiAdvanced.SignalClass
+		for k, v in pairs(scripted_ents.GetList()) do
+			if v.t.ClassName:find(defaultClass) and not v.t.ClassName:find("controller") and not v.t.ClassName:find("msa") then
+				if v.t.ClassName ~= defaultClass then
+					MetrostroiAdvanced.SignalClass = v.t.ClassName
+					break
+				end
 			end
 		end
 	end
@@ -459,7 +473,7 @@ if SERVER then
 			local route_found = false
 			local route_opened = false
 			local names = ""
-			for _, ent in pairs(ents.FindByClass("gmod_track_signal")) do
+			for _, ent in pairs(ents.FindByClass(MetrostroiAdvanced.SignalClass)) do
 				if ent.Routes then
 					for RouteID, RouteInfo in pairs(ent.Routes) do
 						if (RouteInfo.RouteName and RouteInfo.RouteName:upper() == Name:upper() or Name == "*") and RouteInfo.Emer then
@@ -496,7 +510,7 @@ if SERVER then
 			local route_found = false
 			local route_closed = false
 			local names = ""
-			for _, ent in pairs(ents.FindByClass("gmod_track_signal")) do
+			for _, ent in pairs(ents.FindByClass(MetrostroiAdvanced.SignalClass)) do
 				if ent.Routes then
 					for RouteID, RouteInfo in pairs(ent.Routes) do
 						if (RouteInfo.RouteName and RouteInfo.RouteName:upper() == Name:upper() or Name == "*") and RouteInfo.Emer then
@@ -534,7 +548,7 @@ if SERVER then
 			local signal_closed = false
 			local route_found = false
 			local route_closed = false
-			for _, ent in pairs(ents.FindByClass("gmod_track_signal")) do
+			for _, ent in pairs(ents.FindByClass(MetrostroiAdvanced.SignalClass)) do
 				if ent.Name == Name:upper() then
 					signal_found = true
 					if #ent.Routes == 1 and ent.Routes[1].Manual then
@@ -603,7 +617,7 @@ if SERVER then
 			local signal_opened = false
 			local route_found = false
 			local route_opened = false
-			for _, ent in pairs(ents.FindByClass("gmod_track_signal")) do
+			for _, ent in pairs(ents.FindByClass(MetrostroiAdvanced.SignalClass)) do
 				if ent.Name == Name:upper() then
 					signal_found = true
 					if #ent.Routes == 1 and ent.Routes[1].Manual then
@@ -655,7 +669,7 @@ if SERVER then
 		elseif comm == "!sopps" then
 			local signal_found = false
 			local signal_opened = false
-			for _, ent in pairs(ents.FindByClass("gmod_track_signal")) do
+			for _, ent in pairs(ents.FindByClass(MetrostroiAdvanced.SignalClass)) do
 				if ent.Name == Name:upper() then
 					signal_found = true
 					if not ent.InvationSignal and ent.GoodInvationSignal != 0 then
@@ -678,7 +692,7 @@ if SERVER then
 		elseif comm == "!sclps" then
 			local signal_found = false
 			local signal_closed = false
-			for _, ent in pairs(ents.FindByClass("gmod_track_signal")) do
+			for _, ent in pairs(ents.FindByClass(MetrostroiAdvanced.SignalClass)) do
 				if ent.Name == Name:upper() then
 					signal_found = true
 					if ent.InvationSignal and ent.GoodInvationSignal != 0 then
@@ -702,7 +716,7 @@ if SERVER then
 			if comm == "!senao" then
 				local signal_found = false
 				local ao_changed = false
-				for _, ent in pairs(ents.FindByClass("gmod_track_signal")) do
+				for _, ent in pairs(ents.FindByClass(MetrostroiAdvanced.SignalClass)) do
 					if ent.Name == Name:upper() then
 						signal_found = true
 						if ent.AODisabled then ent.AODisabled = false ao_changed = true end
@@ -722,7 +736,7 @@ if SERVER then
 			elseif comm == "!sdisao" then
 				local signal_found = false
 				local ao_changed = false
-				for _, ent in pairs(ents.FindByClass("gmod_track_signal")) do
+				for _, ent in pairs(ents.FindByClass(MetrostroiAdvanced.SignalClass)) do
 					if ent.Name == Name:upper() then
 						signal_found = true
 						if ent.ARSSpeedLimit == 2 then ent.AODisabled = true ao_changed = true end

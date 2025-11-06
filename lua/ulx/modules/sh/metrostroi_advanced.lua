@@ -666,7 +666,7 @@ ttp:help( "Teleport to a player's train." )
 
 -- телепорт к светофору по названию
 function ulx.signaltp(calling_ply,signal)
-	for _,sig in pairs(ents.FindByClass("gmod_track_signal")) do
+	for _,sig in pairs(ents.FindByClass(MetrostroiAdvanced.SignalClass)) do
 		if sig.Name and sig.Name:upper() == signal:upper() then
 			if calling_ply:InVehicle() then calling_ply:ExitVehicle() end
 			calling_ply:SetPos(sig:GetPos())
