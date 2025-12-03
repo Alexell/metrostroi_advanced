@@ -163,8 +163,8 @@ hook.Add("MetrostroiSpawnerRestrict","MA.TrainSpawnerLimits",function(ply,settin
 	end
 	
 	-- ограничение составов на картах с сигналкой 2/6
-	if (twotosix_rest:GetInt() == 1 and MetrostroiAdvanced.TwoToSixMap) then
-		if not tr_ent.SubwayTrain.ALS.TwoToSix then
+	if twotosix_rest:GetInt() == 1 and MetrostroiAdvanced.TwoToSixMap then
+		if not tr_ent.SubwayTrain.ALS.TwoToSix and not train:find("agm") then
 			ply:ChatPrint(lang("Restrict26"))
 			return true
 		end
@@ -202,7 +202,7 @@ hook.Add("MetrostroiSpawnerRestrict","MA.TrainSpawnerLimits",function(ply,settin
 	end
 	if ply_wagons > wag_awail then ply_wagons = wag_awail end
 	
-	if settings.WagNum < min_wags:GetInt() then
+	if settings.WagNum < min_wags:GetInt() and not train:find("agm") then
 		settings.WagNum = min_wags:GetInt()
 		ply:ChatPrint(lang("FewWagons").." "..min_wags:GetString()..".")
 	end
@@ -416,16 +416,14 @@ hook.Add("MetrostroiCoupled","MA.SetTrainParams",function(train,train2)
 			train:SetNW2Int("RouteNumber:RouteNumber",rnum)
 			train.RouteNumber.RouteNumber = rnum
 		end
-	else
-		if Metrostroi.Version == 1537278077 and train.RouteNumber then
-			if rnum < 10 then
-				rnum = "0"..tostring(rnum).."0"
-			else
-				rnum = tostring(rnum).."0"
-			end
-			train.RouteNumber.RouteNumber = rnum
-			train:SetNW2String("RouteNumber",rnum)
+	elseif Metrostroi.Version == 1537278077 and train.RouteNumber then
+		if rnum < 10 then
+			rnum = "0"..tostring(rnum).."0"
+		else
+			rnum = tostring(rnum).."0"
 		end
+		train.RouteNumber.RouteNumber = rnum
+		train:SetNW2String("RouteNumber",rnum)
 	end
 	if train.ASNP then
 		if Metrostroi.Version == 1537278077 then

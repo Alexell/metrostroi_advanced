@@ -399,10 +399,11 @@ if SERVER then
 		if not IsValid(train) then return -1 end
 		local station = -1
 		
-		if train:GetClass() == "gmod_subway_am" or train:GetClass() == "gmod_subway_ap" then return -1 end
+		local class = train:GetClass()
+		if class:find("subway_am") or class:find("subway_ap") or class:find("subway_agm") then return -1 end
 		
 		-- 81-540.2K
-		if train:GetClass():find("540_2k",1,true) and train.ASNP then
+		if class:find("540_2k",1,true) and train.ASNP then
 			if (train:GetNW2String("Inf:Tablo1") == "обкатка" or train:GetNW2String("Inf:Tablo1") == "перегонка") then return 1111 end
 			-- у меня на табло станци не отображаются, будем брать с информатора
 			if train.ASNP.State < 2 then return 1111 end
@@ -419,7 +420,7 @@ if SERVER then
 		end
 		
 		-- 81-720.1, 81-717.5A и 81-740.4 (только ASNP)
-		if (station == -1 and (train:GetClass():find("720_1") or train:GetClass():find("717_5a") or train:GetClass():find("740_4")) and train.ASNP) then
+		if (station == -1 and (class:find("720_1") or class:find("717_5a") or class:find("740_4")) and train.ASNP) then
 			if train.ASNP.State < 7 then return 1111 end
 			local tbl = Metrostroi.ASNPSetup[train:GetNW2Int("Announcer",1)] and Metrostroi.ASNPSetup[train:GetNW2Int("Announcer",1)][train.ASNP.Line]
 			if tbl and (tbl.Loop and train.ASNP.LastStation == 0) then tbl = nil return -1 end -- когда выбран "Кольцевой", срабатывать не будет
@@ -428,7 +429,7 @@ if SERVER then
 		end
 		
 		-- 81-722
-		if (station == -1 and train:GetClass():find("722") and train.SarmatUPO) then
+		if (station == -1 and class:find("722") and train.SarmatUPO) then
 			if train.SarmatUPO.Line < 1 then return 1111 end -- сервисная надпись табло
 			local tbl = Metrostroi.SarmatUPOSetup[train:GetNW2Int("Announcer",1)] and Metrostroi.SarmatUPOSetup[train:GetNW2Int("Announcer",1)][train.SarmatUPO.Line]
 			if tbl and (tbl.Loop and train.SarmatUPO.LastStationName == "Кольцевой") then tbl = nil return -1 end
@@ -439,7 +440,7 @@ if SERVER then
 		-- 81-* LVZ (на остальных нельзя выбирать конечную и нет трафаретов)
 		
 		-- 81-760
-		if (station == -1 and train:GetClass():find("760") and train.BMCIS) then
+		if (station == -1 and class:find("760") and train.BMCIS) then
 			if train.BMCIS.Line < 1 then return 1111 end -- сервисная надпись табло
 			if train.BMCIS.State1 < 7 then return 1111 end
 			local tbl = Metrostroi.CISConfig[train.CISConfig] and Metrostroi.CISConfig[train.CISConfig][train.BMCIS.Line]

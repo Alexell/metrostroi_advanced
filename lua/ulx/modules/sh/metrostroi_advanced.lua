@@ -59,7 +59,7 @@ local function TrainStart(train)
 	local class = train:GetClass()
 	local cursig
 	-- Проход по составам - самая большая группа - Номерной и древнее
-	if class and (not class:find("718") and not class:find("720") and not class:find("722") and not class:find("760")) then
+	if class and (not class:find("718") and not class:find("720") and not class:find("722") and not class:find("760") and not class:find("agm")) then
 		if train.KVWrenchMode != 1  or train.KVWrenchMode == 1 then
 			train:PlayOnce("revers_in", "cabin", 0.7)
 			train.KVWrenchMode = 1
@@ -281,7 +281,7 @@ end
 local function TrainStop(train)
 	local class = train:GetClass()
 	-- Проход по составам - самая большая группа - Номерной и древнее
-	if class and (not class:find("718") and not class:find("720") and not class:find("722") and not class:find("760")) then
+	if class and (not class:find("718") and not class:find("720") and not class:find("722") and not class:find("760") and not class:find("agm")) then
 		if train.Pneumatic.DriverValvePosition != 5 then
 			train.Pneumatic:TriggerInput("BrakeSet", 5)
 		end
@@ -398,6 +398,7 @@ end
 
 -- Смена кабины
 local function ChangeCab (ply,train1,train2)
+	if not IsValid(train1) or not IsValid(train2) then return end
     local tim = 3
 	local tim2 = tim + 1.5
 	local tim3 = tim2 + 1.5
@@ -559,7 +560,7 @@ function ulx.wagons( calling_ply )
 		if Trains[ply:Nick()] then continue end
 		Trains[ply:Nick()] = MetrostroiAdvanced.TrainList[cl]
 		Wags[ply:Nick()] = #train.WagonList
-		local rnum = 0
+		local rnum = "-"
 		if cl:find("722") or cl:find("7175p") then
 			if train.RouteNumberSys then
 				rnum = tonumber(train.RouteNumberSys.RouteNumber)
@@ -639,6 +640,11 @@ function ulx.traintp( calling_ply, target_ply )
 						GotoTrain(calling_ply,target_ply,v,true)
 						teleported = true
 					end
+				end
+			elseif class:find("agm") then
+				if v.Engine.Reverser ~= 0 then
+					GotoTrain(calling_ply,target_ply,v,true)
+					teleported = true
 				end
 			else
 				if v.KVWrenchMode ~= 0 then
