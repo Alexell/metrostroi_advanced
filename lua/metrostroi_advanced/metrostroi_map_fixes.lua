@@ -1,12 +1,14 @@
 if CLIENT then return end
 
+local map = game.GetMap()
+
 -- фикс деповских магистралей на Imagine Line
 local function snake()
 	for k,v in pairs(ents.FindByClass("gmod_track_pneumatic_snake")) do
 		v:SetPos(v:GetPos()-Vector(0,0,30))
 	end
 end
-if (game.GetMap():find("gm_metro_jar_imagine_line")) then
+if (map:find("gm_metro_jar_imagine_line")) then
 	timer.Simple(1, function() snake() end)
 end
 
@@ -16,7 +18,7 @@ MetrostroiAdvanced.Box_Positions = {}
 MetrostroiAdvanced.Box_Angles = {}
 local function get_udc_pos()
 	local boxes = {}
-	if (game.GetMap():find("gm_mus_loopline")) then
+	if map:find("loopline") and not map:find("_r") then
 		boxes = ents.FindByClass("func_tracktrain")
 	else
 		boxes = ents.FindByClass("func_physbox")

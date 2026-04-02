@@ -396,7 +396,7 @@ hook.Add("MetrostroiCoupled","MA.SetTrainParams",function(train,train2)
 			train.RouteNumber.RouteNumber = rnum
 			train.RouteNumber.CurrentRouteNumber = rnum
 		end
-	elseif ((Metrostroi.Version == 1537278077 and class:find("722")) or class:find("7175p")) then
+	elseif ((Metrostroi.Version == 1537278077 and class:find("722")) or class:find("725") or class:find("7175p")) then
 		if train.RouteNumberSys then
 			train.RouteNumberSys.CurrentRouteNumber = rnum
 		end
@@ -416,6 +416,20 @@ hook.Add("MetrostroiCoupled","MA.SetTrainParams",function(train,train2)
 			train:SetNW2Int("RouteNumber:RouteNumber",rnum)
 			train.RouteNumber.RouteNumber = rnum
 		end
+	elseif class:find("717.9") then
+		if rnum < 10 then
+			rnum = "0"..tostring(rnum).."0"
+		else
+			rnum = tostring(rnum).."0"
+		end
+		timer.Simple(6,function()
+			train.BMCIS.RouteNumber = rnum
+			train:SetNW2Int("RouteNumber:RouteNumber",rnum)
+			train.RouteNumber.RouteNumber = rnum
+		end)
+	elseif class:find("765") then
+		train.BUIK.RouteNumber = rnum
+		train.BUKP.RouteNumber = rnum
 	elseif Metrostroi.Version == 1537278077 and train.RouteNumber then
 		if rnum < 10 then
 			rnum = "0"..tostring(rnum).."0"
@@ -510,8 +524,12 @@ timer.Simple(4,function()
 			pmidpos_id = pmidpos[1].node1.id
 			trainpos = Metrostroi.GetPositionOnTrack(ctrain:GetPos())
 			trainpos_id = trainpos[1].node1.id
-			if ((trainpos_id > (pmidpos_id - 1)) and (trainpos_id < (pmidpos_id + 1))) then
-				if (ctrain.BMCIS) then
+			if ((trainpos_id > (pmidpos_id - 2)) and (trainpos_id < (pmidpos_id + 1))) then
+				if (ctrain.BUIK) then
+					if ctrain.BUIK.Arrived then return end
+					if (#ctrain.Announcer.Schedule ~= 0) then return end
+					ctrain.BUIK:Trigger("R_Program1",1)
+				elseif (ctrain.BMCIS) then
 					if ctrain:GetNW2Bool("BMCISArrived",true) then return end
 					if (#ctrain.Announcer.Schedule ~= 0) then return end
 					ctrain.BMCIS:Trigger("R_Program1",1)

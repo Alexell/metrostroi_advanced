@@ -323,7 +323,7 @@ if SERVER then
 			if not IsValid(owner) then continue end
 			if owner == ply then continue end
 			local rnum2 = 0
-			if cl:find("722") or cl:find("7175p") then
+			if cl:find("722") or cl:find("725") or cl:find("7175p") then
 				if train.RouteNumberSys then
 					rnum2 = tonumber(train.RouteNumberSys.RouteNumber)
 				end
@@ -360,11 +360,11 @@ if SERVER then
 		if (not IsValid(ent)) then return false end
 		if (not MetrostroiAdvanced.TrainList[ent:GetClass()]) then return false end -- только головные
 		local class = ent:GetClass()
-		if class:find("760") then
+		if class:find("760") or class:find("717.9") or class:find("765") then
 			if ent.RV.KROPosition ~= 0 then
 				return true
 			end
-		elseif class:find("722") then
+		elseif class:find("722") or class:find("725") then
 			if ent.Electric.CabActive ~= 0 then
 				return true
 			end
@@ -428,8 +428,8 @@ if SERVER then
 			tbl = nil
 		end
 		
-		-- 81-722
-		if (station == -1 and class:find("722") and train.SarmatUPO) then
+		-- 81-722 / 81-725
+		if (station == -1 and (class:find("722") or class:find("725")) and train.SarmatUPO) then
 			if train.SarmatUPO.Line < 1 then return 1111 end -- сервисная надпись табло
 			local tbl = Metrostroi.SarmatUPOSetup[train:GetNW2Int("Announcer",1)] and Metrostroi.SarmatUPOSetup[train:GetNW2Int("Announcer",1)][train.SarmatUPO.Line]
 			if tbl and (tbl.Loop and train.SarmatUPO.LastStationName == "Кольцевой") then tbl = nil return -1 end
@@ -439,8 +439,8 @@ if SERVER then
 		
 		-- 81-* LVZ (на остальных нельзя выбирать конечную и нет трафаретов)
 		
-		-- 81-760
-		if (station == -1 and class:find("760") and train.BMCIS) then
+		-- 81-760 / 81-717.9
+		if (station == -1 and (class:find("760") or class:find("717.9")) and train.BMCIS) then
 			if train.BMCIS.Line < 1 then return 1111 end -- сервисная надпись табло
 			if train.BMCIS.State1 < 7 then return 1111 end
 			local tbl = Metrostroi.CISConfig[train.CISConfig] and Metrostroi.CISConfig[train.CISConfig][train.BMCIS.Line]
@@ -448,7 +448,18 @@ if SERVER then
 			station = tbl and (train.BMCIS.LastStationEntered == 0 and (train.BMCIS.Path and tbl[train.BMCIS.FirstStation][1] or tbl[train.BMCIS.LastStation][1]) or tbl[train.BMCIS.laststbl[train.BMCIS.LastStationEntered]][1]) or -1
 			tbl = nil
 		end
-		return tonumber(station,10) or 1111 -- любой трафарет со строковым индексом будет считаться сервисным
+		
+		-- 81-765
+		if (station == -1 and class:find("765") and train.BUIK) then
+			if train.BUIK.IsServiceRoute then return 1111 end -- сервисная надпись табло
+			if train.BUIK.State ~= 2 then return 1111 end
+			local tbl = Metrostroi.CISConfig[train.BUIK.CisCfgIdx] and Metrostroi.CISConfig[train.BUIK.CisCfgIdx][train.BUIK.Route]
+			if tbl and (tbl.Loop and #train.BUIK.LastStations == 0) then return -1 end
+			local last_idx = train.BUIK.LastStationIdx
+			station = train.BUIK.LastStations[last_idx].index
+		end
+		
+		return tonumber(station, 10) or 1111 -- любой трафарет со строковым индексом будет считаться сервисным
 	end
 	
 	-- Проверяем, является ли полученный id станции реальной конечной (т.е. первой или последней станцией на линии)

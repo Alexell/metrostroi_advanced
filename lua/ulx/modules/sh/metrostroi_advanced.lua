@@ -54,12 +54,12 @@ end
 --				  Made by Agent Smith					--
 ----------------------------------------------------------
 
-local function TrainStart(train)
+local function TrainStart(ply, train)
 	if not IsValid(train) then return end
 	local class = train:GetClass()
 	local cursig
 	-- Проход по составам - самая большая группа - Номерной и древнее
-	if class and (not class:find("718") and not class:find("720") and not class:find("722") and not class:find("760") and not class:find("agm")) then
+	if class and (not class:find("717.9") and not class:find("718") and not class:find("720") and not class:find("722") and not class:find("725") and not class:find("760") and not class:find("765") and not class:find("agm")) then
 		if train.KVWrenchMode != 1  or train.KVWrenchMode == 1 then
 			train:PlayOnce("revers_in", "cabin", 0.7)
 			train.KVWrenchMode = 1
@@ -222,8 +222,8 @@ local function TrainStart(train)
 				if train.ALSFreq then train.ALSFreq:TriggerInput("Set", 0) end
 			end
 		end)
-	-- Юбилейный
-	elseif class:find("722") then
+	-- Юбилейный / Балтиец
+	elseif class:find("722") or class:find("725") then
 		if train.ALS then train.ALS:TriggerInput("Set", 0) end
 		if train.ARS then train.ARS:TriggerInput("Set", 0) end
 		if train.MFDU.State != 1 then train.MFDU.State = 1 end
@@ -247,8 +247,8 @@ local function TrainStart(train)
 		timer.Simple(3.5, function() 
 			train.KRO:TriggerInput("Set", 2) 
 		end)
-	-- Ока
-	elseif class:find("760") then
+	-- Ока / Циферной / 81-765
+	elseif class:find("760") or class:find("717.9") or class:find("765") then
 		timer.Simple(0.5, function() -- таймер на переключение реверса
 			train.RV:TriggerInput("KROSet", train.RV.KROPosition + 1)
 		end)
@@ -261,27 +261,33 @@ local function TrainStart(train)
 			if train.DoorSelectL then train.DoorSelectL:TriggerInput("Toggle", 1) end
 			if train.DoorClose then train.DoorClose:TriggerInput("Toggle", 1) end
 		end)
-		timer.Simple(2.5, function() -- таймер на дешифратор
-			local pos = Metrostroi.TrainPositions[train]
-			if pos then pos = pos[1] end
-			if pos then
-				cursig = Metrostroi.GetARSJoint(pos.node1, pos.x, Metrostroi.TrainDirections[train])
-			end
-			if IsValid(cursig) and cursig.TwoToSix then
-				if train.SA14k then train.SA14k:TriggerInput("Set", 0) end
-				if train.SA14 then train.SA14:TriggerInput("Set", 1) end
-			else
-				if train.SA14k then train.SA14k:TriggerInput("Set", 1) end
-				if train.SA14 then train.SA14:TriggerInput("Set", 0) end
-			end
-		end)
+		if not class:find("765") then -- уже вшито переключение дешифратора
+			timer.Simple(2.5, function() -- таймер на дешифратор
+				local pos = Metrostroi.TrainPositions[train]
+				if pos then pos = pos[1] end
+				if pos then
+					cursig = Metrostroi.GetARSJoint(pos.node1, pos.x, Metrostroi.TrainDirections[train])
+				end
+				if IsValid(cursig) and cursig.TwoToSix then
+					if train.SA14k then train.SA14k:TriggerInput("Set", 0) end
+					if train.SA14 then train.SA14:TriggerInput("Set", 1) end
+				else
+					if train.SA14k then train.SA14k:TriggerInput("Set", 1) end
+					if train.SA14 then train.SA14:TriggerInput("Set", 0) end
+				end
+			end)
+		end
+	else
+		ply:ChatPrint(lang("CommandNS"))
+		return
 	end
+	ulx.fancyLog("#s "..lang("UseTrainStart"), ply:Nick())
 end
 
-local function TrainStop(train)
+local function TrainStop(ply, train)
 	local class = train:GetClass()
 	-- Проход по составам - самая большая группа - Номерной и древнее
-	if class and (not class:find("718") and not class:find("720") and not class:find("722") and not class:find("760") and not class:find("agm")) then
+	if class and (not class:find("717.9") and not class:find("718") and not class:find("720") and not class:find("722") and not class:find("725") and not class:find("760") and not class:find("765") and not class:find("agm")) then
 		if train.Pneumatic.DriverValvePosition != 5 then
 			train.Pneumatic:TriggerInput("BrakeSet", 5)
 		end
@@ -365,8 +371,8 @@ local function TrainStop(train)
 				if train.DoorSelectR then train.DoorSelectR:TriggerInput("Set", 0) end
 			end)
 		end	
-	-- Юбилейный (без комментариев)
-	elseif class:find("722") then
+	-- Юбилейный / Балтиец
+	elseif class:find("722") or class:find("725") then
 			timer.Simple(0.5, function() 
 				train.KRO:TriggerInput("Set", 1) 
 			end)
@@ -379,8 +385,8 @@ local function TrainStop(train)
 				train:SetPackedBool("MFDUActive", false)	
 				if train.DoorClose then train.DoorClose:TriggerInput("Set", 1) end			
 			end)
-	-- Oka
-	elseif class:find("760") then
+	-- Ока / Циферной / 81-765
+	elseif class:find("760") or class:find("717.9") or class:find("765") then
 		timer.Simple(1, function() -- таймер на переключение реверса
 			train.RV:TriggerInput("KROSet", train.RV.KROPosition - 1)
 		end)
@@ -389,6 +395,9 @@ local function TrainStop(train)
 			if train.DoorSelectR then train.DoorSelectR:TriggerInput("Set", 0) end
 			if train.DoorClose then train.DoorClose:TriggerInput("Set", 0) end
 		end)
+	else
+		ply:ChatPrint(lang("CommandNS"))
+		return
 	end
 end
 
@@ -405,7 +414,7 @@ local function ChangeCab (ply,train1,train2)
 	if ply:GetNW2String("MATrainClass",""):find("720") or ply:GetNW2String("MATrainClass",""):find("722") then
 		tim = 1  tim2 = tim + 1 tim3 = tim2 + 1
 	end
-	TrainStop(train1)	
+	TrainStop(ply, train1)	
 	timer.Simple(tim, function()
 		ply:ExitVehicle()
 		ply:SetMoveType(8)
@@ -415,7 +424,7 @@ local function ChangeCab (ply,train1,train2)
 		train2.DriverSeat:Use(ply,ply,3,1)
 	end)
 	timer.Simple(tim3, function()
-		TrainStart(train2)
+		TrainStart(ply, train2)
 	end)	
 end
 
@@ -617,12 +626,12 @@ function ulx.traintp( calling_ply, target_ply )
 	local ents = ents.FindByClass(class)
 	for k,v in pairs(ents) do
 		if v.Owner:Nick() == target_ply:Nick() then
-			if class:find("760") then
+			if class:find("760") or class:find("717.9") or class:find("765") then
 				if v.RV.KROPosition ~= 0 then
 					GotoTrain(calling_ply,target_ply,v,true)
 					teleported = true
 				end
-			elseif class:find("722") then
+			elseif class:find("722") or class:find("725") then
 				if v.Electric.CabActive ~= 0 then
 					GotoTrain(calling_ply,target_ply,v,true) 
 					teleported = true
@@ -738,8 +747,9 @@ setwagnumber:help("Set wagon number (aim at any wagon)")
 
 -- восстановление исходного положения удочек
 function ulx.udochka( calling_ply )
+	local map = game.GetMap()
 	local boxes = {}
-	if (game.GetMap():find("gm_mus_loopline")) then
+	if map:find("loopline") and not map:find("_r") then
 		boxes = ents.FindByClass("func_tracktrain")
 	else
 		boxes = ents.FindByClass("func_physbox")
@@ -863,8 +873,7 @@ function ulx.trainstart( calling_ply )
 	if not IsValid(calling_ply) then return end
     local train = calling_ply:GetTrain()
 	if not IsValid(train) then return end
-	TrainStart(train)
-	ulx.fancyLog("#s "..lang("UseTrainStart"),calling_ply:Nick())
+	TrainStart(calling_ply, train)
 end
 local trainstart = ulx.command( CATEGORY_NAME, "ulx trainstart", ulx.trainstart, "!trainstart" )
 trainstart:defaultAccess( ULib.ACCESS_ALL )
@@ -874,7 +883,7 @@ function ulx.trainstop( calling_ply )
 	if not IsValid(calling_ply) then return end
     local train = calling_ply:GetTrain()
 	if not IsValid(train) then return end
-	TrainStop(train)
+	TrainStop(calling_ply, train)
 end
 local trainstop = ulx.command( CATEGORY_NAME, "ulx trainstop", ulx.trainstop, "!trainstop" )
 trainstop:defaultAccess( ULib.ACCESS_ALL )
