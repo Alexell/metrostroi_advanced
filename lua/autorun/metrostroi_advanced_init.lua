@@ -45,7 +45,7 @@ function MetrostroiAdvanced.LoadLanguage(lang)
 end
 
 function MetrostroiAdvanced.FixedRoute(class,route)
-	local classes = {"gmod_subway_em508","gmod_subway_81-702","gmod_subway_81-703","gmod_subway_81-705_old","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_ezh3ru1","gmod_subway_81-717_mvm","gmod_subway_81-718","gmod_subway_81-720","gmod_subway_81-720_1","gmod_subway_81-720a","gmod_subway_81-717_freight","gmod_subway_81-717_5a", "gmod_subway_81-717_ars_minsk", "gmod_subway_am"}
+	local classes = {"gmod_subway_em508","gmod_subway_81-702","gmod_subway_81-703","gmod_subway_81-705_old","gmod_subway_ezh","gmod_subway_ezh3","gmod_subway_ezh3ru1","gmod_subway_81-717_mvm","gmod_subway_81-718","gmod_subway_81-720","gmod_subway_81-720_1","gmod_subway_81-720a","gmod_subway_81-717_freight","gmod_subway_81-717_5a", "gmod_subway_81-717_ars_minsk", "gmod_subway_am", "gmod_subway_81-7401", "gmod_subway_81-7404"}
 	local rnum = tonumber(route)
 	if table.HasValue(classes, class) then
 		rnum = rnum / 10
@@ -419,8 +419,8 @@ if SERVER then
 			if station == "" and game.GetMap():find("gm_mus_loop") then return -1 end -- для таблички "Кольцевой" на MSS
 		end
 		
-		-- 81-720.1, 81-717.5A и 81-740.4 (только ASNP)
-		if (station == -1 and (class:find("720_1") or class:find("717_5a") or class:find("740_4")) and train.ASNP) then
+		-- 81-720.1, 81-717.5A и 81-740 (только ASNP)
+		if (station == -1 and (class:find("720_1") or class:find("717_5a") or class:find("7401") or class:find("7404")) and train.ASNP) then
 			if train.ASNP.State < 7 then return 1111 end
 			local tbl = Metrostroi.ASNPSetup[train:GetNW2Int("Announcer",1)] and Metrostroi.ASNPSetup[train:GetNW2Int("Announcer",1)][train.ASNP.Line]
 			if tbl and (tbl.Loop and train.ASNP.LastStation == 0) then tbl = nil return -1 end -- когда выбран "Кольцевой", срабатывать не будет

@@ -59,7 +59,7 @@ local function TrainStart(ply, train)
 	local class = train:GetClass()
 	local cursig
 	-- Проход по составам - самая большая группа - Номерной и древнее
-	if class and (not class:find("717.9") and not class:find("718") and not class:find("720") and not class:find("722") and not class:find("725") and not class:find("760") and not class:find("765") and not class:find("agm")) then
+	if class and (not class:find("717.9") and not class:find("718") and not class:find("720") and not class:find("722") and not class:find("725") and not class:find("760") and not class:find("765") and not class:find("agm") and not class:find("740")) then
 		if train.KVWrenchMode != 1  or train.KVWrenchMode == 1 then
 			train:PlayOnce("revers_in", "cabin", 0.7)
 			train.KVWrenchMode = 1
@@ -261,8 +261,11 @@ local function TrainStart(ply, train)
 			if train.DoorSelectL then train.DoorSelectL:TriggerInput("Toggle", 1) end
 			if train.DoorClose then train.DoorClose:TriggerInput("Toggle", 1) end
 		end)
-		if not class:find("765") then -- уже вшито переключение дешифратора
-			timer.Simple(2.5, function() -- таймер на дешифратор
+		if not class:find("765") then -- переключение дешифратора и установка в начало не требуется
+			timer.Simple(2.4, function() -- таймер на установку в начало
+				if train.BMCIS then train.BMCIS:Trigger("R_ToBack", 1) end
+			end)
+			timer.Simple(2.8, function() -- таймер на дешифратор
 				local pos = Metrostroi.TrainPositions[train]
 				if pos then pos = pos[1] end
 				if pos then
@@ -277,6 +280,24 @@ local function TrainStart(ply, train)
 				end
 			end)
 		end
+	-- Русич
+	elseif class:find("740") then
+		timer.Simple(0.5, function() -- таймер на переключение реверса
+			train.RV:TriggerInput("KROSet", train.RV.KROPosition + 1)
+		end)
+		timer.Simple(1.5, function() -- таймер на кнопки спереди
+			if train.DoorSelectL then train.DoorSelectL:TriggerInput("Toggle", 1) end
+			if train.DoorClose then train.DoorClose:TriggerInput("Toggle", 1) end
+		end)
+		timer.Simple(2.5, function() -- таймер на установку в начало
+			--if train.BUCIK then train.BUCIK:Trigger("ToBack", 1) end -- не работает
+			if train.ToBack then 
+				train.ToBack:TriggerInput("Set", 1)
+				timer.Simple(0.3, function()
+					train.ToBack:TriggerInput("Set", 0)
+				end)
+			end
+		end)
 	else
 		ply:ChatPrint(lang("CommandNS"))
 		return
@@ -287,7 +308,7 @@ end
 local function TrainStop(ply, train)
 	local class = train:GetClass()
 	-- Проход по составам - самая большая группа - Номерной и древнее
-	if class and (not class:find("717.9") and not class:find("718") and not class:find("720") and not class:find("722") and not class:find("725") and not class:find("760") and not class:find("765") and not class:find("agm")) then
+	if class and (not class:find("717.9") and not class:find("718") and not class:find("720") and not class:find("722") and not class:find("725") and not class:find("760") and not class:find("765") and not class:find("agm") and not class:find("740")) then
 		if train.Pneumatic.DriverValvePosition != 5 then
 			train.Pneumatic:TriggerInput("BrakeSet", 5)
 		end
@@ -385,8 +406,8 @@ local function TrainStop(ply, train)
 				train:SetPackedBool("MFDUActive", false)	
 				if train.DoorClose then train.DoorClose:TriggerInput("Set", 1) end			
 			end)
-	-- Ока / Циферной / 81-765
-	elseif class:find("760") or class:find("717.9") or class:find("765") then
+	-- Ока / Циферной / 81-765 / Русич
+	elseif class:find("760") or class:find("717.9") or class:find("765") or class:find("740") then
 		timer.Simple(1, function() -- таймер на переключение реверса
 			train.RV:TriggerInput("KROSet", train.RV.KROPosition - 1)
 		end)
@@ -626,7 +647,7 @@ function ulx.traintp( calling_ply, target_ply )
 	local ents = ents.FindByClass(class)
 	for k,v in pairs(ents) do
 		if v.Owner:Nick() == target_ply:Nick() then
-			if class:find("760") or class:find("717.9") or class:find("765") then
+			if class:find("760") or class:find("717.9") or class:find("765") or class:find("740") then
 				if v.RV.KROPosition ~= 0 then
 					GotoTrain(calling_ply,target_ply,v,true)
 					teleported = true

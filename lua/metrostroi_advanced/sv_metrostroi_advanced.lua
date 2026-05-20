@@ -533,6 +533,10 @@ timer.Simple(4,function()
 					if ctrain:GetNW2Bool("BMCISArrived",true) then return end
 					if (#ctrain.Announcer.Schedule ~= 0) then return end
 					ctrain.BMCIS:Trigger("R_Program1",1)
+				elseif (ctrain.BUCIK) then
+					if ctrain:GetNW2Bool("BUCIK:Arrived",true) then return end
+					if (#ctrain.Announcer.Schedule ~= 0) then return end
+					ctrain.BUCIK:Trigger("StartProgram",1)
 				elseif (ctrain.ASNP) then
 					if ctrain:GetNW2Bool("ASNP:Arrived",true) then return end
 					if ctrain:GetNW2Bool("ASNP:Playing") then return end
