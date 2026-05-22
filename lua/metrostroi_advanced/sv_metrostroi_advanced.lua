@@ -202,7 +202,7 @@ hook.Add("MetrostroiSpawnerRestrict","MA.TrainSpawnerLimits",function(ply,settin
 	end
 	if ply_wagons > wag_awail then ply_wagons = wag_awail end
 	
-	if settings.WagNum < min_wags:GetInt() and not train:find("agm") then
+	if settings.WagNum < min_wags:GetInt() and not train:find("agm") and not train:find("740") then
 		settings.WagNum = min_wags:GetInt()
 		ply:ChatPrint(lang("FewWagons").." "..min_wags:GetString()..".")
 	end
