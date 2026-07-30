@@ -120,6 +120,7 @@ MetrostroiAdvanced.Lang["SetWagNum1"]			= "Пожалуйста наведите
 MetrostroiAdvanced.Lang["SetWagNum2"]			= "Это не ваш вагон!"
 MetrostroiAdvanced.Lang["SetWagNum3"]			= "Упс, такой номер вагона уже существует! \nПопробуйте другой."
 MetrostroiAdvanced.Lang["TS760"]				= "Установите реверс по ходу 'вперед' и отправляйтесь."
+MetrostroiAdvanced.Lang["NoFreeSeats"]			= "Свободное кресло не найдено!"
 
 -- CL
 MetrostroiAdvanced.Lang["CPGameStart"]			= "При запуске игры:"

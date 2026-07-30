@@ -120,6 +120,7 @@ MetrostroiAdvanced.Lang["SetWagNum1"]			= "Lütfen vagon numarasını değiştir
 MetrostroiAdvanced.Lang["SetWagNum2"]			= "Bu senin vagonun değil!"
 MetrostroiAdvanced.Lang["SetWagNum3"]			= "Üzgünüz, bu numara zaten var! \nBaşka bir tane dene."
 MetrostroiAdvanced.Lang["TS760"]				= "Lütfen ters çeviriciyi ileri ve git olarak ayarlayın."
+MetrostroiAdvanced.Lang["NoFreeSeats"]			= "Boş koltuk bulunamadı!"
 
 -- CL
 MetrostroiAdvanced.Lang["CPGameStart"]			= "Oyun yüklenirken:"

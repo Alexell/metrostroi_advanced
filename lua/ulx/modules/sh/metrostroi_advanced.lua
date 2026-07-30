@@ -12,9 +12,30 @@ local function lang(str)
 	return MetrostroiAdvanced.Lang[str]
 end
 
+local function FindFreeSeat(train)
+	local seat_names = {
+		"InstructorsSeat",
+		"InstructorsSeat1",
+		"InstructorsSeat2",
+		"InstructorsSeat3",
+		"InstructorsSeat4",
+		"InstructorsSeat5",
+		"ExtraSeat1",
+		"ExtraSeat2",
+		"ExtraSeat3",
+	}
+	
+	for _, seat_name in pairs(seat_names) do
+		local seat = train[seat_name]
+		if IsValid(seat) and not IsValid(seat:GetDriver()) then
+			return seat
+		end
+	end
+end
+
 -- телепортация в состав
 local function GotoTrain (ply,tply,train,sit)
-	if not IsValid(train) then return end
+	if not IsValid(train) then return false end
     if IsValid(ply:GetVehicle()) then
         ply:ExitVehicle()
     end
@@ -24,16 +45,21 @@ local function GotoTrain (ply,tply,train,sit)
         ply:Freeze(true)
         ply:SetPos(pos-Vector(0,0,40))
 		if ply == tply then
-			train.DriverSeat:UseClientSideAnimation() -- пусть ебучую анимацию отрабатывает клиент
+			train.DriverSeat:UseClientSideAnimation()
 			timer.Simple(1, function()
 				train.DriverSeat:Use(ply,ply,3,1)
 				ulx.fancyLog("#s "..lang("Teleported")..lang("Teleported1"),ply:Nick())
 				ply:Freeze(false)
 			end)
 		else
-			train.InstructorsSeat:UseClientSideAnimation()
+			local free_seat = FindFreeSeat(train)
+			if not IsValid(free_seat) then
+				ply:ChatPrint(lang("NoFreeSeats"))
+				return false
+			end
+			free_seat:UseClientSideAnimation()
 			timer.Simple(1, function()
-				train.InstructorsSeat:Use(ply,ply,3,1)
+				free_seat:Use(ply,ply,3,1)
 				ulx.fancyLog("#s "..lang("Teleported")..lang("Teleported2").." #s.",ply:Nick(),tply:Nick())
 				ply:Freeze(false)
 			end)
@@ -47,6 +73,7 @@ local function GotoTrain (ply,tply,train,sit)
 			ulx.fancyLog("#s "..lang("Teleported")..lang("Teleported4").." #s.",ply:Nick(),tply:Nick())
 		end
     end
+	return true
 end
 
 ----------------------------------------------------------
@@ -649,38 +676,32 @@ function ulx.traintp( calling_ply, target_ply )
 		if v.Owner:Nick() == target_ply:Nick() then
 			if class:find("760") or class:find("717.9") or class:find("765") or class:find("740") then
 				if v.RV.KROPosition ~= 0 then
-					GotoTrain(calling_ply,target_ply,v,true)
-					teleported = true
+					teleported = GotoTrain(calling_ply,target_ply,v,true)
 				end
 			elseif class:find("722") or class:find("725") then
 				if v.Electric.CabActive ~= 0 then
-					GotoTrain(calling_ply,target_ply,v,true) 
-					teleported = true
+					teleported = GotoTrain(calling_ply,target_ply,v,true) 
 				end
 			elseif class:find("720") then
 				if v.WrenchMode ~= 0 then
 					if v.RV.KROPosition ~= 0 then
-						GotoTrain(calling_ply,target_ply,v,true)
-						teleported = true
+						teleported = GotoTrain(calling_ply,target_ply,v,true)
 					end
 				end
 			elseif class:find("718") then
 				if v.WrenchMode ~= 0 then
 					if v.KR.Position ~= 0 then
-						GotoTrain(calling_ply,target_ply,v,true)
-						teleported = true
+						teleported = GotoTrain(calling_ply,target_ply,v,true)
 					end
 				end
 			elseif class:find("agm") then
 				if v.Engine.Reverser ~= 0 then
-					GotoTrain(calling_ply,target_ply,v,true)
-					teleported = true
+					teleported = GotoTrain(calling_ply,target_ply,v,true)
 				end
 			else
 				if v.KVWrenchMode ~= 0 then
 					if v.KV.ReverserSet ~= 0 then
-						GotoTrain(calling_ply,target_ply,v,true)
-						teleported = true
+						teleported = GotoTrain(calling_ply,target_ply,v,true)
 					end
 				end
 			end
