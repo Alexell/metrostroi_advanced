@@ -360,7 +360,7 @@ if SERVER then
 		if (not IsValid(ent)) then return false end
 		if (not MetrostroiAdvanced.TrainList[ent:GetClass()]) then return false end -- только головные
 		local class = ent:GetClass()
-		if class:find("760") or class:find("717.9") or class:find("765") then
+		if class:find("760") or class:find("717.9") or class:find("765") or class:find("740") then
 			if ent.RV.KROPosition ~= 0 then
 				return true
 			end
@@ -392,9 +392,7 @@ if SERVER then
 	
 	-- Получение установленной конечной из информатора/табло/трафарета поезда
 	function MetrostroiAdvanced.GetLastStationID(train)
-		if game.GetMap():find("gm_metro_crossline") then return -1 end -- там нет трафаретов + с конфигами ЦИС и списком станций все через жопу
 		if game.GetMap():find("gm_metro_nsk_line") then return -1 end -- там нет трафаретов, информаторов и конфига ЦИС
-		if game.GetMap():find("gm_smr_1987") then return -1 end -- трафареты есть, но пустые
 		
 		if not IsValid(train) then return -1 end
 		local station = -1
@@ -415,13 +413,13 @@ if SERVER then
 		
 		-- 81-* трафареты
 		if (station == -1 and train.LastStation and train.LastStation.ID and train.LastStation.TableName) then
-			station = table.KeyFromValue(Metrostroi.Skins[train.LastStation.TableName],(tonumber(train.LastStation.ID) == 0 and 1 or train.LastStation.ID)) or -1 -- по ID 0 в Metrostroi.Skins ничего не находит
+			station = table.KeyFromValue(Metrostroi.Skins[train.LastStation.TableName], (tonumber(train.LastStation.ID) == 0 and 1 or train.LastStation.ID)) or -1 -- по ID 0 в Metrostroi.Skins ничего не находит
 			if station == "" and game.GetMap():find("gm_mus_loop") then return -1 end -- для таблички "Кольцевой" на MSS
 		end
 		
 		-- 81-720.1, 81-717.5A и 81-740 (только ASNP)
-		if (station == -1 and (class:find("720_1") or class:find("717_5a") or class:find("7401") or class:find("7404")) and train.ASNP) then
-			if train.ASNP.State < 7 then return 1111 end
+		if (station == -1 and (class:find("720_1") or class:find("717_5a") or class:find("740")) and train.ASNP) then
+			if train.ASNP.State < 7 and not class:find("740") then return 1111 end
 			local tbl = Metrostroi.ASNPSetup[train:GetNW2Int("Announcer",1)] and Metrostroi.ASNPSetup[train:GetNW2Int("Announcer",1)][train.ASNP.Line]
 			if tbl and (tbl.Loop and train.ASNP.LastStation == 0) then tbl = nil return -1 end -- когда выбран "Кольцевой", срабатывать не будет
 			station = tbl and tbl[train.ASNP.Path and train.ASNP.FirstStation or train.ASNP.LastStation][1] or -1

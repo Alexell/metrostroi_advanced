@@ -430,7 +430,7 @@ hook.Add("MetrostroiCoupled","MA.SetTrainParams",function(train,train2)
 	elseif class:find("765") then
 		train.BUIK.RouteNumber = rnum
 		train.BUKP.RouteNumber = rnum
-	elseif Metrostroi.Version == 1537278077 and train.RouteNumber then
+	elseif Metrostroi.Version == 1537278077 and train.RouteNumber and not class:find("740") then
 		if rnum < 10 then
 			rnum = "0"..tostring(rnum).."0"
 		else
@@ -439,7 +439,7 @@ hook.Add("MetrostroiCoupled","MA.SetTrainParams",function(train,train2)
 		train.RouteNumber.RouteNumber = rnum
 		train:SetNW2String("RouteNumber",rnum)
 	end
-	if train.ASNP then
+	if train.ASNP and not class:find("740") then
 		if Metrostroi.Version == 1537278077 then
 			rnum = rnum / 10
 		end
@@ -534,7 +534,7 @@ timer.Simple(4,function()
 					if (#ctrain.Announcer.Schedule ~= 0) then return end
 					ctrain.BMCIS:Trigger("R_Program1",1)
 				elseif (ctrain.BUCIK) then
-					if ctrain:GetNW2Bool("BUCIK:Arrived",true) then return end
+					if ctrain.BUCIK.Arrived then return end
 					if (#ctrain.Announcer.Schedule ~= 0) then return end
 					ctrain.BUCIK:Trigger("StartProgram",1)
 				elseif (ctrain.ASNP) then
